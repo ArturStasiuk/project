@@ -20,7 +20,7 @@ class Config {
         // Unikelne klasy i ID dla tascBar
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
-        this.positionTascBar = 'bottom'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
+        this.positionTascBar = 'top'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
 
 
     }
@@ -67,7 +67,7 @@ class Config {
         tascBar.classList.add(`tascbar-${this.positionTascBar}`);
         // Dodanie testowej ikony (emoji)
         const icon = document.createElement('span');
-        icon.textContent = '📦';
+        icon.textContent = '⬅️';
         icon.className = 'tascbar-icon';
         tascBar.appendChild(icon);
         return tascBar;
