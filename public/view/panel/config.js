@@ -21,7 +21,7 @@ class Config {
         // Unikelne klasy i ID dla tascBar
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
-        this.positionTascBar = 'left'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
+        this.positionTascBar = 'bottom'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
 
 
     }
