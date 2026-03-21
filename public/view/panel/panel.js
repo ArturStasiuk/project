@@ -1,51 +1,54 @@
-import { config }
+import { config } from './config.js';
 
 class Panel{
     constructor(parent) {
-        this.parent = parent; // Przechowywanie referencji do rodzica, jeśli jest potrzebna
-        /** Inicjalizacja panelu konfiguracji */
-        if (!document.getElementById('panel-css')) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = './view/css/panel.css';
-            link.id = 'panel-css';
-            document.head.appendChild(link);
-        }
-        // sciezka do tapety panelu
-        this.wallpapers=['./view/css/wallpapers/wallpapers1.jpg'];
-
-
-        // Unikalne klasy i ID dla panelu 
-        this.classNamePanel = 'panel';
-        this.idPanel= 'id_panel';
-        // Unikelne klasy i ID dla tascBar
-        this.classNameTascBar = 'tascBar';
-        this.idTascBar ='idTascBar'
-    
+        this.parent = parent; // Przechowywanie referencji do rodzica, jeśli 
+        this.config = new config(this); // Inicjalizacja konfiguracji panelu
 
     }
 
 
     // wyswietlenie panelu 
     async showPanel() {
-        let panel = document.getElementById(this.idPanel);
+        let panel = document.getElementById(this.config.idPanel);
         if (panel) {
             panel.style.display = 'block';
         } else {
-            document.body.appendChild(await this.configPanel());
+            // Utwórz panel
+            panel = await this.config.configPanel();
+            document.body.appendChild(panel);
         }
     }
 
     // wylaczanie panelu 
     async hidePanel() {
-        const panel = document.getElementById(this.idPanel);
+        const panel = document.getElementById(this.config.idPanel);
         if (panel) {
             panel.remove();
         }
     }
 
-
-
+    // wlaczenie tascBar
+    async showTascBar() {
+        let tascBar = document.getElementById(this.config.idTascBar);
+        if (tascBar) {
+            tascBar.style.display = 'block';
+        } else {
+            // Utwórz tascBar
+            tascBar = await this.config.configTascBar();
+            const panel = document.getElementById(this.config.idPanel);
+            if (panel) {
+                panel.appendChild(tascBar);
+            }
+        }
+    }
+    // wylaczenie tascBar
+    async hideTascBar() {
+        const tascBar = document.getElementById(this.config.idTascBar);
+        if (tascBar) {
+            tascBar.remove();
+        }
+    }
 
 
 

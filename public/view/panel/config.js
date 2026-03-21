@@ -16,9 +16,11 @@ class Config {
         // Unikalne klasy i ID dla panelu 
         this.classNamePanel = 'panel';
         this.idPanel = 'id_panel';
+        
         // Unikelne klasy i ID dla tascBar
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
+        this.positionTascBar = 'bottom'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
 
 
     }
@@ -69,6 +71,53 @@ class Config {
         return panel;
     }
 
+    async configTascBar() {
+        const tascBar = document.createElement('div');
+        tascBar.className = this.classNameTascBar;
+        tascBar.id = this.idTascBar;
+
+        // Dopasowanie rozmiaru i pozycji
+        tascBar.style.position = 'absolute';
+        if (this.positionTascBar === 'top') {
+            tascBar.style.top = '0';
+            tascBar.style.left = '0';
+            tascBar.style.width = '100%';
+            tascBar.style.height = '48px';
+            tascBar.style.flexDirection = 'row';
+        } else if (this.positionTascBar === 'bottom') {
+            tascBar.style.bottom = '0';
+            tascBar.style.left = '0';
+            tascBar.style.width = '100%';
+            tascBar.style.height = '48px';
+            tascBar.style.flexDirection = 'row';
+        } else if (this.positionTascBar === 'left') {
+            tascBar.style.top = '0';
+            tascBar.style.left = '0';
+            tascBar.style.width = '48px';
+            tascBar.style.height = '100%';
+            tascBar.style.flexDirection = 'column';
+        } else if (this.positionTascBar === 'right') {
+            tascBar.style.top = '0';
+            tascBar.style.right = '0';
+            tascBar.style.width = '48px';
+            tascBar.style.height = '100%';
+            tascBar.style.flexDirection = 'column';
+        }
+        tascBar.style.display = 'flex';
+        tascBar.style.alignItems = 'center';
+        tascBar.style.justifyContent = 'center';
+        tascBar.style.background = 'rgba(255,255,255,0.7)';
+        tascBar.style.zIndex = '10';
+
+        // Dodanie testowej ikony (emoji)
+        const icon = document.createElement('span');
+        icon.textContent = '📦';
+        icon.style.fontSize = '2rem';
+        icon.style.cursor = 'pointer';
+        tascBar.appendChild(icon);
+
+        return tascBar;
+    }
 
 
 
@@ -78,3 +127,5 @@ class Config {
 
 
 }
+
+export { Config as config };

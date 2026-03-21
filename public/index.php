@@ -17,8 +17,7 @@ import { Wiew } from "./view/js/view.js";
 
 const wiew = new Wiew();
 await wiew.showPanel();
-await wiew.hidePanel();
-await wiew.showPanel();
+await wiew.showTascBar();
 </script>
 
 

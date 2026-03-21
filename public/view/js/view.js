@@ -17,7 +17,14 @@ class Wiew {
     async hidePanel() {
         await this.panel.hidePanel();
     }
-    
+    /// wyswietlenie tascBar
+    async showTascBar() {
+        await this.panel.showTascBar();
+    }
+    /// ukrycie tascBar
+    async hideTascBar() {
+        await this.panel.hideTascBar();
+    }
 
 
 
