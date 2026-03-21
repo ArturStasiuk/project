@@ -73,41 +73,23 @@ class Config {
      * @param {Object} config konfiguracja ikony/menu
      * @returns {HTMLElement}
      */
-    async createTascBarIcon(config) {
+    createTascBarIcon(config) {
         // Kontener ikony/menu
         const iconWrap = document.createElement('div');
         iconWrap.className = 'tascbar-icon';
         iconWrap.id = config.idIcon || '';
-        iconWrap.style.display = 'flex';
-        iconWrap.style.alignItems = 'center';
-        iconWrap.style.justifyContent = 'center';
-        iconWrap.style.cursor = 'pointer';
-        iconWrap.style.margin = '0 4px';
 
         // Ikona lub tekst
         const iconSpan = document.createElement('span');
-        iconSpan.style.display = 'inline-flex';
-        iconSpan.style.alignItems = 'center';
-        iconSpan.style.justifyContent = 'center';
-        iconSpan.style.border = '1.5px solid rgba(0,0,0,0.13)';
-        iconSpan.style.borderRadius = '50%';
-        iconSpan.style.background = 'rgba(255,255,255,0.18)';
-        iconSpan.style.padding = '0.15em';
-        iconSpan.style.boxSizing = 'border-box';
-        iconSpan.style.transition = 'box-shadow 0.2s, border-color 0.2s, background 0.2s';
-        iconSpan.style.fontSize = '1em';
-        iconSpan.style.width = '1.5em';
-        iconSpan.style.height = '1.5em';
+        iconSpan.className = 'tascbar-icon-emoji';
         iconSpan.textContent = config.icon || config.title || '';
         iconWrap.appendChild(iconSpan);
 
         // Tooltip/tekst obok ikony
         if (config.title) {
             const titleSpan = document.createElement('span');
+            titleSpan.className = 'tascbar-icon-title';
             titleSpan.textContent = config.title;
-            titleSpan.style.marginLeft = '0.5em';
-            titleSpan.style.fontSize = '1em';
-            titleSpan.style.userSelect = 'none';
             iconWrap.appendChild(titleSpan);
         }
 
@@ -120,35 +102,20 @@ class Config {
         if (Array.isArray(config.items) && config.items.length > 0) {
             // Proste menu rozwijane
             const menu = document.createElement('div');
-            menu.style.position = 'absolute';
-            menu.style.top = '100%';
-            menu.style.left = '0';
-            menu.style.background = 'white';
-            menu.style.border = '1px solid #ccc';
-            menu.style.borderRadius = '6px';
-            menu.style.boxShadow = '0 4px 16px 0 rgba(0,0,0,0.13)';
-            menu.style.padding = '4px 0';
+            menu.className = 'tascbar-menu';
             menu.style.display = 'none';
-            menu.style.minWidth = '120px';
-            menu.style.zIndex = '100';
 
             config.items.forEach(item => {
                 const itemEl = document.createElement('div');
-                itemEl.style.display = 'flex';
-                itemEl.style.alignItems = 'center';
-                itemEl.style.padding = '6px 12px';
-                itemEl.style.cursor = 'pointer';
-                itemEl.style.fontSize = '1em';
-                itemEl.style.transition = 'background 0.2s';
-                itemEl.addEventListener('mouseenter', () => itemEl.style.background = '#f0f0f0');
-                itemEl.addEventListener('mouseleave', () => itemEl.style.background = 'transparent');
+                itemEl.className = 'tascbar-menu-item';
                 if (item.icon) {
                     const itemIcon = document.createElement('span');
+                    itemIcon.className = 'tascbar-menu-item-icon';
                     itemIcon.textContent = item.icon;
-                    itemIcon.style.marginRight = '0.5em';
                     itemEl.appendChild(itemIcon);
                 }
                 const itemLabel = document.createElement('span');
+                itemLabel.className = 'tascbar-menu-item-label';
                 itemLabel.textContent = item.label;
                 itemEl.appendChild(itemLabel);
                 if (typeof item.onClick === 'function') {
@@ -157,6 +124,8 @@ class Config {
                         menu.style.display = 'none';
                     });
                 }
+                itemEl.addEventListener('mouseenter', () => itemEl.classList.add('hover'));
+                itemEl.addEventListener('mouseleave', () => itemEl.classList.remove('hover'));
                 menu.appendChild(itemEl);
             });
 
