@@ -62,14 +62,32 @@ class Panel {
             }
         }
         tascBar.appendChild(icon);
-
+    }
+    // odswiezanie ikonu/meniu w tascBar na podstawie configuracji 
+    async refreshIconTascBar(data) {
+        if (!data || !data.idIcon) return;
+        const tascBar = document.getElementById(this.config.idTascBar);
+        if (!tascBar) return;
+        const oldIcon = document.getElementById(data.idIcon);
+        if (!oldIcon) return;
+        // Utwórz nowy element ikony/menu na podstawie aktualnej konfiguracji
+        const newIcon = await this.config.createTascBarIcon(data);
+        tascBar.replaceChild(newIcon, oldIcon);
+    }
+    // usuwanie ikonu/meniu z tascBar na podstawie id ikony
+    async removeIconTascBar(idIcon) {
+        if (!idIcon) return;
+        const tascBar = document.getElementById(this.config.idTascBar);
+        if (!tascBar) return;
+        const icon = document.getElementById(idIcon);
+        if (icon) {
+            tascBar.removeChild(icon);
+        }
     }
 
 
 
 
-
-    
 
 
 }

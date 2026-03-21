@@ -61,7 +61,13 @@ class Wiew {
             ]
         };
         await this.panel.addIconTascBar(data);
-
+        const data2 = {
+            idIcon: `icon_22`, // id ikony w tasbar 
+            title: 'Zadania', // teks jezeli podano po wyswietlany po prawej srony ikony
+            icon: '📋', // wyglad ikony jezeli podano jezeli nie wyswietlany jest tekst 
+            onClick: async (el) => { /* wywolanie jakiejs funkcji po kliknieciu w tekst badz icokne  */ },
+        };
+        await this.panel.addIconTascBar(data2);
     }
 
 
