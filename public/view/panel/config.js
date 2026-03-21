@@ -69,6 +69,8 @@ class Config {
         // Tryb zwijania/rozwijania dla left/right
         if (this.positionTascBar === 'left' || this.positionTascBar === 'right') {
             tascBar.classList.add('tascbar-collapsed');
+            // Referencja do menu, ustawiana przez createTascBarIcon
+            tascBar._openMenu = null;
             tascBar.addEventListener('mouseenter', () => {
                 tascBar.classList.remove('tascbar-collapsed');
                 tascBar.classList.add('tascbar-expanded');
@@ -76,6 +78,11 @@ class Config {
             tascBar.addEventListener('mouseleave', () => {
                 tascBar.classList.remove('tascbar-expanded');
                 tascBar.classList.add('tascbar-collapsed');
+                // Ukryj menu jeśli otwarte
+                if (tascBar._openMenu) {
+                    tascBar._openMenu.style.display = 'none';
+                    tascBar._openMenu = null;
+                }
             });
         }
         return tascBar;
@@ -144,8 +151,14 @@ class Config {
             }
 
             // Funkcja zamykająca menu
-            function closeMenu() {
+            const tascBar = document.getElementById(this.idTascBar);
+            function closeMenuAndCollapseBar() {
                 menu.style.display = 'none';
+                if (tascBar && (tascBar.classList.contains('tascbar-expanded'))) {
+                    tascBar.classList.remove('tascbar-expanded');
+                    tascBar.classList.add('tascbar-collapsed');
+                }
+                if (tascBar) tascBar._openMenu = null;
             }
             config.items.forEach(item => {
                 const itemEl = document.createElement('div');
@@ -160,13 +173,13 @@ class Config {
                 itemLabel.className = 'tascbar-menu-item-label' + (item.classMenuItemLabel ? ' ' + item.classMenuItemLabel : '');
                 itemLabel.textContent = item.label;
                 itemEl.appendChild(itemLabel);
-                // Zawsze zamykaj menu po kliknięciu w opcję
+                // Zawsze zamykaj menu po kliknięciu w opcję i zwijaj pasek
                 itemEl.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Zapobiega zamknięciu menu przez globalny event click
+                    e.stopPropagation();
                     if (typeof item.onClick === 'function') {
                         item.onClick(itemEl, e);
                     }
-                    closeMenu();
+                    closeMenuAndCollapseBar();
                 });
                 itemEl.addEventListener('mouseenter', () => itemEl.classList.add(item.classMenuItemHover || 'hover'));
                 itemEl.addEventListener('mouseleave', () => itemEl.classList.remove(item.classMenuItemHover || 'hover'));
@@ -176,11 +189,18 @@ class Config {
             // Pokaz/ukryj menu po kliknięciu
             iconWrap.addEventListener('click', (e) => {
                 e.stopPropagation();
-                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                if (menu.style.display === 'block') {
+                    menu.style.display = 'none';
+                    if (tascBar) tascBar._openMenu = null;
+                } else {
+                    menu.style.display = 'block';
+                    if (tascBar) tascBar._openMenu = menu;
+                }
             });
             // Ukryj menu po kliknięciu poza
             document.addEventListener('click', () => {
                 menu.style.display = 'none';
+                if (tascBar) tascBar._openMenu = null;
             });
             iconWrap.style.position = 'relative';
             iconWrap.appendChild(menu);
