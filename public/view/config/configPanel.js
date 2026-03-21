@@ -10,7 +10,12 @@ class configPanel{
             link.id = 'panel-css';
             document.head.appendChild(link);
         }
+        // sciezka do tapety panelu
+        this.wallpapers=['./view/css/wallpapers/wallpapers1.jpg'];
+
+
         // Unikalne klasy i ID dla panelu 
+        
         this.nameClass = 'panel';
         this.Id = 'id_panel';
     }
@@ -27,6 +32,22 @@ class configPanel{
         panel.style.height = window.innerHeight + 'px';
         panel.style.boxSizing = 'border-box';
 
+        // Dodanie tapety, jeśli istnieje
+        let wallpaperImg = null;
+        if (this.wallpapers && this.wallpapers.length > 0 && this.wallpapers[0]) {
+            wallpaperImg = document.createElement('img');
+            wallpaperImg.src = this.wallpapers[0];
+            wallpaperImg.alt = 'wallpaper';
+            wallpaperImg.style.position = 'absolute';
+            wallpaperImg.style.top = '0';
+            wallpaperImg.style.left = '0';
+            wallpaperImg.style.width = '100%';
+            wallpaperImg.style.height = '100%';
+            wallpaperImg.style.objectFit = 'cover';
+            wallpaperImg.style.zIndex = '0';
+            panel.appendChild(wallpaperImg);
+        }
+
         // Aktualizacja rozmiaru przy zmianie okna
         const resizeHandler = () => {
             panel.style.width = window.innerWidth + 'px';
@@ -42,7 +63,9 @@ class configPanel{
         });
 
         const p = document.createElement('p');
-      //  p.textContent = 'Panel konfiguracji';
+        //  p.textContent = 'Panel konfiguracji';
+        p.style.position = 'relative';
+        p.style.zIndex = '1';
         panel.appendChild(p);
         return panel;
     }
