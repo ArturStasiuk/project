@@ -40,22 +40,22 @@ class Wiew {
                     label: 'Przeglądaj',
                     icon: '🔍',
                     onClick: async (el) => {
-                        /* wywolanie jakiejs funkcji */
+                       console.log('Kliknięto Przeglądaj');
                 }
                 },
                 {
                     label: 'Dodaj', icon: '➕', onClick: async (el) => {
-                        /* wywolanie jakiejs funkcji */
+                        console.log('Kliknięto Dodaj');
                 }
                 },
                 {
                     label: 'Edytuj', icon: '✏️', onClick: async (el) => {
-                        /* wywolanie jakiejs funkcji */
+                        console.log('Kliknięto Edytuj');
                     }
                 },
                 {
                     label: 'Usuń', icon: '🗑️', onClick: async (el) => {
-                        /* wywolanie jakiejs funkcji */
+                        console.log('Kliknięto Usuń');
                     }
                 }
             ]

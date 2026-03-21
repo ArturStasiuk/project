@@ -105,6 +105,10 @@ class Config {
             menu.className = 'tascbar-menu' + (config.classMenu ? ' ' + config.classMenu : '');
             menu.style.display = 'none';
 
+            // Funkcja zamykająca menu
+            function closeMenu() {
+                menu.style.display = 'none';
+            }
             config.items.forEach(item => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'tascbar-menu-item' + (item.classMenuItem ? ' ' + item.classMenuItem : '');
@@ -118,12 +122,13 @@ class Config {
                 itemLabel.className = 'tascbar-menu-item-label' + (item.classMenuItemLabel ? ' ' + item.classMenuItemLabel : '');
                 itemLabel.textContent = item.label;
                 itemEl.appendChild(itemLabel);
-                // Zamykaj menu po kliknięciu w dowolny element
+                // Zawsze zamykaj menu po kliknięciu w opcję
                 itemEl.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Zapobiega zamknięciu menu przez globalny event click
                     if (typeof item.onClick === 'function') {
                         item.onClick(itemEl, e);
                     }
-                    menu.style.display = 'none';
+                    closeMenu();
                 });
                 itemEl.addEventListener('mouseenter', () => itemEl.classList.add(item.classMenuItemHover || 'hover'));
                 itemEl.addEventListener('mouseleave', () => itemEl.classList.remove(item.classMenuItemHover || 'hover'));
