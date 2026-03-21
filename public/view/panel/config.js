@@ -21,7 +21,7 @@ class Config {
         // Unikelne klasy i ID dla tascBar
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
-        this.positionTascBar = 'top'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
+        this.positionTascBar = 'left'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
 
 
     }
@@ -65,6 +65,19 @@ class Config {
         tascBar.id = this.idTascBar;
         // Dopasowanie rozmiaru i pozycji
         tascBar.classList.add(`tascbar-${this.positionTascBar}`);
+
+        // Tryb zwijania/rozwijania dla left/right
+        if (this.positionTascBar === 'left' || this.positionTascBar === 'right') {
+            tascBar.classList.add('tascbar-collapsed');
+            tascBar.addEventListener('mouseenter', () => {
+                tascBar.classList.remove('tascbar-collapsed');
+                tascBar.classList.add('tascbar-expanded');
+            });
+            tascBar.addEventListener('mouseleave', () => {
+                tascBar.classList.remove('tascbar-expanded');
+                tascBar.classList.add('tascbar-collapsed');
+            });
+        }
         return tascBar;
     }
 
@@ -104,6 +117,31 @@ class Config {
             const menu = document.createElement('div');
             menu.className = 'tascbar-menu' + (config.classMenu ? ' ' + config.classMenu : '');
             menu.style.display = 'none';
+
+            // Ustal pozycję menu w zależności od położenia taskbara
+            let tascBarPosition = this.positionTascBar || 'top';
+            if (config.positionTascBar) tascBarPosition = config.positionTascBar;
+            if (tascBarPosition === 'bottom') {
+                menu.style.top = 'auto';
+                menu.style.bottom = '100%';
+                menu.style.left = '0';
+                menu.style.right = 'auto';
+            } else if (tascBarPosition === 'top') {
+                menu.style.top = '100%';
+                menu.style.bottom = 'auto';
+                menu.style.left = '0';
+                menu.style.right = 'auto';
+            } else if (tascBarPosition === 'left') {
+                menu.style.top = '0';
+                menu.style.bottom = 'auto';
+                menu.style.left = '100%';
+                menu.style.right = 'auto';
+            } else if (tascBarPosition === 'right') {
+                menu.style.top = '0';
+                menu.style.bottom = 'auto';
+                menu.style.left = 'auto';
+                menu.style.right = '100%';
+            }
 
             // Funkcja zamykająca menu
             function closeMenu() {

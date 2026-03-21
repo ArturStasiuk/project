@@ -190,6 +190,8 @@
     align-items: flex-start;
     justify-content: flex-start;
     font-size: 15px;
+    transition: width 0.2s cubic-bezier(.4,2,.6,1);
+    overflow: visible;
 }
 .tascbar-right {
     top: 0;
@@ -198,6 +200,22 @@
     height: 100%;
     flex-direction: column;
     font-size: 15px;
+    transition: width 0.2s cubic-bezier(.4,2,.6,1);
+    overflow: visible;
+}
+
+.tascbar-collapsed {
+    width: 32px !important;
+}
+.tascbar-expanded {
+    width: 220px !important; /* domyślnie, JS może nadpisać na max szerokość tekstu */
+}
+.tascbar-left .tascbar-icon-title,
+.tascbar-right .tascbar-icon-title {
+    display: none;
+}
+.tascbar-expanded .tascbar-icon-title {
+    display: inline-block;
 }
 
 
