@@ -1,3 +1,8 @@
 .panel {
-    background-color: #487958;
+    background-color: #26914a;
+    color: white;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), 0 1.5px 4px 0 rgba(0, 0, 0, 0.781);
+    /* border-radius: 18px; */
+    border: 1.5px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(2px);
 }

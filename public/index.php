@@ -13,10 +13,12 @@
 
 
 <script type="module">
-import { Panel } from "./view/js/panel.js";
+import { Wiew } from "./view/js/view.js";
 
-const panel = new Panel();
-panel.showPanel();
+const wiew = new Wiew();
+await wiew.showPanel();
+await wiew.hidePanel();
+await wiew.showPanel();
 </script>
 
 
