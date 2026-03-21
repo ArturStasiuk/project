@@ -62,14 +62,8 @@ class Config {
         const tascBar = document.createElement('div');
         tascBar.className = this.classNameTascBar;
         tascBar.id = this.idTascBar;
-
         // Dopasowanie rozmiaru i pozycji
         tascBar.classList.add(`tascbar-${this.positionTascBar}`);
-        // Dodanie testowej ikony (emoji)
-        const icon = document.createElement('span');
-        icon.textContent = '⬅️';
-        icon.className = 'tascbar-icon';
-        tascBar.appendChild(icon);
         return tascBar;
     }
 
