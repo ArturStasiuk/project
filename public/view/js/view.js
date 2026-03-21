@@ -3,7 +3,8 @@ import { Panel } from "../panel/panel.js";
 class Wiew { 
     constructor() {
         
-     this.panel = new Panel(this);
+        this.panel = new Panel(this);
+        
 
      
  }
@@ -26,7 +27,7 @@ class Wiew {
         await this.panel.hideTascBar();
     }
     // dodanie ikony/meniu do tascBar
-    async addIconTascBar() {
+    async addIconTascBar(data) {
        const data = {
             idIcon: `icon_21`, // id ikony w tasbar 
             title: 'Projekty', // teks jezeli podano po wyswietlany po prawej srony ikony
@@ -68,6 +69,14 @@ class Wiew {
             onClick: async (el) => { /* wywolanie jakiejs funkcji po kliknieciu w tekst badz icokne  */ },
         };
         await this.panel.addIconTascBar(data2);
+    }
+    // refreszowanie ikony/meniu w tascBar na podstawie configuracji 
+    async refreshIconTascBar(data) {
+        await this.panel.refreshIconTascBar(data);
+    }
+    // usuwanie ikony/meniu z tascBar na podstawie idIcon
+    async removeIconTascBar(idIcon) {
+        await this.panel.removeIconTascBar(idIcon);
     }
 
 

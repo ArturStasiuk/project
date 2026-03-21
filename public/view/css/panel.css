@@ -207,9 +207,12 @@
 .tascbar-collapsed {
     width: 32px !important;
 }
+/*
 .tascbar-expanded {
-    /* szerokość ustawiana dynamicznie przez JS */
+     szerokość ustawiana dynamicznie przez JS 
 }
+*/
+
 .tascbar-left .tascbar-icon-title,
 .tascbar-right .tascbar-icon-title {
     display: none;
