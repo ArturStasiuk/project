@@ -76,19 +76,19 @@ class Config {
     createTascBarIcon(config) {
         // Kontener ikony/menu
         const iconWrap = document.createElement('div');
-        iconWrap.className = 'tascbar-icon';
+        iconWrap.className = 'tascbar-icon' + (config.classIconWrap ? ' ' + config.classIconWrap : '');
         iconWrap.id = config.idIcon || '';
 
         // Ikona lub tekst
         const iconSpan = document.createElement('span');
-        iconSpan.className = 'tascbar-icon-emoji';
+        iconSpan.className = 'tascbar-icon-emoji' + (config.classIcon ? ' ' + config.classIcon : '');
         iconSpan.textContent = config.icon || config.title || '';
         iconWrap.appendChild(iconSpan);
 
         // Tooltip/tekst obok ikony
         if (config.title) {
             const titleSpan = document.createElement('span');
-            titleSpan.className = 'tascbar-icon-title';
+            titleSpan.className = 'tascbar-icon-title' + (config.classTitle ? ' ' + config.classTitle : '');
             titleSpan.textContent = config.title;
             iconWrap.appendChild(titleSpan);
         }
@@ -102,30 +102,31 @@ class Config {
         if (Array.isArray(config.items) && config.items.length > 0) {
             // Proste menu rozwijane
             const menu = document.createElement('div');
-            menu.className = 'tascbar-menu';
+            menu.className = 'tascbar-menu' + (config.classMenu ? ' ' + config.classMenu : '');
             menu.style.display = 'none';
 
             config.items.forEach(item => {
                 const itemEl = document.createElement('div');
-                itemEl.className = 'tascbar-menu-item';
+                itemEl.className = 'tascbar-menu-item' + (item.classMenuItem ? ' ' + item.classMenuItem : '');
                 if (item.icon) {
                     const itemIcon = document.createElement('span');
-                    itemIcon.className = 'tascbar-menu-item-icon';
+                    itemIcon.className = 'tascbar-menu-item-icon' + (item.classMenuItemIcon ? ' ' + item.classMenuItemIcon : '');
                     itemIcon.textContent = item.icon;
                     itemEl.appendChild(itemIcon);
                 }
                 const itemLabel = document.createElement('span');
-                itemLabel.className = 'tascbar-menu-item-label';
+                itemLabel.className = 'tascbar-menu-item-label' + (item.classMenuItemLabel ? ' ' + item.classMenuItemLabel : '');
                 itemLabel.textContent = item.label;
                 itemEl.appendChild(itemLabel);
-                if (typeof item.onClick === 'function') {
-                    itemEl.addEventListener('click', (e) => {
+                // Zamykaj menu po kliknięciu w dowolny element
+                itemEl.addEventListener('click', (e) => {
+                    if (typeof item.onClick === 'function') {
                         item.onClick(itemEl, e);
-                        menu.style.display = 'none';
-                    });
-                }
-                itemEl.addEventListener('mouseenter', () => itemEl.classList.add('hover'));
-                itemEl.addEventListener('mouseleave', () => itemEl.classList.remove('hover'));
+                    }
+                    menu.style.display = 'none';
+                });
+                itemEl.addEventListener('mouseenter', () => itemEl.classList.add(item.classMenuItemHover || 'hover'));
+                itemEl.addEventListener('mouseleave', () => itemEl.classList.remove(item.classMenuItemHover || 'hover'));
                 menu.appendChild(itemEl);
             });
 
