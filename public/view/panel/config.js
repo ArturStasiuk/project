@@ -71,13 +71,39 @@ class Config {
             tascBar.classList.add('tascbar-collapsed');
             // Referencja do menu, ustawiana przez createTascBarIcon
             tascBar._openMenu = null;
+
+            // Funkcja do dynamicznego ustawiania szerokości
+            function setDynamicWidth() {
+                // Pobierz wszystkie tytuły ikon
+                const titles = tascBar.querySelectorAll('.tascbar-icon-title');
+                let maxWidth = 0;
+                titles.forEach(title => {
+                    // Utwórz tymczasowy span do pomiaru szerokości
+                    const temp = document.createElement('span');
+                    temp.style.visibility = 'hidden';
+                    temp.style.position = 'absolute';
+                    temp.style.fontSize = window.getComputedStyle(title).fontSize;
+                    temp.style.fontWeight = window.getComputedStyle(title).fontWeight;
+                    temp.style.fontFamily = window.getComputedStyle(title).fontFamily;
+                    temp.textContent = title.textContent;
+                    document.body.appendChild(temp);
+                    maxWidth = Math.max(maxWidth, temp.offsetWidth);
+                    document.body.removeChild(temp);
+                });
+                // Szerokość: ikona + odstęp + max tekst + marginesy
+                let newWidth = 32 + 8 + maxWidth + 24; // 32px ikona, 8px margines, 24px zapas
+                tascBar.style.width = newWidth + 'px';
+            }
+
             tascBar.addEventListener('mouseenter', () => {
                 tascBar.classList.remove('tascbar-collapsed');
                 tascBar.classList.add('tascbar-expanded');
+                setDynamicWidth();
             });
             tascBar.addEventListener('mouseleave', () => {
                 tascBar.classList.remove('tascbar-expanded');
                 tascBar.classList.add('tascbar-collapsed');
+                tascBar.style.width = '';
                 // Ukryj menu jeśli otwarte
                 if (tascBar._openMenu) {
                     tascBar._openMenu.style.display = 'none';

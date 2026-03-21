@@ -208,7 +208,7 @@
     width: 32px !important;
 }
 .tascbar-expanded {
-    width: 220px !important; /* domyślnie, JS może nadpisać na max szerokość tekstu */
+    /* szerokość ustawiana dynamicznie przez JS */
 }
 .tascbar-left .tascbar-icon-title,
 .tascbar-right .tascbar-icon-title {
