@@ -1,5 +1,4 @@
-
-class configPanel{
+class Config {
     constructor(parent) {
         this.parent = parent; // Przechowywanie referencji do rodzica, jeśli jest potrzebna
         /** Inicjalizacja panelu konfiguracji */
@@ -11,19 +10,24 @@ class configPanel{
             document.head.appendChild(link);
         }
         // sciezka do tapety panelu
-        this.wallpapers=['./view/css/wallpapers/wallpapers1.jpg'];
+        this.wallpapers = ['./view/css/wallpapers/wallpapers1.jpg'];
 
 
         // Unikalne klasy i ID dla panelu 
-        
-        this.nameClass = 'panel';
-        this.Id = 'id_panel';
+        this.classNamePanel = 'panel';
+        this.idPanel = 'id_panel';
+        // Unikelne klasy i ID dla tascBar
+        this.classNameTascBar = 'tascBar';
+        this.idTascBar = 'idTascBar'
+
+
     }
 
+    
     async configPanel() {
         const panel = document.createElement('div');
-        panel.className = this.nameClass;
-        panel.id = this.Id;
+        panel.className = this.classNamePanel;
+        panel.id = this.idPanel;
         // Dynamiczne dopasowanie rozmiaru
         panel.style.position = 'fixed';
         panel.style.top = '0';
@@ -62,39 +66,15 @@ class configPanel{
             }
         });
 
-        const p = document.createElement('p');
-        //  p.textContent = 'Panel konfiguracji';
-        p.style.position = 'relative';
-        p.style.zIndex = '1';
-        panel.appendChild(p);
         return panel;
     }
-    // wyswietlenie panelu 
-    async showPanel() {
-        let panel = document.getElementById(this.Id);
-        if (panel) {
-            panel.style.display = 'block';
-        } else {
-            document.body.appendChild(await this.configPanel());
-        }
-    }
-
-    // wylaczanie panelu 
-    async hidePanel() {
-        const panel = document.getElementById(this.Id);
-        if (panel) {
-            panel.remove();
-        }
-    }
 
 
 
 
 
 
-    
+
 
 
 }
-
-export { configPanel };

@@ -1,9 +1,9 @@
-import { configPanel } from "../config/configPanel.js";
+import { Panel } from "../panel/panel.js";
 
 class Wiew { 
     constructor() {
         
-     this.panel = new configPanel(this);
+     this.panel = new Panel(this);
 
      
  }
