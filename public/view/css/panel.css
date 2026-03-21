@@ -18,7 +18,7 @@
     color: white;
     box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), 0 1.5px 4px 0 rgba(0, 0, 0, 0.781);
     /* border-radius: 32px; */
-    border: 1.5px solid rgba(255,255,255,0.22);
+
     backdrop-filter: blur(2px);
 
 }
@@ -31,7 +31,7 @@
     justify-content: flex-start;
     background: rgba(255,255,255,0.41);
     z-index: 10;
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.18), 0 1px 2px 0 rgba(0,0,0,0.10);
+    box-shadow: 0 6px 24px 0 rgba(0,0,0,0.22), 0 2px 8px 0 rgba(0,0,0,0.13);
    
     border: 1.5px solid rgba(0,0,0,0.10);
 }

@@ -1,6 +1,6 @@
 import { config } from './config.js';
 
-class Panel{
+class Panel {
     constructor(parent) {
         this.parent = parent; // Przechowywanie referencji do rodzica, jeśli 
         this.config = new config(this); // Inicjalizacja konfiguracji panelu
@@ -49,8 +49,13 @@ class Panel{
             tascBar.remove();
         }
     }
+    // // twozy wyglad dla ikon/meniu w tascBar na podstawie configuracji a satempnie dodaje ja do taskbar 
+    async addIconTascBar(data) {
+        const icon = await this.config.createTascBarIcon(data);
 
-    
+    }
+
+
 
 
 
