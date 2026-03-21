@@ -1,9 +1,68 @@
+.panel-wallpaper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
 .panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
     background-color: #26914a;
     color: white;
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), 0 1.5px 4px 0 rgba(0, 0, 0, 0.781);
+    box-shadow: 0 8px 38px 0 rgba(0,0,0,0.37), 0 1.5px 4px 0 rgba(0, 0, 0, 0.781);
     /* border-radius: 18px; */
     border: 1.5px solid rgba(255,255,255,0.18);
     backdrop-filter: blur(2px);
- 
+
+}
+
+/* TascBar - pozycje */
+.tascBar {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.41);
+    z-index: 10;
+}
+.tascbar-top {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 38px;
+    flex-direction: row;
+}
+.tascbar-bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 38px;
+    flex-direction: row;
+}
+.tascbar-left {
+    top: 0;
+    left: 0;
+    width: 38px;
+    height: 100%;
+    flex-direction: column;
+}
+.tascbar-right {
+    top: 0;
+    right: 0;
+    width: 38px;
+    height: 100%;
+    flex-direction: column;
+}
+
+/* Ikona w tascBar */
+.tascbar-icon {
+    font-size: 2rem;
+    cursor: pointer;
 }

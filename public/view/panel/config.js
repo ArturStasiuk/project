@@ -16,7 +16,7 @@ class Config {
         // Unikalne klasy i ID dla panelu 
         this.classNamePanel = 'panel';
         this.idPanel = 'id_panel';
-        
+
         // Unikelne klasy i ID dla tascBar
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
@@ -30,13 +30,6 @@ class Config {
         const panel = document.createElement('div');
         panel.className = this.classNamePanel;
         panel.id = this.idPanel;
-        // Dynamiczne dopasowanie rozmiaru
-        panel.style.position = 'fixed';
-        panel.style.top = '0';
-        panel.style.left = '0';
-        panel.style.width = window.innerWidth + 'px';
-        panel.style.height = window.innerHeight + 'px';
-        panel.style.boxSizing = 'border-box';
 
         // Dodanie tapety, jeśli istnieje
         let wallpaperImg = null;
@@ -44,13 +37,7 @@ class Config {
             wallpaperImg = document.createElement('img');
             wallpaperImg.src = this.wallpapers[0];
             wallpaperImg.alt = 'wallpaper';
-            wallpaperImg.style.position = 'absolute';
-            wallpaperImg.style.top = '0';
-            wallpaperImg.style.left = '0';
-            wallpaperImg.style.width = '100%';
-            wallpaperImg.style.height = '100%';
-            wallpaperImg.style.objectFit = 'cover';
-            wallpaperImg.style.zIndex = '0';
+            wallpaperImg.className = 'panel-wallpaper';
             panel.appendChild(wallpaperImg);
         }
 
@@ -77,45 +64,12 @@ class Config {
         tascBar.id = this.idTascBar;
 
         // Dopasowanie rozmiaru i pozycji
-        tascBar.style.position = 'absolute';
-        if (this.positionTascBar === 'top') {
-            tascBar.style.top = '0';
-            tascBar.style.left = '0';
-            tascBar.style.width = '100%';
-            tascBar.style.height = '48px';
-            tascBar.style.flexDirection = 'row';
-        } else if (this.positionTascBar === 'bottom') {
-            tascBar.style.bottom = '0';
-            tascBar.style.left = '0';
-            tascBar.style.width = '100%';
-            tascBar.style.height = '48px';
-            tascBar.style.flexDirection = 'row';
-        } else if (this.positionTascBar === 'left') {
-            tascBar.style.top = '0';
-            tascBar.style.left = '0';
-            tascBar.style.width = '48px';
-            tascBar.style.height = '100%';
-            tascBar.style.flexDirection = 'column';
-        } else if (this.positionTascBar === 'right') {
-            tascBar.style.top = '0';
-            tascBar.style.right = '0';
-            tascBar.style.width = '48px';
-            tascBar.style.height = '100%';
-            tascBar.style.flexDirection = 'column';
-        }
-        tascBar.style.display = 'flex';
-        tascBar.style.alignItems = 'center';
-        tascBar.style.justifyContent = 'center';
-        tascBar.style.background = 'rgba(255,255,255,0.7)';
-        tascBar.style.zIndex = '10';
-
+        tascBar.classList.add(`tascbar-${this.positionTascBar}`);
         // Dodanie testowej ikony (emoji)
         const icon = document.createElement('span');
         icon.textContent = '📦';
-        icon.style.fontSize = '2rem';
-        icon.style.cursor = 'pointer';
+        icon.className = 'tascbar-icon';
         tascBar.appendChild(icon);
-
         return tascBar;
     }
 
