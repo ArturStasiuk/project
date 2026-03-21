@@ -26,7 +26,7 @@ class Wiew {
         await this.panel.hideTascBar();
     }
     // dodanie ikony/meniu do tascBar
-    async addIconTascBar(data) {
+    async addIconTascBar() {
        const data = {
             idIcon: `icon_21`, // id ikony w tasbar 
             title: 'Projekty', // teks jezeli podano po wyswietlany po prawej srony ikony

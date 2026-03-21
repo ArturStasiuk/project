@@ -52,6 +52,16 @@ class Panel {
     // // twozy wyglad dla ikon/meniu w tascBar na podstawie configuracji a satempnie dodaje ja do taskbar 
     async addIconTascBar(data) {
         const icon = await this.config.createTascBarIcon(data);
+        let tascBar = document.getElementById(this.config.idTascBar);
+        if (!tascBar) {
+            // Jeśli tascBar nie istnieje, utwórz go i dodaj do panelu
+            tascBar = await this.config.configTascBar();
+            const panel = document.getElementById(this.config.idPanel);
+            if (panel) {
+                panel.appendChild(tascBar);
+            }
+        }
+        tascBar.appendChild(icon);
 
     }
 
