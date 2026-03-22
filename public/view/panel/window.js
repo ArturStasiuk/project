@@ -1,5 +1,6 @@
 class AppWindow {
     static zIndex = 1000;
+    static MAX_ZINDEX = 99998; // zawsze mniej niż tascbar-menu
 
     constructor(parent) {
         // dodanie styli okna z public/view/css/window.css
@@ -60,7 +61,8 @@ class AppWindow {
 
         // focus
         win.addEventListener('mousedown', () => {
-            win.style.zIndex = ++AppWindow.zIndex;
+            AppWindow.zIndex = Math.min(++AppWindow.zIndex, AppWindow.MAX_ZINDEX);
+            win.style.zIndex = AppWindow.zIndex;
         });
 
      return win;
@@ -88,7 +90,8 @@ class AppWindow {
             win.style.display = 'block';
         }
 
-        win.style.zIndex = ++AppWindow.zIndex;
+        AppWindow.zIndex = Math.min(++AppWindow.zIndex, AppWindow.MAX_ZINDEX);
+        win.style.zIndex = AppWindow.zIndex;
     }
 
     // =========================

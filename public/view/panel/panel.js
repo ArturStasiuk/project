@@ -102,10 +102,7 @@ class panel {
         if (panel) {
             panel.appendChild(win); // Dodaj okno do panelu
         }
-        const win2 = await this.appWindow.winDemo2();
-        if (panel) {
-            panel.appendChild(win2); // Dodaj okno do panelu
-        }
+
     }
 
 
