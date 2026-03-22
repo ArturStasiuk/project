@@ -65,11 +65,7 @@ await viewInstance.addIconTascBar({
 
 
 
-    // Czy blokować tło (overlay, bez blokowania taskbara)
-   // backgroundBlock: false,
 
-    // Czy blokować taskbar (bez blokowania tła)
-   // taskbarBlock: false,
 
     // Pozycja okna: 'onCenter' (wyśrodkowane) lub {top: liczba, left: liczba}
     position: 'onCenter',
