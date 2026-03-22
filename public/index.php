@@ -56,27 +56,26 @@ await viewInstance.addIconTascBar({
     idWinndow: 'window-projekty',
 
     // Nazwa/tytuł okna wyświetlana w pasku tytułu 
-   // name: 'Przegląd projektów',
+    name: 'Przegląd projektów',
 
-    // Emoji lub HTML z ikoną do paska tytułu i taskbara
-   // icon: '📁',
+     icon: '📁',
 
     // Czy dodać ikonę do taskbara (domyślnie false) w trakcie interpletacji 
-      addToTaskbar: false,
+    addToTaskbar: false,
 
 
 
     // Czy blokować tło (overlay, bez blokowania taskbara)
-    backgroundBlock: false,
+   // backgroundBlock: false,
 
     // Czy blokować taskbar (bez blokowania tła)
-    taskbarBlock: false,
+   // taskbarBlock: false,
 
     // Pozycja okna: 'onCenter' (wyśrodkowane) lub {top: liczba, left: liczba}
     position: 'onCenter',
 
     // Rozmiar okna: 'auto' lub {width: liczba lub '400px', height: liczba lub '300px'}
-    size: 'auto',
+   // size: 'auto',
 
     // Kontrolki okna: minimalizuj, maksymalizuj, zamknij jezeli podano to wyswietlaj jezeli
     // brak nie nalezy wyswietlac paska z kontrolkami  
@@ -86,27 +85,27 @@ await viewInstance.addIconTascBar({
     menuVisible: true,
 
     // Menu okna (tablica grup menu)
-    menu: [
+  menu: [
         {
             title: 'Plik',
             icon:'🕒➕',
             onClick: (el) => { /* ... */ }, 
             items: [
-                { label: 'Nowy', icon: '🆕', onClick: (el) => { /* ... */ } },
-                { label: 'Zapisz', icon: '💾', onClick: (el) => { /* ... */ } },
+                { label: 'Nowy', icon: '🆕', onClick: (el) => { console.log('kliknieto nowy') } },
+                { label: 'Zapisz', icon: '💾', onClick: (el) => { console.log('kliknieto zapisz') } },
                 '---', // separator
-                { label: 'Zamknij', icon: '✖️', onClick: (el) => { /* ... */ } }
+                { label: 'Zamknij', icon: '✖️', onClick: (el) => { console.log('kliknieto zamknij') } }
             ]
         },
         {
             title: 'Edycja',
             items: [
-                { label: 'Kopiuj', icon: '📋', onClick: (el) => { /* ... */ } },
-                { label: 'Wklej', icon: '📋', onClick: (el) => { /* ... */ } }
+                { label: 'Kopiuj', icon: '📋', onClick: (el) => { console.log('kliknieto kopiuj') } },
+                { label: 'Wklej', icon: '📋', onClick: (el) => { console.log('kliknieto wklej') } }
             ]
         }
     ],
-
+ 
     // Zawartość okna (HTML, może być generowany dynamicznie)
     content: `
         <div>

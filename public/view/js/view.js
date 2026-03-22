@@ -41,8 +41,8 @@ class view {
     }
    // dodanie okna do widoku
    async addWindow(data) {
-       // await this.panel.addWindow(data);
-       await this.panel.contentPanel();
+        await this.panel.addWindow(data);
+
    }
 
     

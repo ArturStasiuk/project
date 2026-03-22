@@ -246,400 +246,328 @@ class config {
 
 
 
-    /**
-     * Tworzy div, który automatycznie dopasowuje maksymalny rozmiar do panelu (nie nachodzi na taskbar).
-     * @returns {HTMLElement} element div gotowy do dodania do panelu
+    /** funkcja umozliwiajaca po najechaniu na okno na 
+     * pasek tytulu i itp 
      */
-    createContentDiv() {
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content-panel';
-        contentDiv.style.position = 'absolute';
-        contentDiv.style.border = '1px solid red';
-        //contentDiv.style.background = 'rgba(255,255,255,0.85)';
-        contentDiv.style.minHeight = '60px';
-        contentDiv.style.minWidth = '60px';
-        contentDiv.style.zIndex = '10';
-        // Upewnij się, że panel ma pozycjonowanie inne niż static
-        const panel = document.getElementById(this.idPanel);
-        if (panel && window.getComputedStyle(panel).position === 'static') {
-            panel.style.position = 'relative';
-        }
-        // Funkcja dopasowująca rozmiar contentDiv do panelu i taskbara
-        const adjustContentDiv = () => {
-            const panel = document.getElementById(this.idPanel);
-            const tascBar = document.getElementById(this.idTascBar);
-            if (!panel) return;
-            let top = 0, left = 0, right = 0, bottom = 0;
-            if (tascBar) {
-                const tascBarRect = tascBar.getBoundingClientRect();
-                const panelRect = panel.getBoundingClientRect();
-                if (this.positionTascBar === 'bottom') {
-                    bottom = panelRect.bottom - tascBarRect.top;
-                } else if (this.positionTascBar === 'top') {
-                    top = tascBarRect.bottom - panelRect.top;
-                } else if (this.positionTascBar === 'left') {
-                    left = tascBarRect.right - panelRect.left;
-                } else if (this.positionTascBar === 'right') {
-                    right = panelRect.right - tascBarRect.left;
-                }
-            }
-            contentDiv.style.top = top + 'px';
-            contentDiv.style.left = left + 'px';
-            contentDiv.style.right = right + 'px';
-            contentDiv.style.bottom = bottom + 'px';
-        };
-        setTimeout(adjustContentDiv, 0);
-        window.addEventListener('resize', adjustContentDiv);
-        contentDiv.addEventListener('DOMNodeRemoved', function handler(e) {
-            if (e.target === contentDiv) {
-                window.removeEventListener('resize', adjustContentDiv);
-                contentDiv.removeEventListener('DOMNodeRemoved', handler);
-            }
-        });
-        return contentDiv;
-    }
 
 
 
-
-
+    /**
+     * Tworzy element okna na podstawie przekazanej konfiguracji.
+     * @param {Object} data Konfiguracja okna (patrz dokumentacja)
+     * @returns {HTMLElement} Element DOM okna gotowy do wstawienia do DOM
+     */
     createWindow(data) {
-        // Tworzenie głównego kontenera okna
+                // Dodaj style Windows tylko raz
+                if (!document.getElementById('window-css-inline')) {
+                    const style = document.createElement('style');
+                    style.id = 'window-css-inline';
+                    style.textContent = `
+                    .window {
+                        background: #fff;
+                        border: 1px solid #b4b4b4;
+                        border-radius: 6px;
+                        box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18), 0 1.5px 0 #e0e0e0;
+                        overflow: hidden;
+                        font-family: 'Segoe UI', Arial, sans-serif;
+                        min-width: 240px;
+                        min-height: 120px;
+                    }
+                    .window-titlebar {
+                        background: linear-gradient(90deg, #2186eb 80%, #1a5fb4 100%);
+                        color: #fff;
+                        display: flex;
+                        align-items: center;
+                        height: 32px;
+                        padding: 0 8px;
+                        user-select: none;
+                        font-weight: 500;
+                        letter-spacing: 0.02em;
+                    }
+                    .window-titlebar-icon {
+                        margin-right: 8px;
+                        font-size: 18px;
+                        display: flex;
+                        align-items: center;
+                    }
+                    .window-titlebar-title {
+                        flex: 1;
+                        font-size: 15px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .window-titlebar-controls {
+                        display: flex;
+                        gap: 2px;
+                    }
+                    .window-titlebar-controls button {
+                        background: transparent;
+                        border: none;
+                        color: #fff;
+                        width: 32px;
+                        height: 28px;
+                        font-size: 16px;
+                        border-radius: 3px;
+                        cursor: pointer;
+                        transition: background 0.15s;
+                    }
+                    .window-titlebar-controls button:hover {
+                        background: rgba(255,255,255,0.18);
+                    }
+                    .window-btn-close:hover {
+                        background: #e81123 !important;
+                        color: #fff;
+                    }
+                    .window-menubar {
+                        display: flex;
+                        background: #f3f3f3;
+                        border-bottom: 1px solid #e0e0e0;
+                        height: 28px;
+                        align-items: stretch;
+                        font-size: 14px;
+                        user-select: none;
+                    }
+                    .window-menu-group {
+                        position: relative;
+                        padding: 0 16px;
+                        display: flex;
+                        align-items: center;
+                        cursor: pointer;
+                        height: 100%;
+                    }
+                    .window-menu-group.active, .window-menu-group:hover {
+                        background: #e5f1fb;
+                    }
+                    .window-menu-title {
+                        font-weight: 500;
+                    }
+                    .window-menu-dropdown {
+                        display: none;
+                        position: absolute;
+                        top: 100%;
+                        left: 0;
+                        min-width: 160px;
+                        background: #fff;
+                        border: 1px solid #b4b4b4;
+                        box-shadow: 0 4px 16px 0 rgba(0,0,0,0.10);
+                        z-index: 100;
+                        border-radius: 0 0 6px 6px;
+                        padding: 4px 0;
+                    }
+                    .window-menu-item {
+                        padding: 6px 24px 6px 32px;
+                        font-size: 14px;
+                        color: #222;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        position: relative;
+                        min-height: 28px;
+                    }
+                    .window-menu-item:hover {
+                        background: #e5f1fb;
+                        color: #0050a8;
+                    }
+                    .window-menu-item-icon {
+                        position: absolute;
+                        left: 8px;
+                        font-size: 15px;
+                        width: 18px;
+                        text-align: center;
+                    }
+                    .window-menu-separator {
+                        height: 1px;
+                        background: #e0e0e0;
+                        margin: 4px 0;
+                    }
+                    .window-content {
+                        padding: 18px 18px 18px 18px;
+                        background: #fff;
+                        min-height: 60px;
+                        font-size: 15px;
+                        color: #222;
+                    }
+                    `;
+                    document.head.appendChild(style);
+                }
+        // Główne okno
         const win = document.createElement('div');
-        win.className = 'window-minimal';
+        win.className = 'window';
         win.id = data.id || '';
-
-        // Style minimalistyczne (możesz przenieść do CSS)
-        win.style.position = 'fixed';
-        win.style.background = '#fff';
-        win.style.borderRadius = '12px';
-        win.style.boxShadow = '0 4px 24px rgba(0,0,0,0.10)';
-        win.style.minWidth = '240px';
-        win.style.overflow = 'hidden';
-        win.style.display = 'flex';
-        win.style.flexDirection = 'column';
-        win.style.transition = 'box-shadow 0.2s';
-        win.style.zIndex = 1000;
-        if (data.size && data.size.width) win.style.width = typeof data.size.width === 'number' ? data.size.width + 'px' : data.size.width;
-        if (data.size && data.size.height) win.style.height = typeof data.size.height === 'number' ? data.size.height + 'px' : data.size.height;
-
-        // Pozycjonowanie
-        if (data.position === 'onCenter') {
-            win.style.top = '50%';
-            win.style.left = '50%';
-            win.style.transform = 'translate(-50%, -50%)';
-        } else if (data.position && typeof data.position === 'object') {
-            if (data.position.top !== undefined) win.style.top = data.position.top + 'px';
-            if (data.position.left !== undefined) win.style.left = data.position.left + 'px';
-        } else {
-            win.style.top = '10vh';
-            win.style.left = '10vw';
+        if (data.size && typeof data.size === 'object') {
+            if (data.size.width) win.style.width = typeof data.size.width === 'number' ? data.size.width + 'px' : data.size.width;
+            if (data.size.height) win.style.height = typeof data.size.height === 'number' ? data.size.height + 'px' : data.size.height;
         }
-
+        if (data.position) {
+            if (data.position === 'onCenter') {
+                win.style.position = 'fixed';
+                win.style.top = '50%';
+                win.style.left = '50%';
+                win.style.transform = 'translate(-50%, -50%)';
+            } else if (typeof data.position === 'object') {
+                win.style.position = 'fixed';
+                if (data.position.top !== undefined) win.style.top = data.position.top + 'px';
+                if (data.position.left !== undefined) win.style.left = data.position.left + 'px';
+            }
+        }
         // Pasek tytułu
-        if (data.name || data.icon || (data.controls && (data.controls.minimize || data.controls.maximize || data.controls.close))) {
-            const titlebar = document.createElement('div');
-            titlebar.className = 'window-titlebar';
-            titlebar.style.display = 'flex';
-            titlebar.style.alignItems = 'center';
-            titlebar.style.justifyContent = 'space-between';
-            titlebar.style.padding = '0.15em 0.7em';
-            titlebar.style.background = '#f7f7f7';
-            titlebar.style.borderBottom = '1px solid #eee';
-            titlebar.style.fontWeight = '500';
-            titlebar.style.fontSize = '0.92em';
-            titlebar.style.height = '28px';
-            // Ikona i tytuł
-            const left = document.createElement('div');
-            left.style.display = 'flex';
-            left.style.alignItems = 'center';
+        if (data.name || data.icon || (data.controls && Object.values(data.controls).some(Boolean))) {
+            const titleBar = document.createElement('div');
+            titleBar.className = 'window-titlebar';
             if (data.icon) {
                 const icon = document.createElement('span');
-                icon.textContent = data.icon;
-                icon.style.marginRight = '0.35em';
-                icon.style.fontSize = '1.1em';
-                left.appendChild(icon);
+                icon.className = 'window-titlebar-icon';
+                icon.innerHTML = data.icon;
+                titleBar.appendChild(icon);
             }
             if (data.name) {
-                const name = document.createElement('span');
-                name.textContent = data.name;
-                name.style.fontSize = '1em';
-                left.appendChild(name);
+                const title = document.createElement('span');
+                title.className = 'window-titlebar-title';
+                title.textContent = data.name;
+                titleBar.appendChild(title);
             }
-            titlebar.appendChild(left);
-            // Kontrolki okna
+            // Kontrolki
             if (data.controls) {
                 const controls = document.createElement('div');
-                controls.style.display = 'flex';
-                controls.style.gap = '0.25em';
+                controls.className = 'window-titlebar-controls';
                 if (data.controls.minimize) {
                     const minBtn = document.createElement('button');
-                    minBtn.textContent = typeof data.controls.minimize === 'string' ? data.controls.minimize : '➖';
-                    minBtn.title = 'Minimalizuj';
-                    minBtn.style.background = 'none';
-                    minBtn.style.border = 'none';
-                    minBtn.style.fontSize = '1em';
-                    minBtn.style.cursor = 'pointer';
-                    minBtn.style.height = '22px';
-                    minBtn.style.width = '22px';
-                    minBtn.onclick = () => win.style.display = 'none';
+                    minBtn.className = 'window-btn-minimize';
+                    minBtn.innerHTML = data.controls.minimize === true ? '➖' : data.controls.minimize;
                     controls.appendChild(minBtn);
                 }
                 if (data.controls.maximize) {
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'panel-content';
-                    contentDiv.style.position = 'absolute';
-                    contentDiv.style.top = '0';
-                    contentDiv.style.left = '0';
-                    contentDiv.style.width = '100%';
-                    contentDiv.style.height = '100%';
-                    contentDiv.style.border = '2px solid red';
-                    contentDiv.style.background = 'rgba(255,255,255,0.85)';
-                    contentDiv.style.zIndex = '10';
-                    // Upewnij się, że panel ma pozycjonowanie inne niż static
-                    const panel = document.getElementById(this.idPanel);
-                    if (panel && window.getComputedStyle(panel).position === 'static') {
-                        panel.style.position = 'relative';
-                    }
-                    // Automatyczne dopasowanie do panelu i taskbara przy zmianie rozmiaru
-                    const adjustContentDiv = () => {
-                        const panel = document.getElementById(this.idPanel);
-                        const tascBar = document.getElementById(this.idTascBar);
-                        if (!panel) return;
-                        let top = 0, left = 0, right = 0, bottom = 0;
-                        if (tascBar) {
-                            const tascBarRect = tascBar.getBoundingClientRect();
-                            const panelRect = panel.getBoundingClientRect();
-                            if (this.positionTascBar === 'bottom') {
-                                bottom = panelRect.bottom - tascBarRect.top;
-                            } else if (this.positionTascBar === 'top') {
-                                top = tascBarRect.bottom - panelRect.top;
-                            } else if (this.positionTascBar === 'left') {
-                                left = tascBarRect.right - panelRect.left;
-                            } else if (this.positionTascBar === 'right') {
-                                right = panelRect.right - tascBarRect.left;
-                            }
-                        }
-                        contentDiv.style.top = top + 'px';
-                        contentDiv.style.left = left + 'px';
-                        contentDiv.style.right = right + 'px';
-                        contentDiv.style.bottom = bottom + 'px';
+                    const maxBtn = document.createElement('button');
+                    maxBtn.className = 'window-btn-maximize';
+                    maxBtn.innerHTML = data.controls.maximize === true ? '🗖' : data.controls.maximize;
+                    controls.appendChild(maxBtn);
+                }
+                if (data.controls.close) {
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = 'window-btn-close';
+                    closeBtn.innerHTML = data.controls.close === true ? '❌' : data.controls.close;
+                    closeBtn.onclick = () => {
+                        if (typeof data.onClose === 'function') data.onClose(win);
+                        win.remove();
                     };
-                    setTimeout(adjustContentDiv, 0);
-                    window.addEventListener('resize', adjustContentDiv);
-                    contentDiv.addEventListener('DOMNodeRemoved', function handler(e) {
-                        if (e.target === contentDiv) {
-                            window.removeEventListener('resize', adjustContentDiv);
-                            contentDiv.removeEventListener('DOMNodeRemoved', handler);
-                        }
-                    });
-                    if (config && config.content) {
-                        contentDiv.innerHTML = config.content;
-                    }
-                    return contentDiv;
                     controls.appendChild(closeBtn);
                 }
-                titlebar.appendChild(controls);
+                titleBar.appendChild(controls);
             }
-            win.appendChild(titlebar);
+            win.appendChild(titleBar);
         }
-
-        // Menu (jeśli menuVisible)
-        if (data.menuVisible !== false && Array.isArray(data.menu)) {
+        // Menu w stylu Windows (rozwijane, jedno otwarte, klik poza zamyka)
+        if (data.menuVisible !== false && Array.isArray(data.menu) && data.menu.length > 0) {
             const menuBar = document.createElement('div');
             menuBar.className = 'window-menubar';
-            menuBar.style.display = 'flex';
-            menuBar.style.gap = '0';
-            menuBar.style.padding = '0';
-            menuBar.style.background = '#f7f7f7';
-            menuBar.style.borderBottom = '1px solid #eee';
-            menuBar.style.userSelect = 'none';
-            let openMenu = null;
-            data.menu.forEach(group => {
+            let openedMenu = null;
+            // Zamknij menu po kliknięciu poza
+            function closeAllMenus() {
+                menuBar.querySelectorAll('.window-menu-dropdown').forEach(drop => drop.style.display = 'none');
+                menuBar.querySelectorAll('.window-menu-group').forEach(g => g.classList.remove('active'));
+                openedMenu = null;
+            }
+            document.addEventListener('mousedown', (e) => {
+                if (!menuBar.contains(e.target)) closeAllMenus();
+            });
+            data.menu.forEach((group, groupIdx) => {
                 const groupEl = document.createElement('div');
-                groupEl.className = 'window-menubar-group';
-                groupEl.style.position = 'relative';
-                groupEl.style.display = 'flex';
-                groupEl.style.alignItems = 'center';
-                groupEl.style.padding = '0 16px';
-                groupEl.style.height = '28px';
-                groupEl.style.cursor = 'pointer';
-                groupEl.style.fontWeight = '500';
-                groupEl.style.fontSize = '1em';
-                groupEl.style.color = '#222';
-                groupEl.style.background = 'none';
-                if (group.icon) {
-                    const icon = document.createElement('span');
-                    icon.textContent = group.icon;
-                    icon.style.marginRight = '0.3em';
-                    groupEl.appendChild(icon);
-                }
+                groupEl.className = 'window-menu-group';
                 if (group.title) {
-                    const title = document.createElement('span');
-                    title.textContent = group.title;
-                    groupEl.appendChild(title);
+                    const groupTitle = document.createElement('span');
+                    groupTitle.className = 'window-menu-title';
+                    groupTitle.textContent = group.title;
+                    groupEl.appendChild(groupTitle);
                 }
-                // Rozwijane menu (opcjonalnie)
+                // Dropdown
                 if (Array.isArray(group.items)) {
                     const dropdown = document.createElement('div');
-                    dropdown.className = 'window-menubar-dropdown';
-                    dropdown.style.position = 'absolute';
-                    dropdown.style.top = '100%';
-                    dropdown.style.left = '0';
-                    dropdown.style.minWidth = '140px';
-                    dropdown.style.background = '#fff';
-                    dropdown.style.border = '1px solid #ccc';
-                    dropdown.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                    dropdown.className = 'window-menu-dropdown';
                     dropdown.style.display = 'none';
-                    dropdown.style.flexDirection = 'column';
-                    dropdown.style.zIndex = '1001';
                     group.items.forEach(item => {
+                        let itemEl = document.createElement('div');
+                        itemEl.className = 'window-menu-item';
+                        // Separator
                         if (item === '---') {
                             const sep = document.createElement('div');
-                            sep.style.height = '1px';
-                            sep.style.margin = '4px 0';
-                            sep.style.background = '#e0e0e0';
+                            sep.className = 'window-menu-separator';
                             dropdown.appendChild(sep);
-                        } else if (typeof item === 'object') {
-                            const btn = document.createElement('div');
-                            btn.className = 'window-menubar-item';
-                            btn.textContent = (item.icon ? item.icon + ' ' : '') + (item.label || '');
-                            btn.style.padding = '4px 18px 4px 28px';
-                            btn.style.cursor = 'pointer';
-                            btn.style.whiteSpace = 'nowrap';
-                            btn.style.fontSize = '1em';
-                            btn.style.color = '#222';
-                            btn.style.background = 'none';
-                            btn.onmouseenter = () => btn.style.background = '#e6f0fa';
-                            btn.onmouseleave = () => btn.style.background = 'none';
-                            btn.onclick = e => { e.stopPropagation(); dropdown.style.display = 'none'; openMenu = null; item.onClick && item.onClick(win); };
-                            dropdown.appendChild(btn);
-                        } else if (typeof item === 'string') {
-                            const btn = document.createElement('div');
-                            btn.className = 'window-menubar-item';
-                            btn.textContent = item;
-                            btn.style.padding = '4px 18px 4px 28px';
-                            btn.style.cursor = 'pointer';
-                            btn.style.whiteSpace = 'nowrap';
-                            btn.style.fontSize = '1em';
-                            btn.style.color = '#222';
-                            btn.style.background = 'none';
-                            btn.onmouseenter = () => btn.style.background = '#e6f0fa';
-                            btn.onmouseleave = () => btn.style.background = 'none';
-                            btn.onclick = e => { e.stopPropagation(); dropdown.style.display = 'none'; openMenu = null; if (item.toLowerCase().includes('zamknij')) { win.remove(); if (typeof data.onClose === 'function') data.onClose(win); } };
-                            dropdown.appendChild(btn);
+                            return;
                         }
+                        // String jako label
+                        if (typeof item === 'string') {
+                            itemEl.textContent = item;
+                            // Obsługa Zamknij
+                            if (item === 'Zamknij') {
+                                itemEl.onclick = () => {
+                                    closeAllMenus();
+                                    if (typeof data.onClose === 'function') data.onClose(win);
+                                    win.remove();
+                                };
+                            }
+                        }
+                        // Obiekt z label/onClick/icon
+                        else if (typeof item === 'object') {
+                            if (item.icon) {
+                                const icon = document.createElement('span');
+                                icon.className = 'window-menu-item-icon';
+                                icon.textContent = item.icon;
+                                itemEl.appendChild(icon);
+                            }
+                            if (item.label) {
+                                const label = document.createElement('span');
+                                label.className = 'window-menu-item-label';
+                                label.textContent = item.label;
+                                itemEl.appendChild(label);
+                            }
+                            // Obsługa onClick
+                            if (typeof item.onClick === 'function') {
+                                itemEl.onclick = (e) => {
+                                    closeAllMenus();
+                                    item.onClick(win, e);
+                                };
+                            }
+                        }
+                        dropdown.appendChild(itemEl);
                     });
                     groupEl.appendChild(dropdown);
-                    // Obsługa otwierania/zamykania menu
-                    const openDropdown = e => {
+                    // Otwieranie/zamykanie menu
+                    groupEl.addEventListener('mousedown', (e) => {
                         e.stopPropagation();
-                        if (openMenu && openMenu !== dropdown) openMenu.style.display = 'none';
-                        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                        openMenu = dropdown.style.display === 'block' ? dropdown : null;
-                    };
-                    groupEl.addEventListener('click', openDropdown);
-                    groupEl.addEventListener('mouseenter', () => {
-                        if (openMenu && openMenu !== dropdown) {
-                            if (openMenu) openMenu.style.display = 'none';
+                        if (openedMenu && openedMenu !== dropdown) closeAllMenus();
+                        if (dropdown.style.display === 'block') {
+                            dropdown.style.display = 'none';
+                            groupEl.classList.remove('active');
+                            openedMenu = null;
+                        } else {
                             dropdown.style.display = 'block';
-                            openMenu = dropdown;
+                            groupEl.classList.add('active');
+                            openedMenu = dropdown;
                         }
                     });
                 }
                 menuBar.appendChild(groupEl);
             });
-            // Zamknij menu po kliknięciu poza
-            document.addEventListener('click', () => {
-                if (openMenu) openMenu.style.display = 'none';
-                openMenu = null;
-            });
             win.appendChild(menuBar);
         }
-
         // Zawartość okna
         const content = document.createElement('div');
         content.className = 'window-content';
-        content.style.flex = '1 1 auto';
-        content.style.padding = '1.2em';
-        content.style.overflow = 'auto';
         if (data.content) {
-            if (typeof data.content === 'string') content.innerHTML = data.content;
-            else if (data.content instanceof HTMLElement) content.appendChild(data.content);
+            if (typeof data.content === 'string') {
+                content.innerHTML = data.content;
+            } else if (data.content instanceof HTMLElement) {
+                content.appendChild(data.content);
+            }
         }
         win.appendChild(content);
-
-        // Callback po wyrenderowaniu contentu
+        // Callback po utworzeniu contentu
         if (typeof data.onContentReady === 'function') {
             setTimeout(() => data.onContentReady(win), 0);
         }
-            // --- DYNAMICZNE DOPASOWANIE ROZMIARU OKNA DO PANELU I TASKBARA ---
-            const adjustWindowToPanel = () => {
-                const panel = document.getElementById(this.idPanel);
-                const tascBar = document.getElementById(this.idTascBar);
-                if (!panel) return;
-                const panelRect = panel.getBoundingClientRect();
-                let tascBarRect = tascBar ? tascBar.getBoundingClientRect() : null;
-                let maxWidth = panelRect.width;
-                let maxHeight = panelRect.height;
-                let minTop = panelRect.top;
-                let minLeft = panelRect.left;
-                let maxRight = panelRect.right;
-                let maxBottom = panelRect.bottom;
-                if (tascBarRect) {
-                    if (this.positionTascBar === 'bottom') {
-                        maxHeight = tascBarRect.top - panelRect.top;
-                        maxBottom = tascBarRect.top;
-                    } else if (this.positionTascBar === 'top') {
-                        minTop = tascBarRect.bottom;
-                        maxHeight = panelRect.bottom - tascBarRect.bottom;
-                    } else if (this.positionTascBar === 'left') {
-                        minLeft = tascBarRect.right;
-                        maxWidth = panelRect.right - tascBarRect.right;
-                    } else if (this.positionTascBar === 'right') {
-                        maxRight = tascBarRect.left;
-                        maxWidth = tascBarRect.left - panelRect.left;
-                    }
-                }
-                // Dopasuj szerokość
-                if (win.offsetWidth > maxWidth) {
-                    win.style.width = Math.max(240, Math.floor(maxWidth)) + 'px';
-                }
-                // Dopasuj wysokość
-                if (win.offsetHeight > maxHeight) {
-                    win.style.height = Math.max(120, Math.floor(maxHeight)) + 'px';
-                }
-                // Przesuń okno, jeśli wystaje poza panel lub nachodzi na taskbar
-                const winRect = win.getBoundingClientRect();
-                let newLeft = win.offsetLeft;
-                let newTop = win.offsetTop;
-                // Poziomo
-                if (winRect.right > maxRight) {
-                    newLeft = Math.max(maxRight - winRect.width, minLeft);
-                    win.style.left = newLeft + 'px';
-                }
-                if (winRect.left < minLeft) {
-                    newLeft = minLeft;
-                    win.style.left = newLeft + 'px';
-                }
-                // Pionowo
-                if (winRect.bottom > maxBottom) {
-                    newTop = Math.max(maxBottom - winRect.height, minTop);
-                    win.style.top = newTop + 'px';
-                }
-                if (winRect.top < minTop) {
-                    newTop = minTop;
-                    win.style.top = newTop + 'px';
-                }
-            };
-            setTimeout(adjustWindowToPanel, 0);
-            window.addEventListener('resize', adjustWindowToPanel);
-            win.addEventListener('DOMNodeRemoved', function handler(e) {
-                if (e.target === win) {
-                    window.removeEventListener('resize', adjustWindowToPanel);
-                    win.removeEventListener('DOMNodeRemoved', handler);
-                }
-            });
+        // Blokowanie tła/taskbara/modalność (do obsługi przez wywołującego)
+        // ...
         return win;
     }
 
