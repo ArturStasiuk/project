@@ -1,6 +1,6 @@
 import { config } from './config.js';
 
-class Panel {
+class panel {
     constructor(parent) {
         this.parent = parent; // Przechowywanie referencji do rodzica, jeśli 
         this.config = new config(this); // Inicjalizacja konfiguracji panelu
@@ -85,11 +85,21 @@ class Panel {
         }
     }
 
-
+    // dodanie okna do widoku
+    async addWindow(data) {
+        // Dodaje nowe okno do panelu (kontener panelu lub body)
+        const win = this.config.createWindow(data);
+        const panel = document.getElementById(this.config.idPanel);
+        if (panel) {
+            panel.appendChild(win);
+        } else {
+            document.body.appendChild(win);
+        }
+    }
 
 
 
 
 }
 
-export { Panel };
+export { panel };
