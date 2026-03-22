@@ -1,10 +1,10 @@
 import { panel } from "../panel/panel.js";
-//import { window} from "../window/window.js";
+import { window} from "./window.js";
 class view { 
     constructor() {
-        
-        this.panel = new panel(this);
-       // this.window = new window(this);
+        this.window = new window(this);
+        this.panel = new panel(this ,this.window);
+       
         
 
      

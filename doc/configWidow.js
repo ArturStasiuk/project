@@ -2,7 +2,7 @@
 let config = {
     
     /** postawowa konfiguracja okna */
-    window: {
+    _window: {
         visible: true, // czy okno jest widoczne
         onTop: true, // czy okno ma być pokazanenad innymi oknami po kliknieciu w nie
         idWindow: 'configWindow', // id okna , czyli gownego elementu div okna 
@@ -14,7 +14,7 @@ let config = {
     },
 
     /** Funkcje wywoływane w różnych momentach życia okna */
-    function: {
+    _function: {
         /** idFunction : potrzebne do identyfikacji elementu z funkcjami okna jezeli chcemy je dynamicznie modyfikować */
         idFunction: idWindow + '_function', // id dla elementu z funkcjami, domyslnie id okna + '_function'
         onCreate : null, // funkcja wywoływana po utworzeniu okna
@@ -30,7 +30,7 @@ let config = {
     },
 
     /** Konfiguracja paska tytułowego */
-    titleBar: {
+    _titleBar: {
         visible: true, // czy pasek tytułowy jest widoczny
         // jezeli czego nie podano to domyslnie jest: fasse i nie wyswietlaj
         idTitleBar: idWindow + '_titleBar', // id dla elementu paska tytułowego, domyślnie id okna + '_titleBar  , potrzebne do identyfikacji elementu paska tytułowego jezeli chcemy go dynamicznie modyfikować
@@ -44,7 +44,7 @@ let config = {
          onMaximize: null, // funkcja wywoływana po kliknięciu przycisku maksymalizuj    
     },
     /** Konfiguracja menu okna */
-    meniu: {
+    _meniu: {
         visible: true, // czy menu jest widoczne
         idMeniu: idWindow + '_menu', // id dla elementu menu, domyślnie id okna + '_menu', potrzebne do identyfikacji elementu menu jezeli chcemy go dynamicznie modyfikować
         classMeniu: idWindow + ' config-menu', // klasa dla elementu menu, domyślnie 'menu'
@@ -93,7 +93,7 @@ let config = {
 
     },
     /** Konfiguracja zawartości okna */
-    content: {
+    _content: {
         /**
          * Opcje i możliwości pola content:
          *
