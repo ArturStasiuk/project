@@ -50,9 +50,9 @@ await viewInstance.addIconTascBar({
                     }
                 }
             ]
-   });
+});
 
-await viewInstance.addWindow({ // Unikalny identyfikator okna (przydatny do zamykania, aktualizacji)
+ await viewInstance.addWindow({ // Unikalny identyfikator okna (przydatny do zamykania, aktualizacji)
     idWinndow: 'window-projekty',
 
     // Nazwa/tytuł okna wyświetlana w pasku tytułu 
@@ -80,7 +80,7 @@ await viewInstance.addWindow({ // Unikalny identyfikator okna (przydatny do zamy
 
     // Kontrolki okna: minimalizuj, maksymalizuj, zamknij jezeli podano to wyswietlaj jezeli
     // brak nie nalezy wyswietlac paska z kontrolkami  
-  //  controls: { minimize: '➖', maximize: '🗖', close: '❌' },
+     controls: { minimize: '➖', maximize: '🗖', close: '❌' },
 
     // Czy pokazywać menu (domyślnie true)
     menuVisible: true,
@@ -90,7 +90,7 @@ await viewInstance.addWindow({ // Unikalny identyfikator okna (przydatny do zamy
         {
             title: 'Plik',
             icon:'🕒➕',
-            onClick: (el) => { /* ... */ },
+            onClick: (el) => { /* ... */ }, 
             items: [
                 { label: 'Nowy', icon: '🆕', onClick: (el) => { /* ... */ } },
                 { label: 'Zapisz', icon: '💾', onClick: (el) => { /* ... */ } },

@@ -30,6 +30,7 @@ class config {
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
         this.positionTascBar = 'bottom'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
+        this.contentPanel = null; // Przechowywanie referencji do zawartości panelu, jeśli potrzebne
 
 
     }
@@ -243,6 +244,65 @@ class config {
         return iconWrap;
     }
 
+
+
+    /**
+     * Tworzy div, który automatycznie dopasowuje maksymalny rozmiar do panelu (nie nachodzi na taskbar).
+     * @returns {HTMLElement} element div gotowy do dodania do panelu
+     */
+    createContentDiv() {
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'content-panel';
+        contentDiv.style.position = 'absolute';
+        contentDiv.style.border = '1px solid red';
+        //contentDiv.style.background = 'rgba(255,255,255,0.85)';
+        contentDiv.style.minHeight = '60px';
+        contentDiv.style.minWidth = '60px';
+        contentDiv.style.zIndex = '10';
+        // Upewnij się, że panel ma pozycjonowanie inne niż static
+        const panel = document.getElementById(this.idPanel);
+        if (panel && window.getComputedStyle(panel).position === 'static') {
+            panel.style.position = 'relative';
+        }
+        // Funkcja dopasowująca rozmiar contentDiv do panelu i taskbara
+        const adjustContentDiv = () => {
+            const panel = document.getElementById(this.idPanel);
+            const tascBar = document.getElementById(this.idTascBar);
+            if (!panel) return;
+            let top = 0, left = 0, right = 0, bottom = 0;
+            if (tascBar) {
+                const tascBarRect = tascBar.getBoundingClientRect();
+                const panelRect = panel.getBoundingClientRect();
+                if (this.positionTascBar === 'bottom') {
+                    bottom = panelRect.bottom - tascBarRect.top;
+                } else if (this.positionTascBar === 'top') {
+                    top = tascBarRect.bottom - panelRect.top;
+                } else if (this.positionTascBar === 'left') {
+                    left = tascBarRect.right - panelRect.left;
+                } else if (this.positionTascBar === 'right') {
+                    right = panelRect.right - tascBarRect.left;
+                }
+            }
+            contentDiv.style.top = top + 'px';
+            contentDiv.style.left = left + 'px';
+            contentDiv.style.right = right + 'px';
+            contentDiv.style.bottom = bottom + 'px';
+        };
+        setTimeout(adjustContentDiv, 0);
+        window.addEventListener('resize', adjustContentDiv);
+        contentDiv.addEventListener('DOMNodeRemoved', function handler(e) {
+            if (e.target === contentDiv) {
+                window.removeEventListener('resize', adjustContentDiv);
+                contentDiv.removeEventListener('DOMNodeRemoved', handler);
+            }
+        });
+        return contentDiv;
+    }
+
+
+
+
+
     createWindow(data) {
         // Tworzenie głównego kontenera okna
         const win = document.createElement('div');
@@ -283,11 +343,12 @@ class config {
             titlebar.style.display = 'flex';
             titlebar.style.alignItems = 'center';
             titlebar.style.justifyContent = 'space-between';
-            titlebar.style.padding = '0.5em 1em';
+            titlebar.style.padding = '0.15em 0.7em';
             titlebar.style.background = '#f7f7f7';
             titlebar.style.borderBottom = '1px solid #eee';
             titlebar.style.fontWeight = '500';
-            titlebar.style.fontSize = '1.05em';
+            titlebar.style.fontSize = '0.92em';
+            titlebar.style.height = '28px';
             // Ikona i tytuł
             const left = document.createElement('div');
             left.style.display = 'flex';
@@ -295,12 +356,14 @@ class config {
             if (data.icon) {
                 const icon = document.createElement('span');
                 icon.textContent = data.icon;
-                icon.style.marginRight = '0.5em';
+                icon.style.marginRight = '0.35em';
+                icon.style.fontSize = '1.1em';
                 left.appendChild(icon);
             }
             if (data.name) {
                 const name = document.createElement('span');
                 name.textContent = data.name;
+                name.style.fontSize = '1em';
                 left.appendChild(name);
             }
             titlebar.appendChild(left);
@@ -308,61 +371,72 @@ class config {
             if (data.controls) {
                 const controls = document.createElement('div');
                 controls.style.display = 'flex';
-                controls.style.gap = '0.5em';
+                controls.style.gap = '0.25em';
                 if (data.controls.minimize) {
                     const minBtn = document.createElement('button');
                     minBtn.textContent = typeof data.controls.minimize === 'string' ? data.controls.minimize : '➖';
                     minBtn.title = 'Minimalizuj';
                     minBtn.style.background = 'none';
                     minBtn.style.border = 'none';
-                    minBtn.style.fontSize = '1.1em';
+                    minBtn.style.fontSize = '1em';
                     minBtn.style.cursor = 'pointer';
+                    minBtn.style.height = '22px';
+                    minBtn.style.width = '22px';
                     minBtn.onclick = () => win.style.display = 'none';
                     controls.appendChild(minBtn);
                 }
                 if (data.controls.maximize) {
-                    const maxBtn = document.createElement('button');
-                    maxBtn.textContent = typeof data.controls.maximize === 'string' ? data.controls.maximize : '🗖';
-                    maxBtn.title = 'Maksymalizuj';
-                    maxBtn.style.background = 'none';
-                    maxBtn.style.border = 'none';
-                    maxBtn.style.fontSize = '1.1em';
-                    maxBtn.style.cursor = 'pointer';
-                    // Prosty toggle pełnego ekranu
-                    maxBtn.onclick = () => {
-                        if (win.dataset.maximized === '1') {
-                            win.style.width = data.size && data.size.width ? (typeof data.size.width === 'number' ? data.size.width + 'px' : data.size.width) : '';
-                            win.style.height = data.size && data.size.height ? (typeof data.size.height === 'number' ? data.size.height + 'px' : data.size.height) : '';
-                            win.style.top = win.dataset.oldTop;
-                            win.style.left = win.dataset.oldLeft;
-                            win.style.transform = win.dataset.oldTransform;
-                            win.dataset.maximized = '';
-                        } else {
-                            win.dataset.oldTop = win.style.top;
-                            win.dataset.oldLeft = win.style.left;
-                            win.dataset.oldTransform = win.style.transform;
-                            win.style.top = '0';
-                            win.style.left = '0';
-                            win.style.transform = '';
-                            win.style.width = '100vw';
-                            win.style.height = '100vh';
-                            win.dataset.maximized = '1';
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'panel-content';
+                    contentDiv.style.position = 'absolute';
+                    contentDiv.style.top = '0';
+                    contentDiv.style.left = '0';
+                    contentDiv.style.width = '100%';
+                    contentDiv.style.height = '100%';
+                    contentDiv.style.border = '2px solid red';
+                    contentDiv.style.background = 'rgba(255,255,255,0.85)';
+                    contentDiv.style.zIndex = '10';
+                    // Upewnij się, że panel ma pozycjonowanie inne niż static
+                    const panel = document.getElementById(this.idPanel);
+                    if (panel && window.getComputedStyle(panel).position === 'static') {
+                        panel.style.position = 'relative';
+                    }
+                    // Automatyczne dopasowanie do panelu i taskbara przy zmianie rozmiaru
+                    const adjustContentDiv = () => {
+                        const panel = document.getElementById(this.idPanel);
+                        const tascBar = document.getElementById(this.idTascBar);
+                        if (!panel) return;
+                        let top = 0, left = 0, right = 0, bottom = 0;
+                        if (tascBar) {
+                            const tascBarRect = tascBar.getBoundingClientRect();
+                            const panelRect = panel.getBoundingClientRect();
+                            if (this.positionTascBar === 'bottom') {
+                                bottom = panelRect.bottom - tascBarRect.top;
+                            } else if (this.positionTascBar === 'top') {
+                                top = tascBarRect.bottom - panelRect.top;
+                            } else if (this.positionTascBar === 'left') {
+                                left = tascBarRect.right - panelRect.left;
+                            } else if (this.positionTascBar === 'right') {
+                                right = panelRect.right - tascBarRect.left;
+                            }
                         }
+                        contentDiv.style.top = top + 'px';
+                        contentDiv.style.left = left + 'px';
+                        contentDiv.style.right = right + 'px';
+                        contentDiv.style.bottom = bottom + 'px';
                     };
-                    controls.appendChild(maxBtn);
-                }
-                if (data.controls.close) {
-                    const closeBtn = document.createElement('button');
-                    closeBtn.textContent = typeof data.controls.close === 'string' ? data.controls.close : '❌';
-                    closeBtn.title = 'Zamknij';
-                    closeBtn.style.background = 'none';
-                    closeBtn.style.border = 'none';
-                    closeBtn.style.fontSize = '1.1em';
-                    closeBtn.style.cursor = 'pointer';
-                    closeBtn.onclick = () => {
-                        win.remove();
-                        if (typeof data.onClose === 'function') data.onClose(win);
-                    };
+                    setTimeout(adjustContentDiv, 0);
+                    window.addEventListener('resize', adjustContentDiv);
+                    contentDiv.addEventListener('DOMNodeRemoved', function handler(e) {
+                        if (e.target === contentDiv) {
+                            window.removeEventListener('resize', adjustContentDiv);
+                            contentDiv.removeEventListener('DOMNodeRemoved', handler);
+                        }
+                    });
+                    if (config && config.content) {
+                        contentDiv.innerHTML = config.content;
+                    }
+                    return contentDiv;
                     controls.appendChild(closeBtn);
                 }
                 titlebar.appendChild(controls);
@@ -568,6 +642,12 @@ class config {
             });
         return win;
     }
+
+
+
+
+
+
 
 
 

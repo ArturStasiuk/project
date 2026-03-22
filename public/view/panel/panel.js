@@ -85,6 +85,15 @@ class panel {
         }
     }
 
+    // wstawieniw diva contentPanel 
+    async contentPanel() {
+        let contentPanel = await this.config.createContentDiv();
+        const panel = document.getElementById(this.config.idPanel);
+        if (panel) {
+            panel.appendChild(contentPanel);
+        }
+    }
+
     // dodanie okna do widoku
     async addWindow(data) {
         // Dodaje nowe okno do panelu (kontener panelu lub body)
@@ -96,7 +105,7 @@ class panel {
             document.body.appendChild(win);
         }
     }
-
+    
 
 
 
