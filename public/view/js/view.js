@@ -40,8 +40,9 @@ class view {
         await this.panel.removeIconTascBar(idIcon);
     }
    // dodanie okna do widoku
-   async addWindow() {
-      await this.appWindow.winDemo();
+   async addWindow(data) {
+
+      await this.panel.addWindow();
  }
 
     

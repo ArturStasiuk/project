@@ -36,14 +36,12 @@ class AppWindow {
         this._updateMenu(win, config._meniu);
         this._updateContent(win, config._content);
 
-        this._attachFunctions(config._function, win);
-
-        this.parent.appendChild(win);
-
-        config._function?.onCreate?.(win);
-        config._function?.onOpen?.(win);
-
-        return win;
+            this._attachFunctions(config._function, win);        
+            // NIE dodawaj do DOM tutaj! Zwróć tylko obiekt okna.
+            // Dodawanie do DOM powinno być wykonane w innej klasie/metodzie.
+            config._function?.onCreate?.(win);
+            config._function?.onOpen?.(win);
+            return win;
     }
 
     // =========================
@@ -65,7 +63,7 @@ class AppWindow {
             win.style.zIndex = ++AppWindow.zIndex;
         });
 
-        return win;
+         return win;
     }
 
     async _applyWindowConfig(win, cfg = {}) {
@@ -320,8 +318,8 @@ class AppWindow {
             isDragging = false;
         });
     }
-/** funkcja po wywolaniu ktorej zostanie utwozone przykladowe okno demo z tytulem, menu, trescia i przyciskami */
-    async winDemo() {
+     /** funkcja po wywolaniu ktorej zostanie utwozone przykladowe okno demo z tytulem, menu, trescia i przyciskami */
+   async winDemo() {
         // Konfiguracja okna demo
         const config = {
             _window: {
@@ -493,7 +491,7 @@ class AppWindow {
                     // Możesz dodać dodatkowe akcje po zamknięciu okna
                 }
             }
-        };
+    };
 
         // Tworzenie okna demo
       return  this.createWindow(config);

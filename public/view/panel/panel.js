@@ -88,17 +88,21 @@ class panel {
 
 
     // dodanie okna do widoku
-    async addWindow() {
-        // Dodaje nowe okno do panelu (kontener panelu lub body)
-        const win = this.config.createWindow(data);
+    async addWindow(data) {
+        // dodanie okna do widoku na podstawie konfiguracji z panelu window.js
+        if (!this.appWindow) {
+            if (this.parent && this.parent.appWindow) {
+                this.appWindow = this.parent.appWindow;
+            } else {
+                throw new Error('Brak instancji AppWindow!');
+            }
+        }
+        const win = await this.appWindow.winDemo();
         const panel = document.getElementById(this.config.idPanel);
         if (panel) {
-            panel.appendChild(win);
-        } else {
-            document.body.appendChild(win);
+            panel.appendChild(win); // Dodaj okno do panelu
         }
     }
-    
 
 
 
