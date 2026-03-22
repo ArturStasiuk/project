@@ -135,4 +135,11 @@ let config = {
 
 
     }
+/**win.open();
+win.close();
 
+win.update(...);
+win.updateContent(...);
+win.updateMenu(...);
+win.updateTitleBar(...);
+win.updateWindow(...); */

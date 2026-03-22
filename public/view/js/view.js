@@ -1,9 +1,9 @@
 import { panel } from "../panel/panel.js";
-import { window} from "./window.js";
+import { AppWindow } from "../panel/window.js";
 class view { 
     constructor() {
-        this.window = new window(this);
-        this.panel = new panel(this ,this.window);
+        this.appWindow = new AppWindow(this);
+        this.panel = new panel(this ,this.appWindow);
        
         
 
@@ -40,10 +40,9 @@ class view {
         await this.panel.removeIconTascBar(idIcon);
     }
    // dodanie okna do widoku
-   async addWindow(data) {
-        await this.panel.addWindow(data);
-
-   }
+   async addWindow() {
+      await this.appWindow.winDemo();
+ }
 
     
 

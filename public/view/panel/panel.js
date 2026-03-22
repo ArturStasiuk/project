@@ -88,7 +88,7 @@ class panel {
 
 
     // dodanie okna do widoku
-    async addWindow(data) {
+    async addWindow() {
         // Dodaje nowe okno do panelu (kontener panelu lub body)
         const win = this.config.createWindow(data);
         const panel = document.getElementById(this.config.idPanel);
