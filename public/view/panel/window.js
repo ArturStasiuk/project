@@ -389,17 +389,21 @@ class AppWindow {
                 items: [
                     {
                         name: 'Opcja 1',
+                        icon:'🗂️',
                         onClick: () => alert('Wybrano: Opcja 1')
                     },
                     {
                         name: 'Opcja 2',
+                        icon:'⚙️',
                         submenu: [
                             {
                                 name: 'Subopcja 1',
+                                icon: '🔧',
                                 onClick: () => alert('Wybrano: Subopcja 1')
                             },
                             {
                                 name: 'Subopcja 2',
+                                icon: '🔩',
                                 onClick: () => alert('Wybrano: Subopcja 2')
                             }
                         ],
@@ -407,6 +411,7 @@ class AppWindow {
                     },
                     {
                         name: 'Opcja 3',
+                        icon:'❓',
                         onClick: () => alert('Wybrano: Opcja 3')
                     }
                 ]
@@ -516,7 +521,66 @@ class AppWindow {
         // Tworzenie okna demo
       return  this.createWindow(config);
 }
+    async winDemo2() {
+      
+        const config = {
+            _window: {
+                idWindow: 'simple_window',
+                classWindow: 'app-window simple-window',
+                size: { width: 300, height: 200 },
+                position: { top: 150, left: 150 },
+                visible: true
+            },
+            _titleBar: {
+                visible: true,
+                name: 'Proste Okno',
+                controls: {
+                    close: '&#10005;'
+                }
+            },
+            _content: {
+                html: `
+                    <p id="simple-msg">To jest proste okno bez menu.</p>
+                    <button id="simple-btn">Kliknij mnie</button>
+                `,
+                style: `
+                    .simple-window .content {
+                        background: #fff;
+                        border-radius: 0 0 8px 8px;
+                        padding: 16px;
+                        font-family: Arial, sans-serif;
+                        font-size: 14px;
+                        color: #333;
+                    }
+                    .simple-window button {
+                        margin-top: 10px;
+                        padding: 6px 16px;
+                        border-radius: 4px;
+                        border: 1px solid #2196f3;
+                        background: #e3f2fd;
+                        color: #1976d2;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: background 0.2s;
+                    }
+                    .simple-window button:hover {
+                        background: #bbdefb;
+                    }
+                `,
+                script: (content, win) => {
+                    const btn = content.querySelector('#simple-btn');
+                    const msg = content.querySelector('#simple-msg');
+                    if (btn && msg) {
+                        btn.addEventListener('click', () => {
+                            msg.textContent = 'Kliknięto przycisk!';
+                        });
+                    }
+                }
+            }
+        };
 
+        return this.createWindow(config);
+    }
 
 
 }
