@@ -63,7 +63,7 @@ class AppWindow {
             win.style.zIndex = ++AppWindow.zIndex;
         });
 
-         return win;
+     return win;
     }
 
     async _applyWindowConfig(win, cfg = {}) {
@@ -299,23 +299,43 @@ class AppWindow {
     // DRAG
     // =========================
     async _makeDraggable(win, handle) {
-        let isDragging = false, offsetX, offsetY;
+        let isDragging = false, offsetX = 0, offsetY = 0;
+
+        // Ustaw kursor na grab na pasku tytułu
+        handle.style.cursor = 'grab';
+
+        handle.addEventListener('mouseenter', () => {
+            if (!isDragging) handle.style.cursor = 'grab';
+        });
+        handle.addEventListener('mouseleave', () => {
+            if (!isDragging) handle.style.cursor = '';
+        });
 
         handle.addEventListener('mousedown', (e) => {
             isDragging = true;
-            offsetX = e.clientX - win.offsetLeft;
-            offsetY = e.clientY - win.offsetTop;
+            handle.style.cursor = 'grabbing';
+            // Ustal pozycję względem viewportu, by uniknąć przeskoków
+            const rect = win.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            // Ustal left/top względem parenta (viewportu)
+            win.style.left = rect.left + 'px';
+            win.style.top = rect.top + 'px';
+            win.style.transform = 'none';
+            win.style.position = 'absolute';
         });
 
         document.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             win.style.left = (e.clientX - offsetX) + 'px';
             win.style.top = (e.clientY - offsetY) + 'px';
-            win.style.transform = 'none';
         });
 
         document.addEventListener('mouseup', () => {
-            isDragging = false;
+            if (isDragging) {
+                isDragging = false;
+                handle.style.cursor = 'grab';
+            }
         });
     }
      /** funkcja po wywolaniu ktorej zostanie utwozone przykladowe okno demo z tytulem, menu, trescia i przyciskami */
