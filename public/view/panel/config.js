@@ -100,27 +100,37 @@ class config {
                 tascBar.style.width = newWidth + 'px';
             }
 
-            // Rozwiń taskbar po kliknięciu w niego
-            tascBar.addEventListener('click', (e) => {
-                // Jeśli kliknięto w menu, nie zwijaj
-                if (e.target.closest('.tascbar-menu')) return;
+            // Rozwiń taskbar po najechaniu
+            tascBar.addEventListener('mouseenter', () => {
                 tascBar.classList.remove('tascbar-collapsed');
                 tascBar.classList.add('tascbar-expanded');
                 setDynamicWidth();
             });
 
-            // Zwiń taskbar po kliknięciu poza nim
-            document.addEventListener('click', (e) => {
-                if (!tascBar.contains(e.target)) {
-                    tascBar.classList.remove('tascbar-expanded');
-                    tascBar.classList.add('tascbar-collapsed');
-                    tascBar.style.width = '';
-                    // Ukryj menu jeśli otwarte
-                    if (tascBar._openMenu) {
-                        tascBar._openMenu.style.display = 'none';
-                        tascBar._openMenu = null;
-                    }
+            // Zwiń taskbar po wyjechaniu kursorem poza taskbar i menu (jeśli menu nie jest otwarte)
+            tascBar.addEventListener('mouseleave', (e) => {
+                // Jeśli menu jest otwarte i kursor wchodzi do menu, nie chowaj
+                if (tascBar._openMenu) {
+                    const menu = tascBar._openMenu;
+                    // Dodaj nasłuchiwacz na menu, by wykryć opuszczenie menu
+                    const onMenuLeave = (ev) => {
+                        // Jeśli kursor opuścił menu i nie wrócił do taskbara
+                        if (!tascBar.contains(ev.relatedTarget) && !menu.contains(ev.relatedTarget)) {
+                            tascBar.classList.remove('tascbar-expanded');
+                            tascBar.classList.add('tascbar-collapsed');
+                            tascBar.style.width = '';
+                            menu.style.display = 'none';
+                            tascBar._openMenu = null;
+                            menu.removeEventListener('mouseleave', onMenuLeave);
+                        }
+                    };
+                    menu.addEventListener('mouseleave', onMenuLeave);
+                    return;
                 }
+                // Jeśli menu nie jest otwarte, chowaj normalnie
+                tascBar.classList.remove('tascbar-expanded');
+                tascBar.classList.add('tascbar-collapsed');
+                tascBar.style.width = '';
             });
         }
         return tascBar;
