@@ -154,35 +154,11 @@ class config {
 
         // Obsługa menu rozwijanego
         if (Array.isArray(config.items) && config.items.length > 0) {
-            // Proste menu rozwijane
             const menu = document.createElement('div');
             menu.className = 'tascbar-menu' + (config.classMenu ? ' ' + config.classMenu : '');
             menu.style.display = 'none';
-
-            // Ustal pozycję menu w zależności od położenia taskbara
-            let tascBarPosition = this.positionTascBar || 'top';
-            if (config.positionTascBar) tascBarPosition = config.positionTascBar;
-            if (tascBarPosition === 'bottom') {
-                menu.style.top = 'auto';
-                menu.style.bottom = '100%';
-                menu.style.left = '0';
-                menu.style.right = 'auto';
-            } else if (tascBarPosition === 'top') {
-                menu.style.top = '100%';
-                menu.style.bottom = 'auto';
-                menu.style.left = '0';
-                menu.style.right = 'auto';
-            } else if (tascBarPosition === 'left') {
-                menu.style.top = '0';
-                menu.style.bottom = 'auto';
-                menu.style.left = '100%';
-                menu.style.right = 'auto';
-            } else if (tascBarPosition === 'right') {
-                menu.style.top = '0';
-                menu.style.bottom = 'auto';
-                menu.style.left = 'auto';
-                menu.style.right = '100%';
-            }
+            menu.style.position = 'absolute';
+            menu.style.zIndex = '99999';
 
             // Funkcja zamykająca menu
             const tascBar = document.getElementById(this.idTascBar);
@@ -207,7 +183,6 @@ class config {
                 itemLabel.className = 'tascbar-menu-item-label' + (item.classMenuItemLabel ? ' ' + item.classMenuItemLabel : '');
                 itemLabel.textContent = item.label;
                 itemEl.appendChild(itemLabel);
-                // Zawsze zamykaj menu po kliknięciu w opcję i zwijaj pasek
                 itemEl.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (typeof item.onClick === 'function') {
@@ -220,6 +195,30 @@ class config {
                 menu.appendChild(itemEl);
             });
 
+            // Pozycjonowanie menu względem ikony
+            function positionMenu() {
+                const rect = iconWrap.getBoundingClientRect();
+                menu.style.minWidth = rect.width + 'px';
+                // Rozwijanie do góry jeśli taskbar na dole
+                let tascBarPosition = (this && this.positionTascBar) ? this.positionTascBar : (config && config.positionTascBar);
+                // Spróbuj pobrać z instancji klasy config
+                if (!tascBarPosition && typeof window !== 'undefined' && window.config && window.config.positionTascBar) {
+                    tascBarPosition = window.config.positionTascBar;
+                }
+                // domyślnie pod ikoną
+                if (tascBarPosition === 'bottom') {
+                    // rozwijaj do góry
+                    menu.style.left = rect.left + 'px';
+                    // najpierw pokaż menu, by znać jego wysokość
+                    menu.style.display = 'block';
+                    menu.style.top = (rect.top + window.scrollY - menu.offsetHeight) + 'px';
+                } else {
+                    // domyślnie w dół
+                    menu.style.left = rect.left + 'px';
+                    menu.style.top = (rect.bottom + window.scrollY) + 'px';
+                }
+            }
+
             // Pokaz/ukryj menu po kliknięciu
             iconWrap.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -227,7 +226,9 @@ class config {
                     menu.style.display = 'none';
                     if (tascBar) tascBar._openMenu = null;
                 } else {
+                    // najpierw pokaż menu, by znać jego wysokość
                     menu.style.display = 'block';
+                    positionMenu();
                     if (tascBar) tascBar._openMenu = menu;
                 }
             });
@@ -236,8 +237,8 @@ class config {
                 menu.style.display = 'none';
                 if (tascBar) tascBar._openMenu = null;
             });
-            iconWrap.style.position = 'relative';
-            iconWrap.appendChild(menu);
+            // Przenieś menu do body
+            document.body.appendChild(menu);
         }
 
         return iconWrap;
