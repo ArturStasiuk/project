@@ -199,18 +199,19 @@ class config {
             function positionMenu() {
                 const rect = iconWrap.getBoundingClientRect();
                 menu.style.minWidth = rect.width + 'px';
-                // Rozwijanie do góry jeśli taskbar na dole
-                let tascBarPosition = (this && this.positionTascBar) ? this.positionTascBar : (config && config.positionTascBar);
-                // Spróbuj pobrać z instancji klasy config
-                if (!tascBarPosition && typeof window !== 'undefined' && window.config && window.config.positionTascBar) {
-                    tascBarPosition = window.config.positionTascBar;
+                // Ustal pozycję taskbara na podstawie klasy na elemencie tascBar
+                let tascBarPosition = 'bottom';
+                const tascBarElem = document.getElementById('idTascBar');
+                if (tascBarElem) {
+                    if (tascBarElem.classList.contains('tascbar-top')) tascBarPosition = 'top';
+                    else if (tascBarElem.classList.contains('tascbar-left')) tascBarPosition = 'left';
+                    else if (tascBarElem.classList.contains('tascbar-right')) tascBarPosition = 'right';
                 }
-                // domyślnie pod ikoną
                 if (tascBarPosition === 'bottom') {
-                    // rozwijaj do góry
-                    menu.style.left = rect.left + 'px';
                     // najpierw pokaż menu, by znać jego wysokość
                     menu.style.display = 'block';
+                    // menu od dołu przycisku do góry ekranu
+                    menu.style.left = rect.left + 'px';
                     menu.style.top = (rect.top + window.scrollY - menu.offsetHeight) + 'px';
                 } else {
                     // domyślnie w dół
