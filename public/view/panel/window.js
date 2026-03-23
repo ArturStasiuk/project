@@ -402,7 +402,7 @@ class AppWindow {
                 }
             },
             _meniu: {
-                visible: true,
+                visible: false,
                 classMeniu: 'menu',
                 items: [
                     {
