@@ -26,10 +26,10 @@ class config {
         this.classNamePanel = 'panel';
         this.idPanel = 'id_panel';
 
-        // Unikelne klasy i ID dla tascBar
+        // Unikalne klasy i ID dla tascBar
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
-        this.positionTascBar = 'bottom'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
+        this.positionTascBar = 'right'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
         this.contentPanel = null; // Przechowywanie referencji do zawartości panelu, jeśli potrzebne
 
 
