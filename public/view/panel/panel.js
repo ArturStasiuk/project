@@ -2,111 +2,85 @@ import { config } from './config.js';
 
 class panel {
     constructor(parent) {
-        this.parent = parent; // Przechowywanie referencji do rodzica, jeśli 
-        this.config = new config(this); // Inicjalizacja konfiguracji panelu
-
+        this.parent = parent;
+        this.config = new config(this);
     }
 
-
-    // wyswietlenie panelu 
+    // Wyświetlenie panelu
     async showPanel() {
         let panel = document.getElementById(this.config.idPanel);
         if (panel) {
             panel.style.display = 'block';
         } else {
-            // Utwórz panel
             panel = await this.config.configPanel();
             document.body.appendChild(panel);
         }
     }
 
-    // wylaczanie panelu 
+    // Ukrycie/usunięcie panelu
     async hidePanel() {
         const panel = document.getElementById(this.config.idPanel);
-        if (panel) {
-            panel.remove();
-        }
+        if (panel) panel.remove();
     }
 
-    // wlaczenie tascBar
+    // Wyświetlenie tascBar
     async showTascBar() {
         let tascBar = document.getElementById(this.config.idTascBar);
         if (tascBar) {
-            tascBar.style.display = 'block';
+            tascBar.style.display = 'flex';
         } else {
-            // Utwórz tascBar
             tascBar = await this.config.configTascBar();
             const panel = document.getElementById(this.config.idPanel);
-            if (panel) {
-                panel.appendChild(tascBar);
-            }
+            if (panel) panel.appendChild(tascBar);
         }
     }
-    // wylaczenie tascBar
+
+    // Ukrycie/usunięcie tascBar
     async hideTascBar() {
         const tascBar = document.getElementById(this.config.idTascBar);
-        if (tascBar) {
-            tascBar.remove();
-        }
+        if (tascBar) tascBar.remove();
     }
-    // // twozy wyglad dla ikon/meniu w tascBar na podstawie configuracji a satempnie dodaje ja do taskbar 
+
+    // Dodanie ikony/menu do tascBar
     async addIconTascBar(data) {
         const icon = await this.config.createTascBarIcon(data);
         let tascBar = document.getElementById(this.config.idTascBar);
         if (!tascBar) {
-            // Jeśli tascBar nie istnieje, utwórz go i dodaj do panelu
             tascBar = await this.config.configTascBar();
             const panel = document.getElementById(this.config.idPanel);
-            if (panel) {
-                panel.appendChild(tascBar);
-            }
+            if (panel) panel.appendChild(tascBar);
         }
         tascBar.appendChild(icon);
     }
-    // odswiezanie ikonu/meniu w tascBar na podstawie configuracji 
+
+    // Odświeżenie ikony/menu w tascBar
     async refreshIconTascBar(data) {
-        if (!data || !data.idIcon) return;
+        if (!data?.idIcon) return;
         const tascBar = document.getElementById(this.config.idTascBar);
         if (!tascBar) return;
         const oldIcon = document.getElementById(data.idIcon);
         if (!oldIcon) return;
-        // Utwórz nowy element ikony/menu na podstawie aktualnej konfiguracji
         const newIcon = await this.config.createTascBarIcon(data);
         tascBar.replaceChild(newIcon, oldIcon);
     }
-    // usuwanie ikonu/meniu z tascBar na podstawie id ikony
+
+    // Usunięcie ikony/menu z tascBar
     async removeIconTascBar(idIcon) {
         if (!idIcon) return;
         const tascBar = document.getElementById(this.config.idTascBar);
         if (!tascBar) return;
         const icon = document.getElementById(idIcon);
-        if (icon) {
-            tascBar.removeChild(icon);
-        }
+        if (icon) tascBar.removeChild(icon);
     }
 
-
-
-    // dodanie okna do widoku
+    // Dodanie okna do widoku
     async addWindow(data) {
-        // dodanie okna do widoku na podstawie konfiguracji z panelu window.js
-        if (!this.appWindow) {
-            if (this.parent && this.parent.appWindow) {
-                this.appWindow = this.parent.appWindow;
-            } else {
-                throw new Error('Brak instancji AppWindow!');
-            }
-        }
-        const win = await this.appWindow.winDemo();
+        const appWindow = this.parent?.appWindow;
+        if (!appWindow) throw new Error('Brak instancji AppWindow!');
+        const win = await appWindow.winDemo();
         const panel = document.getElementById(this.config.idPanel);
-        if (panel) {
-            panel.appendChild(win); // Dodaj okno do panelu
-        }
-
+        if (panel) panel.appendChild(win);
     }
-
-
-
 }
 
 export { panel };

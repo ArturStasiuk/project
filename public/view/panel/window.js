@@ -3,14 +3,6 @@ class AppWindow {
     static MAX_ZINDEX = 99998; // zawsze mniej niż tascbar-menu
 
     constructor(parent) {
-        // dodanie styli okna z public/view/css/window.css
-        if (!document.getElementById('app-window-styles')) {
-            const link = document.createElement('link');
-            link.id = 'app-window-styles';
-            link.rel = 'stylesheet';
-            link.href = 'view/css/window.css';
-            document.head.appendChild(link);
-        }
         this.parent = parent;
     }
 
@@ -37,12 +29,10 @@ class AppWindow {
         this._updateMenu(win, config._meniu);
         this._updateContent(win, config._content);
 
-            this._attachFunctions(config._function, win);        
-            // NIE dodawaj do DOM tutaj! Zwróć tylko obiekt okna.
-            // Dodawanie do DOM powinno być wykonane w innej klasie/metodzie.
-            config._function?.onCreate?.(win);
-            config._function?.onOpen?.(win);
-            return win;
+        this._attachFunctions(config._function, win);
+        config._function?.onCreate?.(win);
+        config._function?.onOpen?.(win);
+        return win;
     }
 
     // =========================
@@ -51,24 +41,21 @@ class AppWindow {
     async _createMain(cfg = {}) {
         const win = document.createElement('div');
 
-        const id = cfg.idWindow || 'win_' + Date.now();
-        win.id = id;
+        win.id = cfg.idWindow || 'win_' + Date.now();
         win.className = cfg.classWindow || 'app-window';
-
         win.style.position = 'absolute';
 
         this._applyWindowConfig(win, cfg);
 
-        // focus
         win.addEventListener('mousedown', () => {
             AppWindow.zIndex = Math.min(++AppWindow.zIndex, AppWindow.MAX_ZINDEX);
             win.style.zIndex = AppWindow.zIndex;
         });
 
-     return win;
+        return win;
     }
 
-    async _applyWindowConfig(win, cfg = {}) {
+    _applyWindowConfig(win, cfg = {}) {
         if (cfg.size && cfg.size !== 'auto') {
             win.style.width = cfg.size.width + 'px';
             win.style.height = cfg.size.height + 'px';
@@ -84,11 +71,7 @@ class AppWindow {
             win.style.transform = 'none';
         }
 
-        if (cfg.visible === false) {
-            win.style.display = 'none';
-        } else {
-            win.style.display = 'block';
-        }
+        win.style.display = (cfg.visible === false) ? 'none' : 'block';
 
         AppWindow.zIndex = Math.min(++AppWindow.zIndex, AppWindow.MAX_ZINDEX);
         win.style.zIndex = AppWindow.zIndex;
@@ -97,7 +80,7 @@ class AppWindow {
     // =========================
     // TITLE BAR
     // =========================
-    async _updateTitleBar(win, cfg = {}, fullConfig = {}) {
+    _updateTitleBar(win, cfg = {}, fullConfig = {}) {
         if (win._parts.titleBar) {
             win._parts.titleBar.remove();
             win._parts.titleBar = null;
@@ -146,7 +129,6 @@ class AppWindow {
 
         bar.appendChild(title);
         bar.appendChild(controls);
-
         win.prepend(bar);
         win._parts.titleBar = bar;
 
@@ -156,7 +138,7 @@ class AppWindow {
     // =========================
     // MENU
     // =========================
-    async _updateMenu(win, cfg = {}) {
+    _updateMenu(win, cfg = {}) {
         if (win._parts.menu) {
             win._parts.menu.remove();
             win._parts.menu = null;
@@ -184,29 +166,24 @@ class AppWindow {
                     const subEl = document.createElement('div');
                     subEl.className = 'submenu-item';
                     subEl.innerHTML = `${subItem.icon || ''} ${subItem.name}`;
-
                     subEl.onclick = async (e) => {
                         await subItem.onClick?.(subEl, win, e);
                     };
-
                     sub.appendChild(subEl);
                 });
 
                 el.appendChild(sub);
-                // Rozwijaj submenu tylko po kliknięciu
+
                 el.onclick = async (e) => {
-                    // Jeśli kliknięto już otwarte, zamknij
                     if (sub.style.display === 'block') {
                         sub.style.display = 'none';
                     } else {
-                        // Zamknij inne otwarte submenus
                         menu.querySelectorAll('.submenu').forEach(s => { if (s !== sub) s.style.display = 'none'; });
                         sub.style.display = 'block';
                     }
-                    // Jeśli menu-item ma własny onClick, wywołaj go
                     if (item.onClick) await item.onClick(el, win, e);
                 };
-                // Ukryj submenu po kliknięciu poza menu
+
                 document.addEventListener('click', function hideSub(e) {
                     if (!el.contains(e.target)) sub.style.display = 'none';
                 });
@@ -227,7 +204,7 @@ class AppWindow {
     // =========================
     // CONTENT
     // =========================
-    async _updateContent(win, cfg = {}) {
+    _updateContent(win, cfg = {}) {
         let content = win._parts.content;
 
         if (!content) {
@@ -247,9 +224,7 @@ class AppWindow {
             content.appendChild(cfg.html);
         }
 
-        if (cfg.scrollable !== false) {
-            content.style.overflow = 'auto';
-        }
+        content.style.overflow = (cfg.scrollable !== false) ? 'auto' : '';
 
         if (cfg.style) {
             let styleEl = content.querySelector('style');
@@ -270,73 +245,43 @@ class AppWindow {
     // =========================
     // FULL UPDATE
     // =========================
-    async _updateWindowFull(win, config) {
-        if (config._window) this._applyWindowConfig(win, config._window);
+    _updateWindowFull(win, config) {
+        if (config._window)   this._applyWindowConfig(win, config._window);
         if (config._titleBar) this._updateTitleBar(win, config._titleBar, config);
-        if (config._meniu) this._updateMenu(win, config._meniu);
-        if (config._content) this._updateContent(win, config._content);
+        if (config._meniu)    this._updateMenu(win, config._meniu);
+        if (config._content)  this._updateContent(win, config._content);
     }
 
     // =========================
     // FUNCTIONS API
     // =========================
-    async _attachFunctions(cfg = {}, win) {
-
-        win.update = (newConfig) => {
-            this._updateWindowFull(win, newConfig);
-        };
-
-        win.updateContent = (cfg) => {
-            this._updateContent(win, cfg);
-        };
-
-        win.updateMenu = (cfg) => {
-            this._updateMenu(win, cfg);
-        };
-
-        win.updateTitleBar = (cfg) => {
-            this._updateTitleBar(win, cfg);
-        };
-
-        win.updateWindow = (cfg) => {
-            this._applyWindowConfig(win, cfg);
-        };
-
-        win.open = () => {
-            win.style.display = 'block';
-            cfg.onOpen?.(win);
-        };
-
-        win.close = () => {
-            win.remove();
-            cfg.onClose?.(win);
-        };
+    _attachFunctions(cfg = {}, win) {
+        win.update        = (newConfig) => this._updateWindowFull(win, newConfig);
+        win.updateContent = (c)         => this._updateContent(win, c);
+        win.updateMenu    = (c)         => this._updateMenu(win, c);
+        win.updateTitleBar= (c)         => this._updateTitleBar(win, c);
+        win.updateWindow  = (c)         => this._applyWindowConfig(win, c);
+        win.open          = ()          => { win.style.display = 'block'; cfg.onOpen?.(win); };
+        win.close         = ()          => { win.remove(); cfg.onClose?.(win); };
     }
 
     // =========================
     // DRAG
     // =========================
-    async _makeDraggable(win, handle) {
+    _makeDraggable(win, handle) {
         let isDragging = false, offsetX = 0, offsetY = 0;
 
-        // Ustaw kursor na grab na pasku tytułu
         handle.style.cursor = 'grab';
 
-        handle.addEventListener('mouseenter', () => {
-            if (!isDragging) handle.style.cursor = 'grab';
-        });
-        handle.addEventListener('mouseleave', () => {
-            if (!isDragging) handle.style.cursor = '';
-        });
+        handle.addEventListener('mouseenter', () => { if (!isDragging) handle.style.cursor = 'grab'; });
+        handle.addEventListener('mouseleave', () => { if (!isDragging) handle.style.cursor = ''; });
 
         handle.addEventListener('mousedown', (e) => {
             isDragging = true;
             handle.style.cursor = 'grabbing';
-            // Ustal pozycję względem viewportu, by uniknąć przeskoków
             const rect = win.getBoundingClientRect();
             offsetX = e.clientX - rect.left;
             offsetY = e.clientY - rect.top;
-            // Ustal left/top względem parenta (viewportu)
             win.style.left = rect.left + 'px';
             win.style.top = rect.top + 'px';
             win.style.transform = 'none';
@@ -356,14 +301,14 @@ class AppWindow {
             }
         });
     }
-     /** funkcja po wywolaniu ktorej zostanie utwozone przykladowe okno demo z tytulem, menu, trescia i przyciskami */
-   async winDemo() {
-        // Konfiguracja okna demo
+
+    /** Tworzy i zwraca przykładowe okno demo */
+    async winDemo() {
         const config = {
             _window: {
                 idWindow: 'demo_window',
-                classWindow: 'app-window demo-window',
-                size: { width: 500, height: 350 },
+                classWindow: 'app-window',
+                size: { width: 500, height: 380 },
                 position: 'onCenter',
                 visible: true
             },
@@ -377,172 +322,57 @@ class AppWindow {
                     maximize: '&#9723;',
                     close: '&#10005;'
                 },
-                onMinimize: (win) => {
-                    win.style.display = 'none';
-                },
                 onMaximize: (win) => {
-                    win.classList.toggle('maximized');
                     if (win.classList.contains('maximized')) {
-                        win.style.top = '0';
-                        win.style.left = '0';
-                        win.style.width = '100vw';
-                        win.style.height = '100vh';
-                        win.style.transform = 'none';
-                    } else {
                         win.style.width = '500px';
-                        win.style.height = '350px';
-                        win.style.position = 'absolute';
+                        win.style.height = '380px';
                         win.style.top = '50%';
                         win.style.left = '50%';
                         win.style.transform = 'translate(-50%, -50%)';
                     }
-                },
-                onClose: (win) => {
-                    // Usuwanie okna z DOM obsługiwane przez domyślną funkcję
                 }
             },
             _meniu: {
                 visible: true,
                 classMeniu: 'menu',
                 items: [
-                    {
-                        name: 'Opcja 1',
-                        icon:'🗂️',
-                      //  onClick: () => alert('Wybrano: Opcja 1')
-                    },
+                    { name: 'Opcja 1', icon: '🗂️' },
                     {
                         name: 'Opcja 2',
-                        icon:'⚙️',
-                      //  onClick: () => alert('Wybrano: Opcja 2'),
+                        icon: '⚙️',
                         submenu: [
-                            {
-                                name: 'Subopcja 1',
-                                icon: '🔧',
-                                onClick: () => alert('Wybrano: Subopcja 1')
-                            },
-                            {
-                                name: 'Subopcja 2',
-                                icon: '🔩',
-                                onClick: () => alert('Wybrano: Subopcja 2')
-                            }
-                        ],
-                        
+                            { name: 'Subopcja 1', icon: '🔧', onClick: () => alert('Wybrano: Subopcja 1') },
+                            { name: 'Subopcja 2', icon: '🔩', onClick: () => alert('Wybrano: Subopcja 2') }
+                        ]
                     },
-                    {
-                        name: 'Opcja 3',
-                        icon:'❓',
-                        onClick: () => alert('Wybrano: Opcja 3')
-                    }
+                    { name: 'Opcja 3', icon: '❓', onClick: () => alert('Wybrano: Opcja 3') }
                 ]
             },
             _content: {
                 classContent: 'content',
-                html: `<h2 style=\"color:#2196f3;\">Witamy w oknie demo!</h2>
+                scrollable: true,
+                html: `<h2 style="color:#0078d4;margin-top:0;">Witamy w oknie demo!</h2>
                 <p>To jest przykładowa treść okna. Możesz przewijać tę sekcję, jeśli tekstu będzie więcej.<br><br>
-                <b>Możliwości okna:</b><ul>
-                <li>Przeciąganie za pasek tytułu</li>
-                <li>Menu z podmenu</li>
-                <li>Przyciski: minimalizuj, maksymalizuj, zamknij</li>
-                <li>Przewijana treść</li>
-                <li>Własny styl CSS</li>
-                </ul></p>
-                <div style=\"height:200px;\"></div>
-                <p>Przewiń, by zobaczyć więcej!</p>` ,
-                style: `
-                    .demo-window .content {
-                        background: #f5f7fa;
-                        border-radius: 0 0 8px 8px;
-                        padding: 18px;
-                        font-family: Arial, sans-serif;
-                        font-size: 15px;
-                        color: #333;
-                        max-height: 220px;
-                        min-height: 120px;
-                        overflow: auto;
-                    }
-                    .demo-window .menu {
-                        background: #e3eaf2;
-                        border-bottom: 1px solid #bcd;
-                    }
-                    .demo-window .menu-item {
-                        padding: 6px 18px;
-                        cursor: pointer;
-                        display: inline-block;
-                        position: relative;
-                        border-radius: 4px 4px 0 0;
-                        margin-right: 2px;
-                        transition: background 0.2s;
-                    }
-                    .demo-window .menu-item:hover {
-                        background: #d0e2fa;
-                    }
-                    .demo-window .submenu {
-                        display: none;
-                        position: absolute;
-                        left: 0;
-                        top: 100%;
-                        background: #fff;
-                        border: 1px solid #bcd;
-                        border-radius: 0 0 6px 6px;
-                        min-width: 120px;
-                        z-index: 10;
-                        box-shadow: 0 2px 8px #0001;
-                    }
-                    .demo-window .submenu-item {
-                        padding: 6px 16px;
-                        cursor: pointer;
-                        white-space: nowrap;
-                        border-radius: 0 0 6px 6px;
-                    }
-                    .demo-window .submenu-item:hover {
-                        background: #e3eaf2;
-                    }
-                    .demo-window .title-bar {
-                        background: #2196f3;
-                        color: #fff;
-                        border-radius: 8px 8px 0 0;
-                        padding: 2px 10px;
-                        font-size: 15px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        user-select: none;
-                    }
-                    .demo-window .controls button {
-                        background: none;
-                        border: none;
-                        color: #fff;
-                        font-size: 18px;
-                        margin-left: 8px;
-                        cursor: pointer;
-                        border-radius: 3px;
-                        transition: background 0.2s;
-                    }
-                    .demo-window .controls button:hover {
-                        background: #1976d2;
-                    }
-                `,
-                scrollable: true
+                <b>Możliwości okna:</b></p>
+                <ul>
+                  <li>Przeciąganie za pasek tytułu</li>
+                  <li>Menu z podmenu</li>
+                  <li>Przyciski: minimalizuj, maksymalizuj, zamknij</li>
+                  <li>Przewijana treść</li>
+                  <li>Własny styl CSS</li>
+                </ul>
+                <div style="height:200px;"></div>
+                <p>Przewiń, by zobaczyć więcej!</p>`
             },
             _function: {
-                onCreate: (win) => {
-                    // Możesz dodać dodatkowe akcje po utworzeniu okna
-                },
-                onOpen: (win) => {
-                    // Możesz dodać dodatkowe akcje po otwarciu okna
-                },
-                onClose: (win) => {
-                    // Możesz dodać dodatkowe akcje po zamknięciu okna
-                }
+                onCreate: () => {},
+                onOpen:   () => {},
+                onClose:  () => {}
             }
-    };
+        };
 
-        // Tworzenie okna demo
-      return  this.createWindow(config);
-}
-
-
-
+        return this.createWindow(config);
+    }
 }
 
 export { AppWindow };
