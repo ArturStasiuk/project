@@ -193,8 +193,23 @@ class AppWindow {
                 });
 
                 el.appendChild(sub);
-                el.onmouseenter = () => sub.style.display = 'block';
-                el.onmouseleave = () => sub.style.display = 'none';
+                // Rozwijaj submenu tylko po kliknięciu
+                el.onclick = async (e) => {
+                    // Jeśli kliknięto już otwarte, zamknij
+                    if (sub.style.display === 'block') {
+                        sub.style.display = 'none';
+                    } else {
+                        // Zamknij inne otwarte submenus
+                        menu.querySelectorAll('.submenu').forEach(s => { if (s !== sub) s.style.display = 'none'; });
+                        sub.style.display = 'block';
+                    }
+                    // Jeśli menu-item ma własny onClick, wywołaj go
+                    if (item.onClick) await item.onClick(el, win, e);
+                };
+                // Ukryj submenu po kliknięciu poza menu
+                document.addEventListener('click', function hideSub(e) {
+                    if (!el.contains(e.target)) sub.style.display = 'none';
+                });
             }
 
             menu.appendChild(el);
@@ -393,11 +408,12 @@ class AppWindow {
                     {
                         name: 'Opcja 1',
                         icon:'🗂️',
-                        onClick: () => alert('Wybrano: Opcja 1')
+                      //  onClick: () => alert('Wybrano: Opcja 1')
                     },
                     {
                         name: 'Opcja 2',
                         icon:'⚙️',
+                      //  onClick: () => alert('Wybrano: Opcja 2'),
                         submenu: [
                             {
                                 name: 'Subopcja 1',
@@ -410,7 +426,7 @@ class AppWindow {
                                 onClick: () => alert('Wybrano: Subopcja 2')
                             }
                         ],
-                        onClick: () => alert('Wybrano: Opcja 2')
+                        
                     },
                     {
                         name: 'Opcja 3',
