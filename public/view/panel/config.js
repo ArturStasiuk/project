@@ -29,7 +29,7 @@ class config {
         // Unikalne klasy i ID dla tascBar
         this.classNameTascBar = 'tascBar';
         this.idTascBar = 'idTascBar'
-        this.positionTascBar = 'right'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
+        this.positionTascBar = 'left'; // Możliwe wartości: 'top', 'bottom', 'left', 'right'
         this.contentPanel = null; // Przechowywanie referencji do zawartości panelu, jeśli potrzebne
 
 
@@ -78,16 +78,13 @@ class config {
         // Tryb zwijania/rozwijania dla left/right
         if (this.positionTascBar === 'left' || this.positionTascBar === 'right') {
             tascBar.classList.add('tascbar-collapsed');
-            // Referencja do menu, ustawiana przez createTascBarIcon
             tascBar._openMenu = null;
 
             // Funkcja do dynamicznego ustawiania szerokości
             function setDynamicWidth() {
-                // Pobierz wszystkie tytuły ikon
                 const titles = tascBar.querySelectorAll('.tascbar-icon-title');
                 let maxWidth = 0;
                 titles.forEach(title => {
-                    // Utwórz tymczasowy span do pomiaru szerokości
                     const temp = document.createElement('span');
                     temp.style.visibility = 'hidden';
                     temp.style.position = 'absolute';
@@ -99,24 +96,30 @@ class config {
                     maxWidth = Math.max(maxWidth, temp.offsetWidth);
                     document.body.removeChild(temp);
                 });
-                // Szerokość: ikona + odstęp + max tekst + marginesy
-                let newWidth = 32 + 8 + maxWidth + 24; // 32px ikona, 8px margines, 24px zapas
+                let newWidth = 32 + 8 + maxWidth + 24;
                 tascBar.style.width = newWidth + 'px';
             }
 
-            tascBar.addEventListener('mouseenter', () => {
+            // Rozwiń taskbar po kliknięciu w niego
+            tascBar.addEventListener('click', (e) => {
+                // Jeśli kliknięto w menu, nie zwijaj
+                if (e.target.closest('.tascbar-menu')) return;
                 tascBar.classList.remove('tascbar-collapsed');
                 tascBar.classList.add('tascbar-expanded');
                 setDynamicWidth();
             });
-            tascBar.addEventListener('mouseleave', () => {
-                tascBar.classList.remove('tascbar-expanded');
-                tascBar.classList.add('tascbar-collapsed');
-                tascBar.style.width = '';
-                // Ukryj menu jeśli otwarte
-                if (tascBar._openMenu) {
-                    tascBar._openMenu.style.display = 'none';
-                    tascBar._openMenu = null;
+
+            // Zwiń taskbar po kliknięciu poza nim
+            document.addEventListener('click', (e) => {
+                if (!tascBar.contains(e.target)) {
+                    tascBar.classList.remove('tascbar-expanded');
+                    tascBar.classList.add('tascbar-collapsed');
+                    tascBar.style.width = '';
+                    // Ukryj menu jeśli otwarte
+                    if (tascBar._openMenu) {
+                        tascBar._openMenu.style.display = 'none';
+                        tascBar._openMenu = null;
+                    }
                 }
             });
         }
@@ -208,13 +211,21 @@ class config {
                     else if (tascBarElem.classList.contains('tascbar-right')) tascBarPosition = 'right';
                 }
                 if (tascBarPosition === 'bottom') {
-                    // najpierw pokaż menu, by znać jego wysokość
                     menu.style.display = 'block';
-                    // menu od dołu przycisku do góry ekranu
                     menu.style.left = rect.left + 'px';
                     menu.style.top = (rect.top + window.scrollY - menu.offsetHeight) + 'px';
+                } else if (tascBarPosition === 'right') {
+                    // menu na lewo od taskbara
+                    menu.style.display = 'block';
+                    menu.style.left = (rect.left - menu.offsetWidth) + 'px';
+                    menu.style.top = rect.top + window.scrollY + 'px';
+                } else if (tascBarPosition === 'left') {
+                    // menu na prawo od taskbara
+                    menu.style.display = 'block';
+                    menu.style.left = (rect.right) + 'px';
+                    menu.style.top = rect.top + window.scrollY + 'px';
                 } else {
-                    // domyślnie w dół
+                    // domyślnie w dół (top)
                     menu.style.left = rect.left + 'px';
                     menu.style.top = (rect.bottom + window.scrollY) + 'px';
                 }
