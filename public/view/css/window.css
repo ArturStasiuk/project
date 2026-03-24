@@ -1,4 +1,5 @@
-/* ===== App Window (Windows 10-like) ===== */
+/* ===== Okno aplikacji (styl Windows 10) ===== */
+/* Główny kontener okna z tłem, cieniem i obramowaniem */
 .app-window {
     background: #f3f3f3;
     border-radius: 4px;
@@ -10,7 +11,8 @@
     border: 1px solid #d1d1d1;
 }
 
-/* ===== Title Bar ===== */
+/* ===== Pasek tytułu okna ===== */
+/* Niebieski pasek z tytułem, ikoną i przyciskami sterującymi */
 .title-bar {
     background: #0078d4;
     color: #fff;
@@ -25,6 +27,7 @@
     font-family: inherit;
 }
 
+/* Sekcja z ikoną i nazwą okna */
 .title-bar .title {
     display: flex;
     align-items: center;
@@ -35,6 +38,7 @@
     text-overflow: ellipsis;
 }
 
+/* Kontener przycisków sterujących (minimalizuj, maksymalizuj, zamknij) */
 .title-bar .controls {
     display: flex;
     align-items: center;
@@ -42,6 +46,7 @@
     flex-shrink: 0;
 }
 
+/* Pojedynczy przycisk sterujący */
 .title-bar .controls button {
     background: none;
     border: none;
@@ -58,15 +63,18 @@
     padding: 0;
 }
 
+/* Podświetlenie przycisku po najechaniu */
 .title-bar .controls button:hover {
     background: rgba(255,255,255,0.18);
 }
 
+/* Czerwone tło przycisku zamknięcia po najechaniu */
 .title-bar .controls button:last-child:hover {
     background: #c42b1c;
 }
 
-/* ===== Menu Bar ===== */
+/* ===== Pasek menu okna ===== */
+/* Poziomy pasek z opcjami menu */
 .menu {
     display: flex;
     background: #f3f3f3;
@@ -77,6 +85,7 @@
     font-family: inherit;
 }
 
+/* Pojedynczy element menu */
 .menu-item {
     display: flex;
     align-items: center;
@@ -90,17 +99,20 @@
     white-space: nowrap;
 }
 
+/* Podświetlenie elementu menu po najechaniu */
 .menu-item:hover {
     background: #e5f3ff;
     color: #000;
 }
 
+/* Fokus klawiatury na elemencie menu */
 .menu-item:focus {
     outline: none;
     background: #e5f3ff;
 }
 
-/* ===== Submenu ===== */
+/* ===== Podmenu ===== */
+/* Rozwijana lista opcji pod elementem menu */
 .submenu {
     display: none;
     position: absolute;
@@ -115,6 +127,7 @@
     padding: 4px 0;
 }
 
+/* Pozycja podmenu */
 .submenu-item {
     display: flex;
     align-items: center;
@@ -126,11 +139,13 @@
     white-space: nowrap;
 }
 
+/* Podświetlenie pozycji podmenu */
 .submenu-item:hover {
     background: #e5f3ff;
 }
 
-/* ===== Content Area ===== */
+/* ===== Obszar treści ===== */
+/* Przewijalna sekcja z zawartością okna */
 .content {
     padding: 12px;
     background: #fff;
@@ -139,7 +154,8 @@
     color: #000;
 }
 
-/* ===== Maximized State ===== */
+/* ===== Stan zmaksymalizowany ===== */
+/* Okno zajmuje cały ekran – przykrywa pasek zadań */
 .maximized {
     top: 0 !important;
     left: 0 !important;
@@ -147,4 +163,104 @@
     height: 100vh !important;
     border-radius: 0 !important;
     transform: none !important;
+}
+
+/* ===== Responsywność – tablety (max 768px) ===== */
+/* Dostosowanie okna i jego elementów dla urządzeń dotykowych */
+@media (max-width: 768px) {
+    /* Wyższy pasek tytułu dla łatwiejszego dotykania */
+    .title-bar {
+        height: 40px;
+        min-height: 40px;
+        font-size: 14px;
+    }
+
+    /* Szersze przyciski sterujące dla dotyku */
+    .title-bar .controls button {
+        width: 52px;
+        height: 40px;
+        font-size: 15px;
+    }
+
+    /* Wyższe elementy paska menu */
+    .menu {
+        min-height: 32px;
+        font-size: 14px;
+    }
+
+    /* Wyższe obszary dotykowe w menu */
+    .menu-item {
+        height: 32px;
+        padding: 4px 10px;
+        font-size: 14px;
+    }
+
+    /* Większe pozycje podmenu */
+    .submenu-item {
+        padding: 8px 18px;
+        font-size: 14px;
+    }
+
+    /* Większy padding treści */
+    .content {
+        padding: 14px;
+        font-size: 14px;
+    }
+}
+
+/* ===== Responsywność – telefony (max 480px) ===== */
+/* Okno dopasowane do małego ekranu telefonu */
+@media (max-width: 480px) {
+    /* Okno zajmuje prawie cały ekran na telefonie */
+    .app-window {
+        border-radius: 0;
+        font-size: 15px;
+    }
+
+    /* Jeszcze wyższy pasek tytułu dla telefonów */
+    .title-bar {
+        height: 46px;
+        min-height: 46px;
+        padding: 0 4px 0 12px;
+        font-size: 15px;
+    }
+
+    /* Duże przyciski sterujące – łatwe do trafienia palcem */
+    .title-bar .controls button {
+        width: 56px;
+        height: 46px;
+        font-size: 16px;
+    }
+
+    /* Wyższy pasek menu na telefonie */
+    .menu {
+        min-height: 38px;
+        font-size: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Duże obszary dotykowe elementów menu */
+    .menu-item {
+        height: 38px;
+        padding: 6px 12px;
+        font-size: 15px;
+    }
+
+    /* Duże pozycje podmenu dla dotyku */
+    .submenu-item {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+
+    /* Więcej przestrzeni w treści okna */
+    .content {
+        padding: 16px;
+        font-size: 15px;
+    }
+
+    /* Zmaksymalizowane okno na całą dostępną przestrzeń */
+    .maximized {
+        width: 100vw !important;
+        height: 100vh !important;
+    }
 }
