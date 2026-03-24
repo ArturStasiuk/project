@@ -3,7 +3,7 @@
     --win-accent:        #0078d4;
     --win-accent-hover:  #106ebe;
     --win-accent-press:  #005a9e;
-    --win-taskbar-bg:    rgba(32, 32, 32, 0.92);
+    --win-taskbar-bg:    rgba(32, 32, 32, 0);
     --win-taskbar-item:  rgba(255,255,255,0.06);
     --win-taskbar-hover: rgba(255,255,255,0.14);
     --win-text-light:    #ffffff;
@@ -193,7 +193,7 @@
 
 /* ===== Custom class examples (backwards-compatible) ===== */
 .tascbar-menu-custom {
-    background: #222;
+    background: #222222;
     color: #fff;
     border-color: #0078d4;
 }
