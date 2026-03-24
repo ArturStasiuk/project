@@ -348,6 +348,7 @@ class AppWindow {
                     { name: 'Opcja 3', icon: '❓', onClick: () => alert('Wybrano: Opcja 3') }
                 ]
             },
+            /** 
             _content: {
                 classContent: 'content',
                 scrollable: true,
@@ -364,6 +365,20 @@ class AppWindow {
                 <div style="height:200px;"></div>
                 <p>Przewiń, by zobaczyć więcej!</p>`
             },
+             */
+            _content: {
+                classContent: 'content',
+                html: `<button id="demo-btn">Załaduj nową treść</button>`,
+                script: (content, win) => {
+                    content.querySelector('#demo-btn').onclick = () => {
+                        win.updateContent({
+                            classContent: 'content',
+                            html: '<p>Nowa zawartość została załadowana!</p>'
+                        });
+                    };
+                }
+            },
+
             _function: {
                 onCreate: () => {},
                 onOpen:   () => {},
