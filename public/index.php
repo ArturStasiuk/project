@@ -518,6 +518,12 @@
  *    getFocusedId()
  * ====================================================================== */
 class WindowManager {
+    /* Minimum window dimensions, must match CSS min-width/min-height */
+    static get MIN_W() { return 300; }
+    static get MIN_H() { return 220; }
+    /* Cascade offset applied per new window so they don't overlap exactly */
+    static get CASCADE_OFFSET() { return 24; }
+
     constructor(containerId) {
         this._cont    = document.getElementById(containerId);
         this._windows = new Map();   // id -> HTMLElement
@@ -528,7 +534,10 @@ class WindowManager {
         document.addEventListener('touchstart', e => this._hitTest(e), { capture: true, passive: true });
     }
 
-    _uid()  { return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+    /** Generates a unique window ID */
+    _generateWindowId() { return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+    /** @deprecated use _generateWindowId */
+    _uid() { return this._generateWindowId(); }
 
     _hitTest(e) {
         const winEl = e.target && e.target.closest && e.target.closest('.window');
@@ -570,14 +579,14 @@ class WindowManager {
     /* ---- CREATE ---- */
     createWindow({ id, title = '', icon = null, statusText = 'Gotowe',
                    width, height, x, y } = {}) {
-        if (!id) id = this._uid();
+        if (!id) id = this._generateWindowId();
         const vw = this._cont.offsetWidth;
         const vh = this._cont.offsetHeight;
         const w  = width  || Math.min(900, Math.max(400, vw - 60));
         const h  = height || Math.min(600, Math.max(280, vh - 60));
         const n  = this._windows.size;
-        const px = (x != null) ? x : Math.max(0, Math.min(vw - w, (vw - w) / 2 + n * 24));
-        const py = (y != null) ? y : Math.max(0, Math.min(vh - h, (vh - h) / 2 + n * 24));
+        const px = (x != null) ? x : Math.max(0, Math.min(vw - w, (vw - w) / 2 + n * WindowManager.CASCADE_OFFSET));
+        const py = (y != null) ? y : Math.max(0, Math.min(vh - h, (vh - h) / 2 + n * WindowManager.CASCADE_OFFSET));
 
         const win = document.createElement('div');
         win.className = 'window win-anim-open';
@@ -623,13 +632,9 @@ class WindowManager {
 
     _focusNext(exceptId) {
         const ids = Array.from(this._windows.keys()).reverse();
-        for (let i = 0; i < ids.length; i++) {
-            const wid = ids[i];
-            if (wid !== exceptId && !this._windows.get(wid)._wm.minimized) {
-                this.focusWindow(wid); return;
-            }
-        }
-        this._focused = null;
+        const nextId = ids.find(wid => wid !== exceptId && !this._windows.get(wid)._wm.minimized);
+        if (nextId) this.focusWindow(nextId);
+        else this._focused = null;
     }
 
     /* ---- MAXIMIZE ---- */
@@ -744,7 +749,7 @@ class WindowManager {
     /* ---- RESIZE (mouse + touch) ---- */
     _bindResize(win) {
         const self = this;
-        const MIN_W = 300, MIN_H = 220;
+        const MIN_W = WindowManager.MIN_W, MIN_H = WindowManager.MIN_H;
         win.querySelectorAll('.win-resize').forEach(function(handle) {
             var dir = handle.dataset.dir;
             var active = false, sx = 0, sy = 0, sw = 0, sh = 0, sl = 0, st = 0;
@@ -874,7 +879,7 @@ class TaskbarController {
         this._ovBtn = document.createElement('button');
         this._ovBtn.className = 'taskbar-overflow-btn';
         this._ovBtn.title = 'Wiecej okien';
-        this._ovBtn.textContent = '\u229e';
+        this._ovBtn.textContent = '\u229e'; // ⊞ overflow / more-windows indicator
         var self = this;
         this._ovBtn.addEventListener('click', function(e) { e.stopPropagation(); self._toggleOverflow(); });
         this._el.appendChild(this._ovBtn);
@@ -1027,11 +1032,16 @@ class TaskbarController {
     }
 
     /* ---- OVERFLOW ---- */
+    // Show overflow button when more than this many items are present
+    static get OVERFLOW_ITEM_THRESHOLD() { return 5; }
+    // Tolerance in px before considering the list as overflowing
+    static get OVERFLOW_SCROLL_TOLERANCE() { return 8; }
+
     _updateOverflow() {
         if (!this._ovBtn) return;
         var show = this._items.size > 0 &&
-            (this._items.size > 5 ||
-             this._winsEl.scrollWidth > this._winsEl.offsetWidth + 8);
+            (this._items.size > TaskbarController.OVERFLOW_ITEM_THRESHOLD ||
+             this._winsEl.scrollWidth > this._winsEl.offsetWidth + TaskbarController.OVERFLOW_SCROLL_TOLERANCE);
         this._ovBtn.classList.toggle('visible', show);
     }
 
