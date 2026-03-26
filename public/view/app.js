@@ -289,9 +289,6 @@ class View {
                             <button class="titlebar-button minimize" title="Minimalizuj">
                                 <div class="minimize-icon"></div>
                             </button>
-                            <button class="titlebar-button maximize" title="Maksymalizuj">
-                                <div class="maximize-icon"></div>
-                            </button>
                             <button class="titlebar-button close" title="Zamknij">
                                 <div class="close-icon"></div>
                             </button>
@@ -305,34 +302,9 @@ class View {
                 win.style.zIndex = ++window._windowZ;
                 window._windowStack.push(win);
 
-                // Ustaw pozycję absolutną (dla przesuwania)
                 win.style.position = 'absolute';
-                win.style.left = '50px';
-                win.style.top = '50px';
-
-                // Przeciąganie okna
-                let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
-                const titlebar = win.querySelector('.titlebar');
-                titlebar.style.cursor = 'move';
-                titlebar.addEventListener('mousedown', e => {
-                    isDragging = true;
-                    dragOffsetX = e.clientX - win.offsetLeft;
-                    dragOffsetY = e.clientY - win.offsetTop;
-                    win.style.transition = 'none';
-                    // Na wierzch przy rozpoczęciu przeciągania
-                    win.style.zIndex = ++window._windowZ;
-                });
-                document.addEventListener('mousemove', e => {
-                    if (!isDragging) return;
-                    win.style.left = (e.clientX - dragOffsetX) + 'px';
-                    win.style.top  = (e.clientY - dragOffsetY) + 'px';
-                });
-                document.addEventListener('mouseup', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                        win.style.transition = '';
-                    }
-                });
+                win.style.left = '0px';
+                win.style.top = '0px';
 
                 // Na wierzch po kliknięciu w okno
                 win.addEventListener('mousedown', () => {
@@ -349,6 +321,9 @@ class View {
 
                 /* poinformuj submoduły o nowym oknie */
                 self._onWindowCreated(win);
+
+                /* od razu maksymalizuj */
+                self._wmAction('maximize');
             },
 
             /** Zmienia tytuł okna */
@@ -384,14 +359,13 @@ class View {
         const self = this;
         return {
             /**
-             * Podpina handlery pod przyciski min/max/close
-             * @param {{ onMinimize, onMaximize, onClose }} cfg
+             * Podpina handlery pod przyciski min/close
+             * @param {{ onMinimize, onClose }} cfg
              */
-            bindControls({ onMinimize, onMaximize, onClose } = {}) {
+            bindControls({ onMinimize, onClose } = {}) {
                 if (!self._windowEl) return;
                 const win = self._windowEl;
                 win.querySelector('.minimize').onclick = e => { e.stopPropagation(); onMinimize && onMinimize(e); };
-                win.querySelector('.maximize').onclick = e => { e.stopPropagation(); onMaximize && onMaximize(e); };
                 win.querySelector('.close').onclick    = e => { e.stopPropagation(); onClose    && onClose(e);    };
             },
 
@@ -466,6 +440,11 @@ class View {
                     sub.className = 'submenu';
                     _buildItems(it.submenu, sub);
                     el.appendChild(sub);
+                    /* obsługa dotyku / kliknięcia dla podmenu */
+                    el.addEventListener('click', e => {
+                        e.stopPropagation();
+                        el.classList.toggle('submenu-open');
+                    });
                 } else if (!it.disabled && typeof it.onClick === 'function') {
                     el.addEventListener('click', e => {
                         e.stopPropagation();
@@ -670,6 +649,7 @@ class View {
 
         if (action === 'minimize') {
             if (_state.minimized) { this._wmAction('restore'); return; }
+            _state.wasMaximized = _state.maximized;
             win.classList.remove('maximized');
             win.classList.add('minimized');
             document.body.classList.remove('window-maximized');
@@ -712,6 +692,13 @@ class View {
             /* zaktualizuj rejestr */
             const regRes = window._windowRegistry.find(r => r.winEl === win);
             if (regRes) regRes.isMinimized = false;
+
+            /* jeśli okno było zmaksymalizowane przed minimalizacją, przywróć maksymalizację */
+            if (_state.wasMaximized) {
+                _state.wasMaximized = false;
+                this._wmAction('maximize');
+                return;
+            }
 
             // Przywróć poprzednie pozycje i rozmiar
             if (_state.prev) {
@@ -807,7 +794,6 @@ class WindowManager {
         v.window.create({ title, icon, statusText });
         v.titlebar.bindControls({
             onMinimize: () => v.window.minimize(),
-            onMaximize: () => { if (v.isMaximized()) v.window.restore(); else v.window.maximize(); },
             onClose:    () => { v.window.close(); this._windows.delete(windowId); }
         });
         this._windows.set(windowId, v);
