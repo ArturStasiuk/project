@@ -1114,6 +1114,43 @@ window.addEventListener('resize', () => {
 
   // Usuń z taskbara:
   view.taskbar.removeItem('tb-extra');
+
+  // dodaj nowe okno:
+    const view2 = new View({ taskbarId: 'taskbar', containerId: 'windowContainer' });
+    view2.window.create({ title: 'Drugie okno', statusText: 'Inne okno' });
+    view2.titlebar.bindControls({
+        onMinimize: () => view2.window.minimize(),
+        onMaximize: () => {
+            if (view2.isMaximized()) view2.window.restore();
+            else                    view2.window.maximize();
+        },
+        onClose: () => view2.window.close()
+    }); 
+        // Dodaj menu do drugiego okna
+        view2.menubar.refresh({
+            menus: [
+                {
+                    label: 'Plik', id: 'menu2-file',
+                    items: [
+                        { id: 'mi2-new',    icon: '📄', label: 'Nowy',        shortcut: 'Ctrl+N', onClick: () => {} },
+                        { id: 'mi2-open',   icon: '📂', label: 'Otwórz',      shortcut: 'Ctrl+O', onClick: () => {} },
+                        { id: 'mi2-save',   icon: '💾', label: 'Zapisz',      shortcut: 'Ctrl+S', onClick: () => {} },
+                        { separator: true },
+                        { id: 'mi2-close',  icon: '❌', label: 'Zamknij',     shortcut: 'Alt+F4',
+                          onClick: () => { view2.window.close(); } }
+                    ]
+                },
+                {
+                    label: 'Pomoc', id: 'menu2-help',
+                    items: [
+                        { icon: 'ℹ️', label: 'O programie', onClick: () => {
+                            view2.window.setStatus('Drugie okno – wersja 1.0.0');
+                        }}
+                    ]
+                }
+            ]
+        });
+    
 */
 </script>
 
