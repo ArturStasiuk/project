@@ -1160,102 +1160,232 @@ class View {
 }
 
 /* ════════════════════════════════════════════════════════════
+ *  class WindowManager
+ *  Zarządza wieloma oknami za pomocą unikalnego windowId.
+ *  Każda operacja przyjmuje windowId jako pierwszy parametr.
+ *
+ *  Tworzenie/usuwanie okna:
+ *    wm.create(id, { title, icon?, statusText? })   → View
+ *    wm.close(id)
+ *    wm.getView(id)                                 → View | null
+ *
+ *  Stan okna:
+ *    wm.setTitle(id, title)
+ *    wm.setStatus(id, text)
+ *    wm.minimize(id)
+ *    wm.maximize(id)
+ *    wm.restore(id)
+ *    wm.isMinimized(id)                             → boolean
+ *    wm.isMaximized(id)                             → boolean
+ *
+ *  Pasek tytułu:
+ *    wm.bindControls(id, { onMinimize, onMaximize, onClose })
+ *    wm.addButton(id, { id, label, onClick, position? })
+ *    wm.removeButton(id, btnId)
+ *
+ *  Zawartość okna:
+ *    wm.refreshContent(id, { header, subheader, cards })
+ *    wm.setHeader(id, text)
+ *    wm.setSubheader(id, text)
+ *    wm.addCard(id, { id, title, text })
+ *    wm.removeCard(id, cardId)
+ *    wm.updateCard(id, cardId, { title?, text? })
+ *
+ *  Menubar okna:
+ *    wm.refreshMenubar(id, menus)
+ *    wm.addMenu(id, { label, id, items, position? })
+ *    wm.removeMenu(id, menuId)
+ *    wm.addMenuItem(id, menuId, item)
+ *    wm.removeMenuItem(id, menuId, itemId)
+ * ════════════════════════════════════════════════════════════ */
+class WindowManager {
+    constructor({ containerId = 'windowContainer', taskbarId = 'taskbar' } = {}) {
+        this._containerId = containerId;
+        this._taskbarId   = taskbarId;
+        this._windows     = new Map(); // windowId → View
+    }
+
+    /** Tworzy nowe okno; zwraca instancję View lub null jeśli id już zajęte */
+    create(windowId, { title = '', icon = null, statusText = 'Gotowe' } = {}) {
+        if (this._windows.has(windowId)) {
+            console.warn(`WindowManager: okno "${windowId}" już istnieje.`);
+            return null;
+        }
+        const v = new View({ taskbarId: this._taskbarId, containerId: this._containerId });
+        v.window.create({ title, icon, statusText });
+        v.titlebar.bindControls({
+            onMinimize: () => v.window.minimize(),
+            onMaximize: () => { if (v.isMaximized()) v.window.restore(); else v.window.maximize(); },
+            onClose:    () => { v.window.close(); this._windows.delete(windowId); }
+        });
+        this._windows.set(windowId, v);
+
+        /* resize wszystkich okien przy zmianie rozmiaru przeglądarki */
+        if (!window._wm) window._wm = { resizeRegistered: false, instances: [] };
+        if (!window._wm.resizeRegistered) {
+            window._wm.resizeRegistered = true;
+            window.addEventListener('resize', () => {
+                window._wm.instances.forEach(wm =>
+                    wm._windows.forEach(view => { if (!view.isMaximized()) view._updateSize(); })
+                );
+            });
+        }
+        if (!window._wm.instances.includes(this)) {
+            window._wm.instances.push(this);
+        }
+
+        return v;
+    }
+
+    /** Zwraca instancję View dla danego ID lub null */
+    getView(windowId) { return this._windows.get(windowId) || null; }
+
+    _get(windowId) {
+        const v = this._windows.get(windowId);
+        if (!v) console.warn(`WindowManager: brak okna "${windowId}".`);
+        return v || null;
+    }
+
+    /* ── operacje na oknie ────────────────────────────────── */
+    setTitle(windowId, title)  { this._get(windowId)?.window.setTitle(title); }
+    setStatus(windowId, text)  { this._get(windowId)?.window.setStatus(text); }
+    minimize(windowId)         { this._get(windowId)?.window.minimize(); }
+    maximize(windowId)         { this._get(windowId)?.window.maximize(); }
+    restore(windowId)          { this._get(windowId)?.window.restore(); }
+    close(windowId)            {
+        const v = this._get(windowId);
+        if (v) { v.window.close(); this._windows.delete(windowId); }
+    }
+    isMinimized(windowId)      { return this._get(windowId)?.isMinimized() ?? null; }
+    isMaximized(windowId)      { return this._get(windowId)?.isMaximized() ?? null; }
+
+    /* ── pasek tytułu ─────────────────────────────────────── */
+    bindControls(windowId, handlers = {}) { this._get(windowId)?.titlebar.bindControls(handlers); }
+    addButton(windowId, cfg)              { this._get(windowId)?.titlebar.addButton(cfg); }
+    removeButton(windowId, btnId)         { this._get(windowId)?.titlebar.removeButton(btnId); }
+
+    /* ── zawartość ────────────────────────────────────────── */
+    refreshContent(windowId, cfg)              { this._get(windowId)?.content.refresh(cfg); }
+    setHeader(windowId, text)                  { this._get(windowId)?.content.setHeader(text); }
+    setSubheader(windowId, text)               { this._get(windowId)?.content.setSubheader(text); }
+    addCard(windowId, cfg)                     { this._get(windowId)?.content.addCard(cfg); }
+    removeCard(windowId, cardId)               { this._get(windowId)?.content.removeCard(cardId); }
+    updateCard(windowId, cardId, cfg)          { this._get(windowId)?.content.updateCard(cardId, cfg); }
+
+    /* ── menubar ──────────────────────────────────────────── */
+    refreshMenubar(windowId, menus)             { this._get(windowId)?.menubar.refresh({ menus }); }
+    addMenu(windowId, cfg)                      { this._get(windowId)?.menubar.addMenu(cfg); }
+    removeMenu(windowId, menuId)                { this._get(windowId)?.menubar.removeMenu(menuId); }
+    addMenuItem(windowId, menuId, item)         { this._get(windowId)?.menubar.addMenuItem(menuId, item); }
+    removeMenuItem(windowId, menuId, itemId)    { this._get(windowId)?.menubar.removeMenuItem(menuId, itemId); }
+}
+
+/* ════════════════════════════════════════════════════════════
+ *  class TaskbarManager
+ *  Zarządza paskiem zadań przez ID elementów.
+ *
+ *  Pełne odświeżenie:
+ *    tb.refresh({ showStart?, items? })
+ *
+ *  Operacje na elementach (zawsze po id):
+ *    tb.addItem(id, { icon?, title, onClick, menuItems? })
+ *    tb.removeItem(id)
+ *    tb.updateItem(id, { title?, icon?, onClick?, menuItems? })
+ * ════════════════════════════════════════════════════════════ */
+class TaskbarManager {
+    constructor({ taskbarId = 'taskbar', containerId = 'windowContainer' } = {}) {
+        this._view = new View({ taskbarId, containerId });
+        this._tb   = this._view.taskbar;
+    }
+
+    refresh(cfg = {})        { this._tb.refresh(cfg); }
+    addItem(id, cfg = {})    { this._tb.addItem({ id, ...cfg }); }
+    removeItem(id)           { this._tb.removeItem(id); }
+    updateItem(id, cfg = {}) { this._tb.updateItem(id, cfg); }
+}
+
+/* ════════════════════════════════════════════════════════════
  *  INICJALIZACJA
  * ════════════════════════════════════════════════════════════ */
-const view = new View({ taskbarId: 'taskbar', containerId: 'windowContainer' });
 
-/* ── 1. Taskbar – tylko Start na początku ── */
-view.taskbar.refresh({ showStart: true, items: [] });
+/* ── 1. Taskbar ── */
+const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
+taskbar.refresh({ showStart: true, items: [] });
 
-/* ── 2. Utwórz okno ── */
-view.window.create({ title: 'Moja Aplikacja - Windows 11', statusText: 'Gotowe' });
+/* ── 2. WindowManager + pierwsze okno ── */
+const wm = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
+wm.create('win-main', { title: 'Moja Aplikacja - Windows 11', statusText: 'Gotowe' });
 
-/* ── 3. Podpnij przyciski okna ── */
-view.titlebar.bindControls({
-    onMinimize: () => {
-        view.window.minimize();
+/* ── 3. Menubar głównego okna ── */
+wm.refreshMenubar('win-main', [
+    {
+        label: 'Plik', id: 'menu-file',
+        items: [
+            { id: 'mi-new',    icon: '📄', label: 'Nowy',           shortcut: 'Ctrl+N', onClick: () => {} },
+            { id: 'mi-open',   icon: '📂', label: 'Otwórz',         shortcut: 'Ctrl+O', onClick: () => {} },
+            { id: 'mi-save',   icon: '💾', label: 'Zapisz',         shortcut: 'Ctrl+S', onClick: () => {} },
+            { id: 'mi-saveas', icon: '📝', label: 'Zapisz jako...', shortcut: 'Ctrl+Shift+S', onClick: () => {} },
+            { separator: true },
+            { id: 'mi-print',  icon: '🖨️', label: 'Drukuj',         shortcut: 'Ctrl+P', onClick: () => {} },
+            { separator: true },
+            { id: 'mi-close',  icon: '❌', label: 'Zamknij',        shortcut: 'Alt+F4',
+              onClick: () => wm.close('win-main') }
+        ]
     },
-    onMaximize: () => {
-        if (view.isMaximized()) view.window.restore();
-        else                    view.window.maximize();
+    {
+        label: 'Edycja', id: 'menu-edit',
+        items: [
+            { id: 'mi-undo',  icon: '↶', label: 'Cofnij',  shortcut: 'Ctrl+Z', onClick: () => {} },
+            { id: 'mi-redo',  icon: '↷', label: 'Ponów',   shortcut: 'Ctrl+Y', onClick: () => {} },
+            { separator: true },
+            { id: 'mi-cut',   icon: '✂️', label: 'Wytnij',  shortcut: 'Ctrl+X', onClick: () => {} },
+            { id: 'mi-copy',  icon: '📋', label: 'Kopiuj',  shortcut: 'Ctrl+C', onClick: () => {} },
+            { id: 'mi-paste', icon: '📄', label: 'Wklej',   shortcut: 'Ctrl+V', onClick: () => {} },
+            { separator: true },
+            {
+                id: 'mi-find', icon: '🔍', label: 'Znajdź',
+                submenu: [
+                    { icon: '🔎', label: 'Znajdź w dokumencie', shortcut: 'Ctrl+F',   onClick: () => {} },
+                    { icon: '🔄', label: 'Znajdź i zamień',     shortcut: 'Ctrl+H',   onClick: () => {} },
+                    { icon: '⏭️', label: 'Znajdź następny',     shortcut: 'F3',       onClick: () => {} },
+                    { icon: '⏮️', label: 'Znajdź poprzedni',    shortcut: 'Shift+F3', onClick: () => {} },
+                ]
+            },
+            {
+                id: 'mi-prefs', icon: '⚙️', label: 'Preferencje',
+                submenu: [
+                    { icon: '🎨', label: 'Motyw',              onClick: () => {} },
+                    { icon: '🔤', label: 'Czcionki',           onClick: () => {} },
+                    { icon: '⌨️', label: 'Skróty klawiszowe', onClick: () => {} },
+                    { separator: true },
+                    { icon: '🌍', label: 'Język',              onClick: () => {} },
+                ]
+            }
+        ]
     },
-    onClose: () => {
-        view.window.close();
+    {
+        label: 'Widok', id: 'menu-view',
+        items: [
+            { icon: '📊', label: 'Pasek narzędzi', onClick: () => {} },
+            { icon: '📏', label: 'Linijka',        onClick: () => {} },
+            { separator: true },
+            { icon: '🔍', label: 'Powiększ',       shortcut: 'Ctrl++', onClick: () => {} },
+            { icon: '🔎', label: 'Pomniejsz',      shortcut: 'Ctrl+-', onClick: () => {} },
+        ]
+    },
+    {
+        label: 'Pomoc', id: 'menu-help',
+        items: [
+            { icon: '📖', label: 'Dokumentacja', shortcut: 'F1', onClick: () => {} },
+            { icon: 'ℹ️', label: 'O programie',                  onClick: () => {
+                wm.setStatus('win-main', 'Windows 11 – wersja 1.0.0');
+            }}
+        ]
     }
-});
+]);
 
-/* ── 4. Menubar ── */
-view.menubar.refresh({
-    menus: [
-        {
-            label: 'Plik', id: 'menu-file',
-            items: [
-                { id: 'mi-new',    icon: '📄', label: 'Nowy',        shortcut: 'Ctrl+N', onClick: () => {} },
-                { id: 'mi-open',   icon: '📂', label: 'Otwórz',      shortcut: 'Ctrl+O', onClick: () => {} },
-                { id: 'mi-save',   icon: '💾', label: 'Zapisz',      shortcut: 'Ctrl+S', onClick: () => {} },
-                { id: 'mi-saveas', icon: '📝', label: 'Zapisz jako...', shortcut: 'Ctrl+Shift+S', onClick: () => {} },
-                { separator: true },
-                { id: 'mi-print',  icon: '🖨️', label: 'Drukuj',      shortcut: 'Ctrl+P', onClick: () => {} },
-                { separator: true },
-                { id: 'mi-close',  icon: '❌', label: 'Zamknij',     shortcut: 'Alt+F4',
-                  onClick: () => { view.window.close(); } }
-            ]
-        },
-        {
-            label: 'Edycja', id: 'menu-edit',
-            items: [
-                { id: 'mi-undo',  icon: '↶', label: 'Cofnij',  shortcut: 'Ctrl+Z', onClick: () => {} },
-                { id: 'mi-redo',  icon: '↷', label: 'Ponów',   shortcut: 'Ctrl+Y', onClick: () => {} },
-                { separator: true },
-                { id: 'mi-cut',   icon: '✂️', label: 'Wytnij',  shortcut: 'Ctrl+X', onClick: () => {} },
-                { id: 'mi-copy',  icon: '📋', label: 'Kopiuj',  shortcut: 'Ctrl+C', onClick: () => {} },
-                { id: 'mi-paste', icon: '📄', label: 'Wklej',   shortcut: 'Ctrl+V', onClick: () => {} },
-                { separator: true },
-                {
-                    id: 'mi-find', icon: '🔍', label: 'Znajdź',
-                    submenu: [
-                        { icon: '🔎', label: 'Znajdź w dokumencie', shortcut: 'Ctrl+F',       onClick: () => {} },
-                        { icon: '🔄', label: 'Znajdź i zamień',     shortcut: 'Ctrl+H',       onClick: () => {} },
-                        { icon: '⏭️', label: 'Znajdź następny',     shortcut: 'F3',           onClick: () => {} },
-                        { icon: '⏮️', label: 'Znajdź poprzedni',    shortcut: 'Shift+F3',     onClick: () => {} },
-                    ]
-                },
-                {
-                    id: 'mi-prefs', icon: '⚙️', label: 'Preferencje',
-                    submenu: [
-                        { icon: '🎨', label: 'Motyw',              onClick: () => {} },
-                        { icon: '🔤', label: 'Czcionki',           onClick: () => {} },
-                        { icon: '⌨️', label: 'Skróty klawiszowe', onClick: () => {} },
-                        { separator: true },
-                        { icon: '🌍', label: 'Język',              onClick: () => {} },
-                    ]
-                }
-            ]
-        },
-        {
-            label: 'Widok', id: 'menu-view',
-            items: [
-                { icon: '📊', label: 'Pasek narzędzi', onClick: () => {} },
-                { icon: '📏', label: 'Linijka',        onClick: () => {} },
-                { separator: true },
-                { icon: '🔍', label: 'Powiększ',       shortcut: 'Ctrl++', onClick: () => {} },
-                { icon: '🔎', label: 'Pomniejsz',      shortcut: 'Ctrl+-', onClick: () => {} },
-            ]
-        },
-        {
-            label: 'Pomoc', id: 'menu-help',
-            items: [
-                { icon: '📖', label: 'Dokumentacja', shortcut: 'F1', onClick: () => {} },
-                { icon: 'ℹ️', label: 'O programie',                  onClick: () => {
-                    view.window.setStatus('Windows 11 – wersja 1.0.0');
-                }}
-            ]
-        }
-    ]
-});
-
-/* ── 5. Zawartość okna ── */
-view.content.refresh({
+/* ── 4. Zawartość głównego okna ── */
+wm.refreshContent('win-main', {
     header:    'Witaj w Windows 11',
     subheader: 'Nowoczesny interfejs z pełnym menu kontekstowym',
     cards: [
@@ -1264,91 +1394,141 @@ view.content.refresh({
         { id: 'card-fluent',  title: '✨ Fluent Design',
           text: 'Menu zostało zaprojektowane w stylu Windows 11 z efektem Acrylic, zaokrąglonymi rogami i płynnymi animacjami.' },
         { id: 'card-interact',title: '⚡ Interaktywność',
-          text: 'Najedź myszką na opcje z strzałką (▶), aby zobaczyć dodatkowe podmenu. Wszystko działa płynnie i responsywnie.' },
+          text: 'Najedź myszką na opcje ze strzałką (▶), aby zobaczyć dodatkowe podmenu. Wszystko działa płynnie i responsywnie.' },
     ]
-});
-
-/* ── 6. Resize okna przy zmianie rozmiaru przeglądarki ── */
-window.addEventListener('resize', () => {
-    if (!view.isMaximized()) view._updateSize();
 });
 
 /*
  ════════════════════════════════════════════════════════════
-  PRZYKŁADY – wklej w konsolę przeglądarki (F12)
+  PRZYKŁADY UŻYCIA – wklej w konsolę przeglądarki (F12)
  ════════════════════════════════════════════════════════════
 
+  ── WindowManager ──────────────────────────────────────────
+
+  // Utwórz nowe okno:
+  wm.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
+
+  // Utwórz drugie okno z własnym menu:
+  wm.create('win-calc', { title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
+  wm.refreshMenubar('win-calc', [
+      { label: 'Widok', id: 'calc-view', items: [
+          { icon: '🔢', label: 'Standardowy', onClick: () => wm.setStatus('win-calc', 'Tryb standardowy') },
+          { icon: '📐', label: 'Naukowy',     onClick: () => wm.setStatus('win-calc', 'Tryb naukowy') }
+      ]}
+  ]);
+
   // Zmień tytuł okna:
-  view.window.setTitle('Nowy tytuł');
+  wm.setTitle('win-notes', 'Notatnik – plik.txt');
 
-  // Zmień status bar:
-  view.window.setStatus('Plik zapisany pomyślnie');
+  // Zmień tekst paska stanu:
+  wm.setStatus('win-notes', 'Plik zapisany pomyślnie');
 
-  // Dodaj nową kartę do treści:
-  view.content.addCard({ id: 'card-new', title: '🚀 Nowa karta', text: 'Treść nowej karty.' });
+  // Dodaj kartę do zawartości:
+  wm.addCard('win-notes', { id: 'card-1', title: '📄 Dokument', text: 'Treść dokumentu.' });
 
   // Zaktualizuj kartę:
-  view.content.updateCard('card-menu', { title: '🎨 Zmieniony tytuł' });
+  wm.updateCard('win-notes', 'card-1', { title: '📄 Dokument (zmodyfikowany)', text: 'Nowa treść.' });
 
   // Usuń kartę:
-  view.content.removeCard('card-fluent');
+  wm.removeCard('win-notes', 'card-1');
 
-  // Dodaj pozycję do menu Plik:
-  view.menubar.addMenuItem('menu-file', { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') });
+  // Odśwież całą zawartość okna:
+  wm.refreshContent('win-notes', {
+      header: 'Notatnik', subheader: 'Wersja 2.0',
+      cards: [{ id: 'c1', title: 'Info', text: 'Nowa zawartość.' }]
+  });
+
+  // Dodaj pozycję do istniejącego menu:
+  wm.addMenuItem('win-main', 'menu-file', { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') });
 
   // Usuń pozycję z menu:
-  view.menubar.removeMenuItem('menu-file', 'mi-print');
+  wm.removeMenuItem('win-main', 'menu-file', 'mi-print');
 
-  // Dodaj nowe menu:
-  view.menubar.addMenu({ label: 'Narzędzia', id: 'menu-tools', items: [
-      { icon: '🔧', label: 'Opcja 1', onClick: () => {} }
+  // Dodaj nowe menu do okna:
+  wm.addMenu('win-main', { label: 'Narzędzia', id: 'menu-tools', items: [
+      { icon: '🔧', label: 'Ustawienia', onClick: () => {} }
   ]});
 
-  // Usuń menu:
-  view.menubar.removeMenu('menu-view');
+  // Usuń menu z okna:
+  wm.removeMenu('win-main', 'menu-view');
 
-  // Dodaj przycisk do taskbara ręcznie:
-  view.taskbar.addItem({ id: 'tb-extra', icon: '📌', title: 'Przypięty', onClick: () => alert('klik!') });
+  // Dodaj przycisk do paska tytułowego:
+  wm.addButton('win-notes', { id: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
 
-  // Usuń z taskbara:
-  view.taskbar.removeItem('tb-extra');
+  // Usuń przycisk:
+  wm.removeButton('win-notes', 'btn-pin');
 
-  // dodaj nowe okno:
-    const view2 = new View({ taskbarId: 'taskbar', containerId: 'windowContainer' });
-    view2.window.create({ title: 'Drugie okno', statusText: 'Inne okno' });
-    view2.titlebar.bindControls({
-        onMinimize: () => view2.window.minimize(),
-        onMaximize: () => {
-            if (view2.isMaximized()) view2.window.restore();
-            else                    view2.window.maximize();
-        },
-        onClose: () => view2.window.close()
-    }); 
-        // Dodaj menu do drugiego okna
-        view2.menubar.refresh({
-            menus: [
-                {
-                    label: 'Plik', id: 'menu2-file',
-                    items: [
-                        { id: 'mi2-new',    icon: '📄', label: 'Nowy',        shortcut: 'Ctrl+N', onClick: () => {} },
-                        { id: 'mi2-open',   icon: '📂', label: 'Otwórz',      shortcut: 'Ctrl+O', onClick: () => {} },
-                        { id: 'mi2-save',   icon: '💾', label: 'Zapisz',      shortcut: 'Ctrl+S', onClick: () => {} },
-                        { separator: true },
-                        { id: 'mi2-close',  icon: '❌', label: 'Zamknij',     shortcut: 'Alt+F4',
-                          onClick: () => { view2.window.close(); } }
-                    ]
-                },
-                {
-                    label: 'Pomoc', id: 'menu2-help',
-                    items: [
-                        { icon: 'ℹ️', label: 'O programie', onClick: () => {
-                            view2.window.setStatus('Drugie okno – wersja 1.0.0');
-                        }}
-                    ]
-                }
-            ]
-        });
-    
+  // Minimalizuj / maksymalizuj / przywróć / zamknij okno:
+  wm.minimize('win-notes');
+  wm.maximize('win-notes');
+  wm.restore('win-notes');
+  wm.close('win-notes');
+
+  // Sprawdź stan okna:
+  wm.isMinimized('win-main');   // → true / false
+  wm.isMaximized('win-main');   // → true / false
+
+  // Dostęp do pełnego obiektu View (dla zaawansowanych operacji):
+  const v = wm.getView('win-main');
+  v.content.addCard({ id: 'extra', title: 'Extra', text: 'Bezpośredni dostęp do View.' });
+
+  ── TaskbarManager ─────────────────────────────────────────
+
+  // Pełne odświeżenie paska (resetuje wszystkie elementy):
+  taskbar.refresh({ showStart: true, items: [
+      { id: 'tb-notes', icon: '📝', title: 'Notatnik',   onClick: () => wm.restore('win-notes') },
+      { id: 'tb-calc',  icon: '🧮', title: 'Kalkulator', onClick: () => wm.restore('win-calc')  }
+  ]});
+
+  // Dodaj element do paska:
+  taskbar.addItem('tb-notes', {
+      icon: '📝', title: 'Notatnik',
+      onClick: () => wm.restore('win-notes'),
+      menuItems: [
+          { label: 'Przywróć',    onClick: () => wm.restore('win-notes')  },
+          { label: 'Minimalizuj', onClick: () => wm.minimize('win-notes') },
+          'separator',
+          { label: 'Zamknij',     onClick: () => wm.close('win-notes')    }
+      ]
+  });
+
+  // Zaktualizuj tytuł elementu paska:
+  taskbar.updateItem('tb-notes', { title: 'Notatnik *' });
+
+  // Usuń element z paska:
+  taskbar.removeItem('tb-notes');
+
+  ── Pełny przykład – dwa okna z paskiem zadań ──────────────
+
+  wm.create('win-a', { title: 'Okno A', icon: '🟦', statusText: 'Gotowe' });
+  wm.create('win-b', { title: 'Okno B', icon: '🟩', statusText: 'Gotowe' });
+
+  wm.refreshContent('win-a', { header: 'Okno A', cards: [
+      { id: 'ca1', title: 'Karta 1', text: 'Zawartość okna A.' }
+  ]});
+  wm.refreshContent('win-b', { header: 'Okno B', cards: [
+      { id: 'cb1', title: 'Karta 1', text: 'Zawartość okna B.' }
+  ]});
+
+  taskbar.addItem('tb-a', { icon: '🟦', title: 'Okno A',
+      onClick: () => wm.restore('win-a'),
+      menuItems: [
+          { label: 'Minimalizuj', onClick: () => wm.minimize('win-a') },
+          { label: 'Maksymalizuj', onClick: () => wm.maximize('win-a') },
+          'separator',
+          { label: 'Zamknij', onClick: () => { wm.close('win-a'); taskbar.removeItem('tb-a'); } }
+      ]
+  });
+  taskbar.addItem('tb-b', { icon: '🟩', title: 'Okno B',
+      onClick: () => wm.restore('win-b'),
+      menuItems: [
+          { label: 'Minimalizuj', onClick: () => wm.minimize('win-b') },
+          { label: 'Maksymalizuj', onClick: () => wm.maximize('win-b') },
+          'separator',
+          { label: 'Zamknij', onClick: () => { wm.close('win-b'); taskbar.removeItem('tb-b'); } }
+      ]
+  });
+
 */
 </script>
 
