@@ -370,6 +370,12 @@ class View {
         this._containerEl = document.getElementById(containerId);
         this._windowEl    = null;   // ustawiany przez window.create()
 
+        // Globalna lista okien i z-index
+        if (!window._windowStack) {
+            window._windowStack = [];
+            window._windowZ = 100;
+        }
+
         this.taskbar  = this._buildTaskbarModule();
         this.window   = this._buildWindowModule();
         this.titlebar = this._buildTitlebarModule();
@@ -575,6 +581,44 @@ class View {
                     <div class="menubar"></div>
                     <div class="window-content"></div>
                     <div class="status-bar"><span>${statusText}</span></div>`;
+
+                // Ustaw z-index i dodaj do stacka
+                win.style.zIndex = ++window._windowZ;
+                window._windowStack.push(win);
+
+                // Ustaw pozycję absolutną (dla przesuwania)
+                win.style.position = 'absolute';
+                win.style.left = '50px';
+                win.style.top = '50px';
+
+                // Przeciąganie okna
+                let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
+                const titlebar = win.querySelector('.titlebar');
+                titlebar.style.cursor = 'move';
+                titlebar.addEventListener('mousedown', e => {
+                    isDragging = true;
+                    dragOffsetX = e.clientX - win.offsetLeft;
+                    dragOffsetY = e.clientY - win.offsetTop;
+                    win.style.transition = 'none';
+                    // Na wierzch przy rozpoczęciu przeciągania
+                    win.style.zIndex = ++window._windowZ;
+                });
+                document.addEventListener('mousemove', e => {
+                    if (!isDragging) return;
+                    win.style.left = (e.clientX - dragOffsetX) + 'px';
+                    win.style.top  = (e.clientY - dragOffsetY) + 'px';
+                });
+                document.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        win.style.transition = '';
+                    }
+                });
+
+                // Na wierzch po kliknięciu w okno
+                win.addEventListener('mousedown', () => {
+                    win.style.zIndex = ++window._windowZ;
+                });
 
                 container.appendChild(win);
                 self._windowEl = win;
@@ -895,6 +939,15 @@ class View {
         if (!win) return;
 
         const _state = win._wmState || (win._wmState = { maximized: false, minimized: false });
+        const container = this._containerEl;
+
+        // Identyfikator okna do taskbara
+        let winId = win.dataset.tbId;
+        if (!winId) {
+            winId = 'win-' + Math.random().toString(36).substr(2, 8);
+            win.dataset.tbId = winId;
+        }
+        const winTitle = win.querySelector('.window-title')?.textContent || 'Okno';
 
         if (action === 'minimize') {
             if (_state.minimized) { this._wmAction('restore'); return; }
@@ -904,6 +957,22 @@ class View {
             _state.minimized = true;
             _state.maximized = false;
 
+            // Dodaj do taskbara przycisk do przywrócenia tego okna
+            this.taskbar.addItem({
+                id: winId,
+                title: winTitle,
+                onClick: () => {
+                    this.window.restore();
+                    this.taskbar.removeItem(winId);
+                },
+                menuItems: [
+                    { label: '🗗 Przywróć', onClick: () => { this.window.restore(); this.taskbar.removeItem(winId); } },
+                    { label: '🗖 Maksymalizuj', onClick: () => { this.window.maximize(); this.taskbar.removeItem(winId); } },
+                    'separator',
+                    { label: '✕ Zamknij', onClick: () => { this.window.close(); this.taskbar.removeItem(winId); } },
+                ]
+            });
+
         } else if (action === 'maximize') {
             if (_state.maximized) { this._wmAction('restore'); return; }
             win.classList.remove('minimized');
@@ -911,18 +980,43 @@ class View {
             document.body.classList.add('window-maximized');
             _state.maximized = true;
             _state.minimized = false;
-            this._updateSize();
+
+            // Zapamiętaj poprzednie pozycje i rozmiar
+            if (!_state.prev) {
+                _state.prev = {
+                    left: win.style.left,
+                    top: win.style.top,
+                    width: win.style.width,
+                    height: win.style.height
+                };
+            }
+            // Ustaw na pełny kontener
+            win.style.left = '0px';
+            win.style.top = '0px';
+            win.style.width = container.offsetWidth + 'px';
+            win.style.height = container.offsetHeight + 'px';
 
         } else if (action === 'restore') {
             win.classList.remove('minimized', 'maximized');
             document.body.classList.remove('window-maximized');
             _state.maximized = false;
             _state.minimized = false;
-            this._updateSize();
+            // Przywróć poprzednie pozycje i rozmiar
+            if (_state.prev) {
+                win.style.left = _state.prev.left;
+                win.style.top = _state.prev.top;
+                win.style.width = _state.prev.width;
+                win.style.height = _state.prev.height;
+                _state.prev = null;
+            } else {
+                this._updateSize();
+            }
 
         } else if (action === 'close') {
             win.classList.add('closing');
             setTimeout(() => { win.style.display = 'none'; }, 300);
+            // Usuwaj z taskbara po zamknięciu
+            if (winId) this.taskbar.removeItem(winId);
         }
     }
 
