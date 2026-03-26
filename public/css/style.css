@@ -376,7 +376,32 @@
         .menubar { height: 36px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
         .menubar::-webkit-scrollbar { display: none; }
         .menu-item { font-size: 12px; padding: 0 8px; }
-        .dropdown-menu { min-width: 200px; max-height: 60vh; }
+        .dropdown-menu {
+            position: fixed; left: 0 !important; right: 0 !important;
+            top: auto !important; bottom: 48px;
+            min-width: 100vw; max-width: 100vw;
+            border-radius: 12px 12px 0 0;
+            max-height: 65vh; overflow-y: auto;
+            transform: none !important;
+        }
+        .menu-item.active .dropdown-menu { transform: none !important; }
+        .dropdown-item { padding: 10px 16px; font-size: 13px; }
+        .submenu {
+            position: static; left: auto; top: auto;
+            transform: none; margin-left: 16px; margin-top: 4px;
+            box-shadow: none; border: 1px solid rgba(0,0,0,0.06);
+            background: rgba(0,0,0,0.03); border-radius: 6px;
+            opacity: 0; visibility: hidden; max-height: 0; overflow: hidden;
+            transition: opacity 0.15s ease, max-height 0.2s ease;
+        }
+        .dropdown-item.submenu-open > .submenu {
+            opacity: 1; visibility: visible; max-height: 400px;
+        }
+        .dropdown-item.submenu-open > .submenu-indicator { opacity: 0.5; }
+        .taskbar-menu {
+            position: fixed; bottom: 48px; left: 0; right: 0;
+            min-width: 100vw; border-radius: 12px 12px 0 0;
+        }
     }
     @media (max-width: 480px) {
         .window:not(.maximized) { border-radius: 8px; }
@@ -387,4 +412,11 @@
         .taskbar { height: 40px; }
         .taskbar-item { padding: 4px 8px; }
         .taskbar-item-title { display: none; }
+        .taskbar-clock { font-size: 10px; padding: 2px 4px; }
+        .taskbar-tray-btn { width: 28px; height: 28px; font-size: 14px; }
+        .taskbar-windows-menu {
+            position: fixed; bottom: 40px; left: 0; right: 0;
+            min-width: 100vw; border-radius: 12px 12px 0 0;
+        }
+        .taskbar-windows-menu-item { padding: 10px 16px; font-size: 14px; }
     }
