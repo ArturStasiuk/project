@@ -1,0 +1,86 @@
+// WindowManager.js
+// Zarządza oknami przez ID
+
+class WindowManager {
+    constructor({ containerId = 'windowContainer', taskbarId = 'taskbar' } = {}) {
+        this._containerId = containerId;
+        this._taskbarId   = taskbarId;
+        this._windows     = new Map(); // windowId → View
+    }
+
+    /** Tworzy nowe okno; zwraca instancję View lub null jeśli id już zajęte */
+    create(windowId, { title = '', icon = null, statusText = 'Gotowe' } = {}) {
+        if (this._windows.has(windowId)) {
+            console.warn(`WindowManager: okno "${windowId}" już istnieje.`);
+            return null;
+        }
+        const v = new View({ taskbarId: this._taskbarId, containerId: this._containerId });
+        v.window.create({ title, icon, statusText });
+        v.titlebar.bindControls({
+            onMinimize: () => v.window.minimize(),
+            onMaximize: () => { if (v.isMaximized()) v.window.restore(); else v.window.maximize(); },
+            onClose:    () => { v.window.close(); this._windows.delete(windowId); }
+        });
+        this._windows.set(windowId, v);
+
+        /* resize wszystkich okien przy zmianie rozmiaru przeglądarki */
+        if (!window._wm) window._wm = { resizeRegistered: false, instances: [] };
+        if (!window._wm.resizeRegistered) {
+            window._wm.resizeRegistered = true;
+            window.addEventListener('resize', () => {
+                window._wm.instances.forEach(wm =>
+                    wm._windows.forEach(view => { if (!view.isMaximized()) view._updateSize(); })
+                );
+            });
+        }
+        if (!window._wm.instances.includes(this)) {
+            window._wm.instances.push(this);
+        }
+
+        return v;
+    }
+
+    /** Zwraca instancję View dla danego ID lub null */
+    getView(windowId) { return this._windows.get(windowId) || null; }
+
+    _get(windowId) {
+        const v = this._windows.get(windowId);
+        if (!v) console.warn(`WindowManager: brak okna "${windowId}".`);
+        return v || null;
+    }
+
+    /* ── operacje na oknie ────────────────────────────────── */
+    setTitle(windowId, title)  { this._get(windowId)?.window.setTitle(title); }
+    setStatus(windowId, text)  { this._get(windowId)?.window.setStatus(text); }
+    minimize(windowId)         { this._get(windowId)?.window.minimize(); }
+    maximize(windowId)         { this._get(windowId)?.window.maximize(); }
+    restore(windowId)          { this._get(windowId)?.window.restore(); }
+    close(windowId)            {
+        const v = this._get(windowId);
+        if (v) { v.window.close(); this._windows.delete(windowId); }
+    }
+    isMinimized(windowId)      { return this._get(windowId)?.isMinimized() ?? null; }
+    isMaximized(windowId)      { return this._get(windowId)?.isMaximized() ?? null; }
+
+    /* ── pasek tytułu ─────────────────────────────────────── */
+    bindControls(windowId, handlers = {}) { this._get(windowId)?.titlebar.bindControls(handlers); }
+    addButton(windowId, cfg)              { this._get(windowId)?.titlebar.addButton(cfg); }
+    removeButton(windowId, btnId)         { this._get(windowId)?.titlebar.removeButton(btnId); }
+
+    /* ── zawartość ────────────────────────────────────────── */
+    refreshContent(windowId, cfg)              { this._get(windowId)?.content.refresh(cfg); }
+    setHeader(windowId, text)                  { this._get(windowId)?.content.setHeader(text); }
+    setSubheader(windowId, text)               { this._get(windowId)?.content.setSubheader(text); }
+    addCard(windowId, cfg)                     { this._get(windowId)?.content.addCard(cfg); }
+    removeCard(windowId, cardId)               { this._get(windowId)?.content.removeCard(cardId); }
+    updateCard(windowId, cardId, cfg)          { this._get(windowId)?.content.updateCard(cardId, cfg); }
+
+    /* ── menubar ──────────────────────────────────────────── */
+    refreshMenubar(windowId, menus)             { this._get(windowId)?.menubar.refresh({ menus }); }
+    addMenu(windowId, cfg)                      { this._get(windowId)?.menubar.addMenu(cfg); }
+    removeMenu(windowId, menuId)                { this._get(windowId)?.menubar.removeMenu(menuId); }
+    addMenuItem(windowId, menuId, item)         { this._get(windowId)?.menubar.addMenuItem(menuId, item); }
+    removeMenuItem(windowId, menuId, itemId)    { this._get(windowId)?.menubar.removeMenuItem(menuId, itemId); }
+}
+
+export default WindowManager;
