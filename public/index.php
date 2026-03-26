@@ -309,6 +309,57 @@
     .taskbar-menu-item:hover { background: rgba(255,255,255,0.1); }
     .taskbar-menu-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 8px; }
 
+    /* prawy obszar paska (ikona okien + zegar) */
+    .taskbar-right {
+        position: absolute; right: 8px;
+        display: flex; align-items: center; gap: 4px;
+    }
+
+    /* przycisk tray z listą okien */
+    .taskbar-tray-btn {
+        width: 36px; height: 36px;
+        background: transparent; border: none; cursor: pointer;
+        border-radius: 6px; display: flex; align-items: center;
+        justify-content: center; transition: background 0.15s ease;
+        color: #fff; font-size: 18px; position: relative;
+        flex-shrink: 0;
+    }
+    .taskbar-tray-btn:hover { background: rgba(255,255,255,0.12); }
+
+    /* dropdown z listą okien */
+    .taskbar-windows-menu {
+        position: absolute; bottom: 46px; right: 0;
+        min-width: 220px;
+        background: rgba(40,40,40,0.97);
+        backdrop-filter: blur(20px);
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 4px; z-index: 20000;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        opacity: 0; visibility: hidden; transform: translateY(8px);
+        transition: all 0.15s cubic-bezier(0.16,1,0.3,1);
+    }
+    .taskbar-windows-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .taskbar-windows-menu-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px; border-radius: 4px; cursor: pointer;
+        font-size: 13px; color: #f0f0f0;
+        transition: background 0.08s ease;
+    }
+    .taskbar-windows-menu-item:hover { background: rgba(255,255,255,0.1); }
+    .taskbar-windows-menu-item.minimized { opacity: 0.65; }
+    .taskbar-windows-menu-empty {
+        padding: 8px 12px; font-size: 13px; color: rgba(255,255,255,0.45);
+    }
+
+    /* zegar */
+    .taskbar-clock {
+        color: #fff; font-size: 11px; text-align: right;
+        line-height: 1.4; padding: 4px 8px; border-radius: 4px;
+        cursor: default; user-select: none; white-space: nowrap;
+    }
+    .taskbar-clock:hover { background: rgba(255,255,255,0.08); }
+
     /* scrollbar */
     ::-webkit-scrollbar { width: 12px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -375,6 +426,7 @@ class View {
             window._windowStack = [];
             window._windowZ = 100;
         }
+        if (!window._windowRegistry) window._windowRegistry = [];
 
         this.taskbar  = this._buildTaskbarModule();
         this.window   = this._buildWindowModule();
@@ -493,6 +545,81 @@ class View {
                 }
 
                 items.forEach(it => bar.appendChild(_makeItem(it)));
+
+                /* ── prawy obszar: ikona okien + zegar ── */
+                const rightSection = document.createElement('div');
+                rightSection.className = 'taskbar-right';
+
+                /* przycisk listy otwartych okien */
+                const trayBtn = document.createElement('button');
+                trayBtn.className = 'taskbar-tray-btn';
+                trayBtn.title = 'Otwarte okna';
+                trayBtn.textContent = '🪟';
+
+                const windowsMenu = document.createElement('div');
+                windowsMenu.className = 'taskbar-windows-menu';
+                trayBtn.appendChild(windowsMenu);
+
+                trayBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    /* zbuduj listę dynamicznie przy każdym otwarciu */
+                    windowsMenu.innerHTML = '';
+                    const registry = (window._windowRegistry || [])
+                        .filter(r => r.winEl.style.display !== 'none');
+                    if (registry.length === 0) {
+                        const empty = document.createElement('div');
+                        empty.className = 'taskbar-windows-menu-empty';
+                        empty.textContent = 'Brak otwartych okien';
+                        windowsMenu.appendChild(empty);
+                    } else {
+                        registry.forEach(reg => {
+                            const item = document.createElement('div');
+                            item.className = 'taskbar-windows-menu-item' +
+                                (reg.isMinimized ? ' minimized' : '');
+                            item.innerHTML =
+                                `<span>${reg.icon || '🖥️'}</span>` +
+                                `<span>${reg.title}${reg.isMinimized ? ' (zminimalizowane)' : ''}</span>`;
+                            item.addEventListener('click', ev => {
+                                ev.stopPropagation();
+                                windowsMenu.classList.remove('open');
+                                if (reg.isMinimized) {
+                                    reg.view.window.restore();
+                                } else {
+                                    reg.winEl.style.zIndex = ++window._windowZ;
+                                    reg.winEl.dispatchEvent(new MouseEvent('mousedown'));
+                                }
+                            });
+                            windowsMenu.appendChild(item);
+                        });
+                    }
+                    windowsMenu.classList.toggle('open');
+                });
+
+                rightSection.appendChild(trayBtn);
+
+                /* zegar z datą */
+                const clockEl = document.createElement('div');
+                clockEl.className = 'taskbar-clock';
+                const _updateClock = () => {
+                    const now  = new Date();
+                    const time = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                    const date = now.toLocaleDateString('pl-PL',
+                        { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    clockEl.innerHTML = `<div>${time}</div><div>${date}</div>`;
+                };
+                _updateClock();
+                if (window._clockInterval) clearInterval(window._clockInterval);
+                window._clockInterval = setInterval(_updateClock, 1000);
+
+                rightSection.appendChild(clockEl);
+                bar.appendChild(rightSection);
+
+                /* zamknij dropdown po kliknięciu poza nim (usuń stary listener jeśli istnieje) */
+                if (window._windowsMenuCloseHandler) {
+                    document.removeEventListener('click', window._windowsMenuCloseHandler);
+                }
+                window._windowsMenuCloseHandler = () => windowsMenu.classList.remove('open');
+                document.addEventListener('click', window._windowsMenuCloseHandler);
             },
 
             /**
@@ -623,6 +750,11 @@ class View {
                 container.appendChild(win);
                 self._windowEl = win;
 
+                /* rejestruj w globalnym rejestrze okien */
+                window._windowRegistry.push({
+                    winEl: win, title, icon, view: self, isMinimized: false
+                });
+
                 /* poinformuj submoduły o nowym oknie */
                 self._onWindowCreated(win);
             },
@@ -631,6 +763,9 @@ class View {
             setTitle(title) {
                 if (!self._windowEl) return;
                 self._windowEl.querySelector('.window-title').textContent = title;
+                /* synchronizuj rejestr */
+                const reg = window._windowRegistry.find(r => r.winEl === self._windowEl);
+                if (reg) reg.title = title;
             },
 
             /** Ustawia tekst paska stanu */
@@ -941,14 +1076,6 @@ class View {
         const _state = win._wmState || (win._wmState = { maximized: false, minimized: false });
         const container = this._containerEl;
 
-        // Identyfikator okna do taskbara
-        let winId = win.dataset.tbId;
-        if (!winId) {
-            winId = 'win-' + Math.random().toString(36).substr(2, 8);
-            win.dataset.tbId = winId;
-        }
-        const winTitle = win.querySelector('.window-title')?.textContent || 'Okno';
-
         if (action === 'minimize') {
             if (_state.minimized) { this._wmAction('restore'); return; }
             win.classList.remove('maximized');
@@ -957,21 +1084,9 @@ class View {
             _state.minimized = true;
             _state.maximized = false;
 
-            // Dodaj do taskbara przycisk do przywrócenia tego okna
-            this.taskbar.addItem({
-                id: winId,
-                title: winTitle,
-                onClick: () => {
-                    this.window.restore();
-                    this.taskbar.removeItem(winId);
-                },
-                menuItems: [
-                    { label: '🗗 Przywróć', onClick: () => { this.window.restore(); this.taskbar.removeItem(winId); } },
-                    { label: '🗖 Maksymalizuj', onClick: () => { this.window.maximize(); this.taskbar.removeItem(winId); } },
-                    'separator',
-                    { label: '✕ Zamknij', onClick: () => { this.window.close(); this.taskbar.removeItem(winId); } },
-                ]
-            });
+            /* zaktualizuj rejestr */
+            const regMin = window._windowRegistry.find(r => r.winEl === win);
+            if (regMin) regMin.isMinimized = true;
 
         } else if (action === 'maximize') {
             if (_state.maximized) { this._wmAction('restore'); return; }
@@ -1001,6 +1116,11 @@ class View {
             document.body.classList.remove('window-maximized');
             _state.maximized = false;
             _state.minimized = false;
+
+            /* zaktualizuj rejestr */
+            const regRes = window._windowRegistry.find(r => r.winEl === win);
+            if (regRes) regRes.isMinimized = false;
+
             // Przywróć poprzednie pozycje i rozmiar
             if (_state.prev) {
                 win.style.left = _state.prev.left;
@@ -1015,8 +1135,8 @@ class View {
         } else if (action === 'close') {
             win.classList.add('closing');
             setTimeout(() => { win.style.display = 'none'; }, 300);
-            // Usuwaj z taskbara po zamknięciu
-            if (winId) this.taskbar.removeItem(winId);
+            /* usuń z globalnego rejestru */
+            window._windowRegistry = window._windowRegistry.filter(r => r.winEl !== win);
         }
     }
 
@@ -1054,21 +1174,6 @@ view.window.create({ title: 'Moja Aplikacja - Windows 11', statusText: 'Gotowe' 
 view.titlebar.bindControls({
     onMinimize: () => {
         view.window.minimize();
-        /* dodaj do taskbara */
-        view.taskbar.addItem({
-            id:    'win-main',
-            title: 'Moja Aplikacja',
-            menuItems: [
-                { label: '🗗 Przywróć',     onClick: () => { view.window.restore();  view.taskbar.removeItem('win-main'); } },
-                { label: '🗖 Maksymalizuj', onClick: () => { view.window.maximize(); view.taskbar.removeItem('win-main'); } },
-                'separator',
-                { label: '✕ Zamknij',      onClick: () => { view.window.close();    view.taskbar.removeItem('win-main'); } },
-            ],
-            onClick: () => {
-                view.window.restore();
-                view.taskbar.removeItem('win-main');
-            }
-        });
     },
     onMaximize: () => {
         if (view.isMaximized()) view.window.restore();
@@ -1076,7 +1181,6 @@ view.titlebar.bindControls({
     },
     onClose: () => {
         view.window.close();
-        view.taskbar.removeItem('win-main');
     }
 });
 
@@ -1094,7 +1198,7 @@ view.menubar.refresh({
                 { id: 'mi-print',  icon: '🖨️', label: 'Drukuj',      shortcut: 'Ctrl+P', onClick: () => {} },
                 { separator: true },
                 { id: 'mi-close',  icon: '❌', label: 'Zamknij',     shortcut: 'Alt+F4',
-                  onClick: () => { view.window.close(); view.taskbar.removeItem('win-main'); } }
+                  onClick: () => { view.window.close(); } }
             ]
         },
         {
