@@ -905,90 +905,9 @@ const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
 taskbar.refresh({ showStart: true, items: [] });
 
 /* ── 2. WindowManager + pierwsze okno ── */
-const wm = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
-wm.create('win-main', { title: 'Moja Aplikacja - Windows 11', statusText: 'Gotowe' });
+const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
 
-/* ── 3. Menubar głównego okna ── */
-wm.refreshMenubar('win-main', [
-    {
-        label: 'Plik', id: 'menu-file',
-        items: [
-            { id: 'mi-new',    icon: '📄', label: 'Nowy',           shortcut: 'Ctrl+N', onClick: () => {} },
-            { id: 'mi-open',   icon: '📂', label: 'Otwórz',         shortcut: 'Ctrl+O', onClick: () => {} },
-            { id: 'mi-save',   icon: '💾', label: 'Zapisz',         shortcut: 'Ctrl+S', onClick: () => {} },
-            { id: 'mi-saveas', icon: '📝', label: 'Zapisz jako...', shortcut: 'Ctrl+Shift+S', onClick: () => {} },
-            { separator: true },
-            { id: 'mi-print',  icon: '🖨️', label: 'Drukuj',         shortcut: 'Ctrl+P', onClick: () => {} },
-            { separator: true },
-            { id: 'mi-close',  icon: '❌', label: 'Zamknij',        shortcut: 'Alt+F4',
-              onClick: () => wm.close('win-main') }
-        ]
-    },
-    {
-        label: 'Edycja', id: 'menu-edit',
-        items: [
-            { id: 'mi-undo',  icon: '↶', label: 'Cofnij',  shortcut: 'Ctrl+Z', onClick: () => {} },
-            { id: 'mi-redo',  icon: '↷', label: 'Ponów',   shortcut: 'Ctrl+Y', onClick: () => {} },
-            { separator: true },
-            { id: 'mi-cut',   icon: '✂️', label: 'Wytnij',  shortcut: 'Ctrl+X', onClick: () => {} },
-            { id: 'mi-copy',  icon: '📋', label: 'Kopiuj',  shortcut: 'Ctrl+C', onClick: () => {} },
-            { id: 'mi-paste', icon: '📄', label: 'Wklej',   shortcut: 'Ctrl+V', onClick: () => {} },
-            { separator: true },
-            {
-                id: 'mi-find', icon: '🔍', label: 'Znajdź',
-                submenu: [
-                    { icon: '🔎', label: 'Znajdź w dokumencie', shortcut: 'Ctrl+F',   onClick: () => {} },
-                    { icon: '🔄', label: 'Znajdź i zamień',     shortcut: 'Ctrl+H',   onClick: () => {} },
-                    { icon: '⏭️', label: 'Znajdź następny',     shortcut: 'F3',       onClick: () => {} },
-                    { icon: '⏮️', label: 'Znajdź poprzedni',    shortcut: 'Shift+F3', onClick: () => {} },
-                ]
-            },
-            {
-                id: 'mi-prefs', icon: '⚙️', label: 'Preferencje',
-                submenu: [
-                    { icon: '🎨', label: 'Motyw',              onClick: () => {} },
-                    { icon: '🔤', label: 'Czcionki',           onClick: () => {} },
-                    { icon: '⌨️', label: 'Skróty klawiszowe', onClick: () => {} },
-                    { separator: true },
-                    { icon: '🌍', label: 'Język',              onClick: () => {} },
-                ]
-            }
-        ]
-    },
-    {
-        label: 'Widok', id: 'menu-view',
-        items: [
-            { icon: '📊', label: 'Pasek narzędzi', onClick: () => {} },
-            { icon: '📏', label: 'Linijka',        onClick: () => {} },
-            { separator: true },
-            { icon: '🔍', label: 'Powiększ',       shortcut: 'Ctrl++', onClick: () => {} },
-            { icon: '🔎', label: 'Pomniejsz',      shortcut: 'Ctrl+-', onClick: () => {} },
-        ]
-    },
-    {
-        label: 'Pomoc', id: 'menu-help',
-        items: [
-            { icon: '📖', label: 'Dokumentacja', shortcut: 'F1', onClick: () => {} },
-            { icon: 'ℹ️', label: 'O programie',                  onClick: () => {
-                wm.setStatus('win-main', 'Windows 11 – wersja 1.0.0');
-            }}
-        ]
-    }
-]);
 
-/* ── 4. Zawartość głównego okna ── */
-wm.refreshContent('win-main', {
-    header:    'Witaj w Windows 11',
-    subheader: 'Nowoczesny interfejs z pełnym menu kontekstowym',
-    cards: [
-        { id: 'card-menu',    title: '🎨 Menu górne',
-          text: 'Kliknij na elementy menu na górze okna, aby zobaczyć rozwijane opcje. Menu zawiera podmenu z dodatkowymi opcjami.' },
-        { id: 'card-fluent',  title: '✨ Fluent Design',
-          text: 'Menu zostało zaprojektowane w stylu Windows 11 z efektem Acrylic, zaokrąglonymi rogami i płynnymi animacjami.' },
-        { id: 'card-interact',title: '⚡ Interaktywność',
-          text: 'Najedź myszką na opcje ze strzałką (▶), aby zobaczyć dodatkowe podmenu. Wszystko działa płynnie i responsywnie.' },
-    ]
-});
 
 /*
  ════════════════════════════════════════════════════════════
@@ -998,89 +917,89 @@ wm.refreshContent('win-main', {
   ── WindowManager ──────────────────────────────────────────
 
   // Utwórz nowe okno:
-  wm.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
+  view.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
 
   // Utwórz drugie okno z własnym menu:
-  wm.create('win-calc', { title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
-  wm.refreshMenubar('win-calc', [
+  view.create('win-calc', { title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
+  view.refreshMenubar('win-calc', [
       { label: 'Widok', id: 'calc-view', items: [
-          { icon: '🔢', label: 'Standardowy', onClick: () => wm.setStatus('win-calc', 'Tryb standardowy') },
-          { icon: '📐', label: 'Naukowy',     onClick: () => wm.setStatus('win-calc', 'Tryb naukowy') }
+          { icon: '🔢', label: 'Standardowy', onClick: () => view.setStatus('win-calc', 'Tryb standardowy') },
+          { icon: '📐', label: 'Naukowy',     onClick: () => view.setStatus('win-calc', 'Tryb naukowy') }
       ]}
   ]);
 
   // Zmień tytuł okna:
-  wm.setTitle('win-notes', 'Notatnik – plik.txt');
+  view.setTitle('win-notes', 'Notatnik – plik.txt');
 
   // Zmień tekst paska stanu:
-  wm.setStatus('win-notes', 'Plik zapisany pomyślnie');
+  view.setStatus('win-notes', 'Plik zapisany pomyślnie');
 
   // Dodaj kartę do zawartości:
-  wm.addCard('win-notes', { id: 'card-1', title: '📄 Dokument', text: 'Treść dokumentu.' });
+  view.addCard('win-notes', { id: 'card-1', title: '📄 Dokument', text: 'Treść dokumentu.' });
 
   // Zaktualizuj kartę:
-  wm.updateCard('win-notes', 'card-1', { title: '📄 Dokument (zmodyfikowany)', text: 'Nowa treść.' });
+  view.updateCard('win-notes', 'card-1', { title: '📄 Dokument (zmodyfikowany)', text: 'Nowa treść.' });
 
   // Usuń kartę:
-  wm.removeCard('win-notes', 'card-1');
+  view.removeCard('win-notes', 'card-1');
 
   // Odśwież całą zawartość okna:
-  wm.refreshContent('win-notes', {
+  view.refreshContent('win-notes', {
       header: 'Notatnik', subheader: 'Wersja 2.0',
       cards: [{ id: 'c1', title: 'Info', text: 'Nowa zawartość.' }]
   });
 
   // Dodaj pozycję do istniejącego menu:
-  wm.addMenuItem('win-main', 'menu-file', { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') });
+  view.addMenuItem('win-main', 'menu-file', { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') });
 
   // Usuń pozycję z menu:
-  wm.removeMenuItem('win-main', 'menu-file', 'mi-print');
+  view.removeMenuItem('win-main', 'menu-file', 'mi-print');
 
   // Dodaj nowe menu do okna:
-  wm.addMenu('win-main', { label: 'Narzędzia', id: 'menu-tools', items: [
+  view.addMenu('win-main', { label: 'Narzędzia', id: 'menu-tools', items: [
       { icon: '🔧', label: 'Ustawienia', onClick: () => {} }
   ]});
 
   // Usuń menu z okna:
-  wm.removeMenu('win-main', 'menu-view');
+  view.removeMenu('win-main', 'menu-view');
 
   // Dodaj przycisk do paska tytułowego:
-  wm.addButton('win-notes', { id: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
+  view.addButton('win-notes', { id: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
 
   // Usuń przycisk:
-  wm.removeButton('win-notes', 'btn-pin');
+  view.removeButton('win-notes', 'btn-pin');
 
   // Minimalizuj / maksymalizuj / przywróć / zamknij okno:
-  wm.minimize('win-notes');
-  wm.maximize('win-notes');
-  wm.restore('win-notes');
-  wm.close('win-notes');
+  view.minimize('win-notes');
+  view.maximize('win-notes');
+  view.restore('win-notes');
+  view.close('win-notes');
 
   // Sprawdź stan okna:
-  wm.isMinimized('win-main');   // → true / false
-  wm.isMaximized('win-main');   // → true / false
+  view.isMinimized('win-main');   // → true / false
+  view.isMaximized('win-main');   // → true / false
 
   // Dostęp do pełnego obiektu View (dla zaawansowanych operacji):
-  const v = wm.getView('win-main');
+  const v = view.getView('win-main');
   v.content.addCard({ id: 'extra', title: 'Extra', text: 'Bezpośredni dostęp do View.' });
 
   ── TaskbarManager ─────────────────────────────────────────
 
   // Pełne odświeżenie paska (resetuje wszystkie elementy):
   taskbar.refresh({ showStart: true, items: [
-      { id: 'tb-notes', icon: '📝', title: 'Notatnik',   onClick: () => wm.restore('win-notes') },
-      { id: 'tb-calc',  icon: '🧮', title: 'Kalkulator', onClick: () => wm.restore('win-calc')  }
-  ]});
+      { id: 'tb-notes', icon: '📝', title: 'Notatnik',   onClick: () => view.restore('win-notes') },
+      { id: 'tb-calc',  icon: '🧮', title: 'Kalkulator', onClick: () => view.restore('win-calc')  }
+  }});
 
   // Dodaj element do paska:
   taskbar.addItem('tb-notes', {
       icon: '📝', title: 'Notatnik',
-      onClick: () => wm.restore('win-notes'),
+      onClick: () => view.restore('win-notes'),
       menuItems: [
-          { label: 'Przywróć',    onClick: () => wm.restore('win-notes')  },
-          { label: 'Minimalizuj', onClick: () => wm.minimize('win-notes') },
+          { label: 'Przywróć',    onClick: () => view.restore('win-notes')  },
+          { label: 'Minimalizuj', onClick: () => view.minimize('win-notes') },
           'separator',
-          { label: 'Zamknij',     onClick: () => wm.close('win-notes')    }
+          { label: 'Zamknij',     onClick: () => view.close('win-notes')    }
       ]
   });
 
@@ -1092,33 +1011,48 @@ wm.refreshContent('win-main', {
 
   ── Pełny przykład – dwa okna z paskiem zadań ──────────────
 
-  wm.create('win-a', { title: 'Okno A', icon: '🟦', statusText: 'Gotowe' });
-  wm.create('win-b', { title: 'Okno B', icon: '🟩', statusText: 'Gotowe' });
+  view.create('win-a', { title: 'Okno A', icon: '🟦', statusText: 'Gotowe' });
+  view.create('win-b', { title: 'Okno B', icon: '🟩', statusText: 'Gotowe' });
 
-  wm.refreshContent('win-a', { header: 'Okno A', cards: [
+  view.refreshContent('win-a', { header: 'Okno A', cards: [
       { id: 'ca1', title: 'Karta 1', text: 'Zawartość okna A.' }
   ]});
-  wm.refreshContent('win-b', { header: 'Okno B', cards: [
+  view.refreshContent('win-b', { header: 'Okno B', cards: [
       { id: 'cb1', title: 'Karta 1', text: 'Zawartość okna B.' }
   ]});
 
   taskbar.addItem('tb-a', { icon: '🟦', title: 'Okno A',
-      onClick: () => wm.restore('win-a'),
+      onClick: () => view.restore('win-a'),
       menuItems: [
-          { label: 'Minimalizuj', onClick: () => wm.minimize('win-a') },
-          { label: 'Maksymalizuj', onClick: () => wm.maximize('win-a') },
+          { label: 'Minimalizuj', onClick: () => view.minimize('win-a') },
+          { label: 'Maksymalizuj', onClick: () => view.maximize('win-a') },
           'separator',
-          { label: 'Zamknij', onClick: () => { wm.close('win-a'); taskbar.removeItem('tb-a'); } }
+          { label: 'Zamknij', onClick: () => { view.close('win-a'); taskbar.removeItem('tb-a'); } }
       ]
   });
   taskbar.addItem('tb-b', { icon: '🟩', title: 'Okno B',
-      onClick: () => wm.restore('win-b'),
+      onClick: () => view.restore('win-b'),
       menuItems: [
-          { label: 'Minimalizuj', onClick: () => wm.minimize('win-b') },
-          { label: 'Maksymalizuj', onClick: () => wm.maximize('win-b') },
+          { label: 'Minimalizuj', onClick: () => view.minimize('win-b') },
+          { label: 'Maksymalizuj', onClick: () => view.maximize('win-b') },
           'separator',
-          { label: 'Zamknij', onClick: () => { wm.close('win-b'); taskbar.removeItem('tb-b'); } }
+          { label: 'Zamknij', onClick: () => { view.close('win-b'); taskbar.removeItem('tb-b'); } }
       ]
   });
+
+  // dodanie ikony do tasckar-start-icon 
+    taskbar.addItem('tb-start', {
+        icon: '🪟', title: 'Start',
+        onClick: () => alert('Menu Start!'),
+        menuItems: [
+            { label: 'Aplikacja 1', onClick: () => alert('Aplikacja 1') },
+            { label: 'Aplikacja 2', onClick: () => alert('Aplikacja 2') },
+            'separator',
+            { label: 'Ustawienia', onClick: () => alert('Ustawienia') }
+        ]
+    }); 
+  
+
+
 
 */

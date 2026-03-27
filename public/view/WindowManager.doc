@@ -1,4 +1,4 @@
-// WindowManager.js
+//  WindowManager.js
 // Zarządza oknami przez ID
 
 class WindowManager {
