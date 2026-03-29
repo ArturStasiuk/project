@@ -314,6 +314,13 @@
     .taskbar[data-pos="right"].autohide:hover,
     .taskbar[data-pos="right"].autohide:focus-within { transform: translateX(0); }
 
+    /* touch-triggered autohide show (all positions) */
+    .taskbar.autohide.autohide-show {
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
     /* przycisk Start */
     .taskbar-start {
         width: 40px; height: 36px;
