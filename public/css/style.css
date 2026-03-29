@@ -233,9 +233,9 @@
     .taskbar {
         position: fixed; bottom: 0; left: 0; right: 0; top: auto;
         height: var(--tb-size-h);
-        background: rgba(13, 4, 133, 0.167);
-       /* backdrop-filter: blur(40px); */
-        display: flex; align-items: center; justify-content: center;
+        background: rgba(32,32,32,0.95);
+        backdrop-filter: blur(40px);
+        display: flex; align-items: center; justify-content: flex-start;
         gap: 4px; padding: 0 8px;
         z-index: 10000;
         box-shadow: 0 -2px 16px rgba(0,0,0,0.3);
