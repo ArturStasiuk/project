@@ -17,7 +17,14 @@
     <div class="taskbar" id="taskbar"></div>
     <div class="window-container" id="windowContainer"></div>
 
-<script src="view/app.js"></script>
+<script src="view/app.js">
+ 
+
+
+
+
+
+</script>
 
 </body>
 </html>
