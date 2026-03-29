@@ -1,4 +1,189 @@
 /* ════════════════════════════════════════════════════════════
+ *  PRZYKŁADY UŻYCIA – wklej w konsolę przeglądarki (F12)
+ * ════════════════════════════════════════════════════════════
+
+  ── WindowManager ──────────────────────────────────────────
+
+  // Utwórz nowe okno:
+  view.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
+
+  // Utwórz drugie okno z własnym menu:
+  view.create('win-calc', { title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
+  view.refreshMenubar('win-calc', [
+      { label: 'Widok', id: 'calc-view', items: [
+          { icon: '🔢', label: 'Standardowy', onClick: () => view.setStatus('win-calc', 'Tryb standardowy') },
+          { icon: '📐', label: 'Naukowy',     onClick: () => view.setStatus('win-calc', 'Tryb naukowy') }
+      ]}
+  ]);
+
+  // Zmień tytuł okna:
+  view.setTitle('win-notes', 'Notatnik – plik.txt');
+
+  // Zmień tekst paska stanu:
+  view.setStatus('win-notes', 'Plik zapisany pomyślnie');
+
+  // Dodaj kartę do zawartości:
+  view.addCard('win-notes', { id: 'card-1', title: '📄 Dokument', text: 'Treść dokumentu.' });
+
+  // Zaktualizuj kartę:
+  view.updateCard('win-notes', 'card-1', { title: '📄 Dokument (zmodyfikowany)', text: 'Nowa treść.' });
+
+  // Usuń kartę:
+  view.removeCard('win-notes', 'card-1');
+
+  // Odśwież całą zawartość okna:
+  view.refreshContent('win-notes', {
+      header: 'Notatnik', subheader: 'Wersja 2.0',
+      cards: [{ id: 'c1', title: 'Info', text: 'Nowa zawartość.' }]
+  });
+
+  // Dodaj pozycję do istniejącego menu:
+  view.addMenuItem('win-main', 'menu-file', { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') });
+
+  // Usuń pozycję z menu:
+  view.removeMenuItem('win-main', 'menu-file', 'mi-print');
+
+  // Dodaj nowe menu do okna:
+  view.addMenu('win-main', { label: 'Narzędzia', id: 'menu-tools', items: [
+      { icon: '🔧', label: 'Ustawienia', onClick: () => {} }
+  ]});
+
+  // Usuń menu z okna:
+  view.removeMenu('win-main', 'menu-view');
+
+  // Dodaj przycisk do paska tytułowego:
+  view.addButton('win-notes', { id: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
+
+  // Usuń przycisk:
+  view.removeButton('win-notes', 'btn-pin');
+
+  // Minimalizuj / maksymalizuj / przywróć / zamknij okno:
+  view.minimize('win-notes');
+  view.maximize('win-notes');
+  view.restore('win-notes');
+  view.close('win-notes');
+
+  // Sprawdź stan okna:
+  view.isMinimized('win-main');   // → true / false
+  view.isMaximized('win-main');   // → true / false
+
+  // Dostęp do pełnego obiektu View (dla zaawansowanych operacji):
+  const v = view.getView('win-main');
+  v.content.addCard({ id: 'extra', title: 'Extra', text: 'Bezpośredni dostęp do View.' });
+
+  ── TaskbarManager ─────────────────────────────────────────
+
+  // Pełne odświeżenie paska (resetuje wszystkie elementy):
+  taskbar.refresh({ showStart: true, items: [
+      { id: 'tb-notes', icon: '📝', title: 'Notatnik',   onClick: () => view.restore('win-notes') },
+      { id: 'tb-calc',  icon: '🧮', title: 'Kalkulator', onClick: () => view.restore('win-calc')  }
+  ]});
+
+  // Dodaj element do paska:
+  taskbar.addItem('tb-notes', {
+      icon: '📝', title: 'Notatnik',
+      onClick: () => view.restore('win-notes'),
+      menuItems: [
+          { label: 'Przywróć',    onClick: () => view.restore('win-notes')  },
+          { label: 'Minimalizuj', onClick: () => view.minimize('win-notes') },
+          'separator',
+          { label: 'Zamknij',     onClick: () => view.close('win-notes')    }
+      ]
+  });
+
+  // Zaktualizuj tytuł elementu paska:
+  taskbar.updateItem('tb-notes', { title: 'Notatnik *' });
+
+  // Usuń element z paska:
+  taskbar.removeItem('tb-notes');
+
+  // Ustaw pozycję paska zadań:
+  taskbar.setPosition('bottom'); // 'bottom' | 'top' | 'left' | 'right'
+  // Przy zmianie pozycji na 'left' lub 'right' elementy paska automatycznie
+  // ustawiają się pionowo, a menu otwiera się po właściwej stronie.
+
+  // Włącz / wyłącz automatyczne ukrywanie paska zadań:
+  // Gdy włączone – pasek chowa się i okna zajmują cały ekran;
+  // po najechaniu myszą (lub dotknięciu na urządzeniach dotykowych) pasek
+  // wysuwa się, a okna zmniejszają się automatycznie.
+  taskbar.setAutoHide(true);
+  taskbar.setAutoHide(false);
+  taskbar.toggleAutoHide();
+
+  // Całkowite ukrycie / pokazanie paska zadań:
+  // hide() – pasek znika, okna automatycznie zajmują całą dostępną przestrzeń.
+  // show() – pasek wraca, okna automatycznie zwalniają dla niego miejsce.
+  taskbar.hide();
+  taskbar.show();
+
+  // ── Menu Start – dodawanie pozycji do przycisku Start ──────
+
+  // Odśwież całe menu Start (zastępuje poprzednie pozycje):
+  taskbar.refreshStartMenu([
+      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore('win-notes') },
+      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore('win-calc')  },
+      'separator',
+      { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
+      { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
+  ]);
+
+  // Dodaj pojedynczą pozycję do menu Start:
+  taskbar.addStartMenuItem({ id: 'sm-browser', icon: '🌐', label: 'Przeglądarka', onClick: () => alert('Przeglądarka') });
+
+  // Dodaj separator:
+  taskbar.addStartMenuItem('separator');
+
+  // Usuń pozycję z menu Start po id:
+  taskbar.removeStartMenuItem('sm-browser');
+
+  // ── Pełny przykład – dwa okna z paskiem zadań ──────────────
+
+  view.create('win-a', { title: 'Okno A', icon: '🟦', statusText: 'Gotowe' });
+  view.create('win-b', { title: 'Okno B', icon: '🟩', statusText: 'Gotowe' });
+
+  view.refreshContent('win-a', { header: 'Okno A', cards: [
+      { id: 'ca1', title: 'Karta 1', text: 'Zawartość okna A.' }
+  ]});
+  view.refreshContent('win-b', { header: 'Okno B', cards: [
+      { id: 'cb1', title: 'Karta 1', text: 'Zawartość okna B.' }
+  ]});
+
+  taskbar.addItem('tb-a', { icon: '🟦', title: 'Okno A',
+      onClick: () => view.restore('win-a'),
+      menuItems: [
+          { label: 'Minimalizuj', onClick: () => view.minimize('win-a') },
+          { label: 'Maksymalizuj', onClick: () => view.maximize('win-a') },
+          'separator',
+          { label: 'Zamknij', onClick: () => { view.close('win-a'); taskbar.removeItem('tb-a'); } }
+      ]
+  });
+  taskbar.addItem('tb-b', { icon: '🟩', title: 'Okno B',
+      onClick: () => view.restore('win-b'),
+      menuItems: [
+          { label: 'Minimalizuj', onClick: () => view.minimize('win-b') },
+          { label: 'Maksymalizuj', onClick: () => view.maximize('win-b') },
+          'separator',
+          { label: 'Zamknij', onClick: () => { view.close('win-b'); taskbar.removeItem('tb-b'); } }
+      ]
+  });
+
+  // ── Dodawanie elementu do ikony Start (z menu kontekstowym) ─
+  // Możesz dodać dowolne pozycje menu – aplikacje, skróty, separator:
+  taskbar.refreshStartMenu([
+      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore('win-notes') },
+      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore('win-calc')  },
+      'separator',
+      { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
+      { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
+  ]);
+  // lub dynamicznie po jednej pozycji:
+  taskbar.addStartMenuItem({ id: 'sm-browser', icon: '🌐', label: 'Przeglądarka', onClick: () => alert('Przeglądarka') });
+  taskbar.addStartMenuItem('separator');
+  taskbar.removeStartMenuItem('sm-browser');
+
+ * ════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════
  *  class View
  *  Zarządza WSZYSTKIMI elementami UI:
  *    view.taskbar  – pasek zadań (start, separator, elementy, menu kontekstowe)
@@ -930,6 +1115,13 @@ class View {
             const regRes = window._windowRegistry.find(r => r.winEl === win);
             if (regRes) regRes.isMinimized = false;
 
+            /* na małych ekranach zawsze maksymalizuj */
+            if (window.innerWidth <= MOBILE_BREAKPOINT) {
+                _state.prev = null;
+                this._wmAction('maximize');
+                return;
+            }
+
             // Przywróć poprzednie pozycje i rozmiar
             if (_state.prev) {
                 win.style.left = _state.prev.left;
@@ -1103,13 +1295,16 @@ class WindowManager {
  * ════════════════════════════════════════════════════════════ */
 class TaskbarManager {
     constructor({ taskbarId = 'taskbar', containerId = 'windowContainer' } = {}) {
-        this._view            = new View({ taskbarId, containerId });
-        this._tb              = this._view.taskbar;
-        this._position        = 'bottom';
-        this._autoHideActive  = false;
-        this._autoHideHovered = false;
-        this._autoHideEnter   = null;
-        this._autoHideLeave   = null;
+        this._view                  = new View({ taskbarId, containerId });
+        this._tb                    = this._view.taskbar;
+        this._position              = 'bottom';
+        this._autoHideActive        = false;
+        this._autoHideHovered       = false;
+        this._autoHideEnter         = null;
+        this._autoHideLeave         = null;
+        this._autoHideTouch         = null;
+        this._autoHideTouchOutside  = null;
+        this._isHidden              = false;
     }
 
     refresh(cfg = {})        { this._tb.refresh(cfg); }
@@ -1128,7 +1323,7 @@ class TaskbarManager {
         const tbH    = style.getPropertyValue('--tb-size-h').trim();
         const tbW    = style.getPropertyValue('--tb-size-v').trim();
         const pos    = this._position;
-        const hidden = this._autoHideActive && !this._autoHideHovered;
+        const hidden = this._isHidden || (this._autoHideActive && !this._autoHideHovered);
 
         root.style.setProperty('--tb-top',    (!hidden && pos === 'top')    ? tbH : '0px');
         root.style.setProperty('--tb-bottom', (!hidden && pos === 'bottom') ? tbH : '0px');
@@ -1175,10 +1370,14 @@ class TaskbarManager {
         const bar = this._view._taskbarEl;
 
         /* usuń poprzednie listenery autohide */
-        if (this._autoHideEnter) bar.removeEventListener('mouseenter', this._autoHideEnter);
-        if (this._autoHideLeave) bar.removeEventListener('mouseleave', this._autoHideLeave);
-        this._autoHideEnter   = null;
-        this._autoHideLeave   = null;
+        if (this._autoHideEnter)        bar.removeEventListener('mouseenter', this._autoHideEnter);
+        if (this._autoHideLeave)        bar.removeEventListener('mouseleave', this._autoHideLeave);
+        if (this._autoHideTouch)        bar.removeEventListener('touchstart', this._autoHideTouch);
+        if (this._autoHideTouchOutside) document.removeEventListener('touchstart', this._autoHideTouchOutside);
+        this._autoHideEnter         = null;
+        this._autoHideLeave         = null;
+        this._autoHideTouch         = null;
+        this._autoHideTouchOutside  = null;
 
         this._autoHideActive  = enabled;
         this._autoHideHovered = false;
@@ -1195,8 +1394,31 @@ class TaskbarManager {
                 this._syncCSSVars();
                 this._resizeAllWindows();
             };
+            /* obsługa dotykowa – wysuń pasek przy dotknięciu */
+            let touchOnBar = false;
+            this._autoHideTouch = () => {
+                touchOnBar = true;
+                this._autoHideHovered = true;
+                bar.classList.add('autohide-show');
+                this._syncCSSVars();
+                this._resizeAllWindows();
+            };
+            this._autoHideTouchOutside = () => {
+                if (touchOnBar) {
+                    touchOnBar = false;
+                    return;
+                }
+                this._autoHideHovered = false;
+                bar.classList.remove('autohide-show');
+                this._syncCSSVars();
+                this._resizeAllWindows();
+            };
             bar.addEventListener('mouseenter', this._autoHideEnter);
             bar.addEventListener('mouseleave', this._autoHideLeave);
+            bar.addEventListener('touchstart', this._autoHideTouch, { passive: true });
+            document.addEventListener('touchstart', this._autoHideTouchOutside, { passive: true });
+        } else {
+            bar.classList.remove('autohide-show');
         }
 
         this._syncCSSVars();
@@ -1206,6 +1428,28 @@ class TaskbarManager {
     /** Przełącza automatyczne ukrywanie paska zadań */
     toggleAutoHide() {
         this.setAutoHide(!this._autoHideActive);
+    }
+
+    /**
+     * Całkowicie ukrywa pasek zadań.
+     * Okna automatycznie rozszerzają się na całą dostępną przestrzeń.
+     */
+    hide() {
+        this._view._taskbarEl.style.display = 'none';
+        this._isHidden = true;
+        this._syncCSSVars();
+        this._resizeAllWindows();
+    }
+
+    /**
+     * Pokazuje pasek zadań po wcześniejszym ukryciu.
+     * Okna automatycznie zwalniają miejsce dla paska.
+     */
+    show() {
+        this._view._taskbarEl.style.display = '';
+        this._isHidden = false;
+        this._syncCSSVars();
+        this._resizeAllWindows();
     }
 }
 
@@ -1223,180 +1467,4 @@ const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'tas
 
 
 
-/*
- ════════════════════════════════════════════════════════════
-  PRZYKŁADY UŻYCIA – wklej w konsolę przeglądarki (F12)
- ════════════════════════════════════════════════════════════
 
-  ── WindowManager ──────────────────────────────────────────
-
-  // Utwórz nowe okno:
-  view.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
-
-  // Utwórz drugie okno z własnym menu:
-  view.create('win-calc', { title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
-  view.refreshMenubar('win-calc', [
-      { label: 'Widok', id: 'calc-view', items: [
-          { icon: '🔢', label: 'Standardowy', onClick: () => view.setStatus('win-calc', 'Tryb standardowy') },
-          { icon: '📐', label: 'Naukowy',     onClick: () => view.setStatus('win-calc', 'Tryb naukowy') }
-      ]}
-  ]);
-
-  // Zmień tytuł okna:
-  view.setTitle('win-notes', 'Notatnik – plik.txt');
-
-  // Zmień tekst paska stanu:
-  view.setStatus('win-notes', 'Plik zapisany pomyślnie');
-
-  // Dodaj kartę do zawartości:
-  view.addCard('win-notes', { id: 'card-1', title: '📄 Dokument', text: 'Treść dokumentu.' });
-
-  // Zaktualizuj kartę:
-  view.updateCard('win-notes', 'card-1', { title: '📄 Dokument (zmodyfikowany)', text: 'Nowa treść.' });
-
-  // Usuń kartę:
-  view.removeCard('win-notes', 'card-1');
-
-  // Odśwież całą zawartość okna:
-  view.refreshContent('win-notes', {
-      header: 'Notatnik', subheader: 'Wersja 2.0',
-      cards: [{ id: 'c1', title: 'Info', text: 'Nowa zawartość.' }]
-  });
-
-  // Dodaj pozycję do istniejącego menu:
-  view.addMenuItem('win-main', 'menu-file', { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') });
-
-  // Usuń pozycję z menu:
-  view.removeMenuItem('win-main', 'menu-file', 'mi-print');
-
-  // Dodaj nowe menu do okna:
-  view.addMenu('win-main', { label: 'Narzędzia', id: 'menu-tools', items: [
-      { icon: '🔧', label: 'Ustawienia', onClick: () => {} }
-  ]});
-
-  // Usuń menu z okna:
-  view.removeMenu('win-main', 'menu-view');
-
-  // Dodaj przycisk do paska tytułowego:
-  view.addButton('win-notes', { id: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
-
-  // Usuń przycisk:
-  view.removeButton('win-notes', 'btn-pin');
-
-  // Minimalizuj / maksymalizuj / przywróć / zamknij okno:
-  view.minimize('win-notes');
-  view.maximize('win-notes');
-  view.restore('win-notes');
-  view.close('win-notes');
-
-  // Sprawdź stan okna:
-  view.isMinimized('win-main');   // → true / false
-  view.isMaximized('win-main');   // → true / false
-
-  // Dostęp do pełnego obiektu View (dla zaawansowanych operacji):
-  const v = view.getView('win-main');
-  v.content.addCard({ id: 'extra', title: 'Extra', text: 'Bezpośredni dostęp do View.' });
-
-  ── TaskbarManager ─────────────────────────────────────────
-
-  // Pełne odświeżenie paska (resetuje wszystkie elementy):
-  taskbar.refresh({ showStart: true, items: [
-      { id: 'tb-notes', icon: '📝', title: 'Notatnik',   onClick: () => view.restore('win-notes') },
-      { id: 'tb-calc',  icon: '🧮', title: 'Kalkulator', onClick: () => view.restore('win-calc')  }
-  }});
-
-  // Dodaj element do paska:
-  taskbar.addItem('tb-notes', {
-      icon: '📝', title: 'Notatnik',
-      onClick: () => view.restore('win-notes'),
-      menuItems: [
-          { label: 'Przywróć',    onClick: () => view.restore('win-notes')  },
-          { label: 'Minimalizuj', onClick: () => view.minimize('win-notes') },
-          'separator',
-          { label: 'Zamknij',     onClick: () => view.close('win-notes')    }
-      ]
-  });
-
-  // Zaktualizuj tytuł elementu paska:
-  taskbar.updateItem('tb-notes', { title: 'Notatnik *' });
-
-  // Usuń element z paska:
-  taskbar.removeItem('tb-notes');
-
-  // Ustaw pozycję paska zadań:
-  taskbar.setPosition('bottom'); // 'bottom' | 'top' | 'left' | 'right'
-
-  // Włącz / wyłącz automatyczne ukrywanie paska zadań:
-  // Gdy włączone – pasek chowa się i okna zajmują cały ekran;
-  // po najechaniu pasek się wysuwa, a okna zmniejszają się automatycznie.
-  taskbar.setAutoHide(true);
-  taskbar.setAutoHide(false);
-  taskbar.toggleAutoHide();
-
-  // ── Menu Start – dodawanie pozycji do przycisku Start ──────
-
-  // Odśwież całe menu Start (zastępuje poprzednie pozycje):
-  taskbar.refreshStartMenu([
-      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore('win-notes') },
-      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore('win-calc')  },
-      'separator',
-      { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
-      { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
-  ]);
-
-  // Dodaj pojedynczą pozycję do menu Start:
-  taskbar.addStartMenuItem({ id: 'sm-browser', icon: '🌐', label: 'Przeglądarka', onClick: () => alert('Przeglądarka') });
-
-  // Dodaj separator:
-  taskbar.addStartMenuItem('separator');
-
-  // Usuń pozycję z menu Start po id:
-  taskbar.removeStartMenuItem('sm-browser');
-
-  ── Pełny przykład – dwa okna z paskiem zadań ──────────────
-
-  view.create('win-a', { title: 'Okno A', icon: '🟦', statusText: 'Gotowe' });
-  view.create('win-b', { title: 'Okno B', icon: '🟩', statusText: 'Gotowe' });
-
-  view.refreshContent('win-a', { header: 'Okno A', cards: [
-      { id: 'ca1', title: 'Karta 1', text: 'Zawartość okna A.' }
-  ]});
-  view.refreshContent('win-b', { header: 'Okno B', cards: [
-      { id: 'cb1', title: 'Karta 1', text: 'Zawartość okna B.' }
-  ]});
-
-  taskbar.addItem('tb-a', { icon: '🟦', title: 'Okno A',
-      onClick: () => view.restore('win-a'),
-      menuItems: [
-          { label: 'Minimalizuj', onClick: () => view.minimize('win-a') },
-          { label: 'Maksymalizuj', onClick: () => view.maximize('win-a') },
-          'separator',
-          { label: 'Zamknij', onClick: () => { view.close('win-a'); taskbar.removeItem('tb-a'); } }
-      ]
-  });
-  taskbar.addItem('tb-b', { icon: '🟩', title: 'Okno B',
-      onClick: () => view.restore('win-b'),
-      menuItems: [
-          { label: 'Minimalizuj', onClick: () => view.minimize('win-b') },
-          { label: 'Maksymalizuj', onClick: () => view.maximize('win-b') },
-          'separator',
-          { label: 'Zamknij', onClick: () => { view.close('win-b'); taskbar.removeItem('tb-b'); } }
-      ]
-  });
-
-  // dodanie ikony do tasckar-start-icon 
-    taskbar.addItem('tb-start', {
-        icon: '🪟', title: 'Start',
-        onClick: () => alert('Menu Start!'),
-        menuItems: [
-            { label: 'Aplikacja 1', onClick: () => alert('Aplikacja 1') },
-            { label: 'Aplikacja 2', onClick: () => alert('Aplikacja 2') },
-            'separator',
-            { label: 'Ustawienia', onClick: () => alert('Ustawienia') }
-        ]
-    }); 
-  
-
-
-
-*/
