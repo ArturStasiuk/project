@@ -7,6 +7,9 @@
  *    view.menubar  – górne menu okna
  *    view.content  – zawartość okna (karty, nagłówek)
  * ════════════════════════════════════════════════════════════ */
+
+const MOBILE_BREAKPOINT = 768;  // px – granica małego ekranu
+
 class View {
     constructor({ taskbarId, containerId }) {
         this._taskbarEl   = document.getElementById(taskbarId);
@@ -277,6 +280,8 @@ class View {
              * @param {{ title, icon?, statusText? }} cfg
              */
             create({ title = '', icon = null, statusText = 'Gotowe' } = {}) {
+                const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+
                 const win = document.createElement('div');
                 win.className = 'window';
                 win.innerHTML = `
@@ -289,9 +294,9 @@ class View {
                             <button class="titlebar-button minimize" title="Minimalizuj">
                                 <div class="minimize-icon"></div>
                             </button>
-                            <button class="titlebar-button maximize" title="Maksymalizuj">
+                            ${isMobile ? '' : `<button class="titlebar-button maximize" title="Maksymalizuj">
                                 <div class="maximize-icon"></div>
-                            </button>
+                            </button>`}
                             <button class="titlebar-button close" title="Zamknij">
                                 <div class="close-icon"></div>
                             </button>
@@ -349,6 +354,11 @@ class View {
 
                 /* poinformuj submoduły o nowym oknie */
                 self._onWindowCreated(win);
+
+                /* auto-maksymalizacja na małych ekranach */
+                if (isMobile) {
+                    self._wmAction('maximize');
+                }
             },
 
             /** Zmienia tytuł okna */
@@ -391,7 +401,8 @@ class View {
                 if (!self._windowEl) return;
                 const win = self._windowEl;
                 win.querySelector('.minimize').onclick = e => { e.stopPropagation(); onMinimize && onMinimize(e); };
-                win.querySelector('.maximize').onclick = e => { e.stopPropagation(); onMaximize && onMaximize(e); };
+                const maxBtn = win.querySelector('.maximize');
+                if (maxBtn) maxBtn.onclick = e => { e.stopPropagation(); onMaximize && onMaximize(e); };
                 win.querySelector('.close').onclick    = e => { e.stopPropagation(); onClose    && onClose(e);    };
             },
 
@@ -478,6 +489,118 @@ class View {
             });
         };
 
+        /* ── mobile bottom-sheet helpers ─────────────────────────── */
+        const _buildMobileItemsFromDrop = (dropEl, container, overlay, indent) => {
+            dropEl.querySelectorAll(':scope > .dropdown-item, :scope > .dropdown-separator').forEach(el => {
+                if (el.classList.contains('dropdown-separator')) {
+                    const sep = document.createElement('div');
+                    sep.className = 'mobile-sheet-separator';
+                    container.appendChild(sep);
+                    return;
+                }
+                const isDisabled = el.classList.contains('disabled');
+                const iconEl     = el.querySelector('.dropdown-item-icon');
+                const shortcutEl = el.querySelector('.dropdown-item-shortcut');
+                const submenuEl  = el.querySelector('.submenu');
+
+                /* extract label text (strip child element text) */
+                const clone = el.cloneNode(true);
+                clone.querySelectorAll('.dropdown-item-icon,.dropdown-item-shortcut,.submenu-indicator,.submenu').forEach(c => c.remove());
+                const labelText = clone.textContent.trim();
+                if (!labelText && !iconEl) return;
+
+                const item = document.createElement('div');
+                item.className = 'mobile-sheet-item' + (isDisabled ? ' disabled' : '') + (indent ? ' mobile-sheet-item-indent' : '');
+                item.innerHTML =
+                    `<span class="mobile-sheet-item-icon">${iconEl ? iconEl.textContent : ''}</span>` +
+                    `<span class="mobile-sheet-item-label">${labelText}</span>` +
+                    (shortcutEl ? `<span class="mobile-sheet-item-shortcut">${shortcutEl.textContent}</span>` : '');
+
+                if (!isDisabled && !submenuEl) {
+                    item.addEventListener('click', e => {
+                        e.stopPropagation();
+                        overlay.classList.remove('open');
+                        el.click();
+                    });
+                } else if (submenuEl) {
+                    item.querySelector('.mobile-sheet-item-label').innerHTML += ' <span class="mobile-sheet-submenu-label">▸</span>';
+                }
+                container.appendChild(item);
+
+                if (submenuEl) {
+                    _buildMobileItemsFromDrop(submenuEl, container, overlay, true);
+                }
+            });
+        };
+
+        const _buildMobileOverlay = () => {
+            const win = self._windowEl; if (!win) return null;
+            const mb  = _getMenubar();  if (!mb)  return null;
+
+            /* remove any existing overlay */
+            win.querySelectorAll('.mobile-menu-overlay').forEach(el => el.remove());
+
+            const overlay = document.createElement('div');
+            overlay.className = 'mobile-menu-overlay';
+
+            const sheet = document.createElement('div');
+            sheet.className = 'mobile-menu-sheet';
+
+            /* header */
+            const header = document.createElement('div');
+            header.className = 'mobile-sheet-header';
+            header.innerHTML = '<span>Menu</span>';
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'mobile-sheet-close';
+            closeBtn.textContent = '✕';
+            closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
+            header.appendChild(closeBtn);
+
+            /* items */
+            const itemsContainer = document.createElement('div');
+            itemsContainer.className = 'mobile-sheet-items';
+
+            mb.querySelectorAll('.menu-item').forEach(menuEl => {
+                const dropEl = menuEl.querySelector('.dropdown-menu');
+                if (!dropEl) return;
+
+                /* section header = menu label */
+                const menuLabel = menuEl.childNodes[0] && menuEl.childNodes[0].nodeType === Node.TEXT_NODE
+                    ? menuEl.childNodes[0].textContent.trim()
+                    : menuEl.dataset.menuId || '';
+
+                const section = document.createElement('div');
+                section.className = 'mobile-sheet-section';
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'mobile-sheet-section-header';
+                sectionHeader.innerHTML = `<span>${menuLabel}</span><span class="mobile-sheet-section-arrow">▾</span>`;
+                sectionHeader.addEventListener('click', () => section.classList.toggle('collapsed'));
+
+                const sectionBody = document.createElement('div');
+                sectionBody.className = 'mobile-sheet-section-body';
+
+                _buildMobileItemsFromDrop(dropEl, sectionBody, overlay, false);
+
+                section.appendChild(sectionHeader);
+                section.appendChild(sectionBody);
+                itemsContainer.appendChild(section);
+            });
+
+            sheet.appendChild(header);
+            sheet.appendChild(itemsContainer);
+            overlay.appendChild(sheet);
+
+            /* close on backdrop click */
+            overlay.addEventListener('click', e => {
+                if (e.target === overlay) overlay.classList.remove('open');
+            });
+
+            win.appendChild(overlay);
+            return overlay;
+        };
+        /* ── end mobile helpers ─────────────────────────────────── */
+
         /* tworzy element .menu-item z dropdown */
         const _makeMenu = ({ label, id, items = [] }) => {
             const mi = document.createElement('div');
@@ -518,6 +641,19 @@ class View {
                 const mb = _getMenubar(); if (!mb) return;
                 mb.innerHTML = '';
                 menus.forEach(m => mb.appendChild(_makeMenu(m)));
+
+                /* hamburger button – visible only on small screens via CSS */
+                const hamburger = document.createElement('button');
+                hamburger.className = 'menubar-hamburger';
+                hamburger.title = 'Menu';
+                hamburger.innerHTML = '&#9776;';
+                hamburger.addEventListener('click', e => {
+                    e.stopPropagation();
+                    _closeMenus();
+                    const overlay = _buildMobileOverlay();
+                    if (overlay) overlay.classList.add('open');
+                });
+                mb.appendChild(hamburger);
             },
 
             /**
@@ -529,8 +665,11 @@ class View {
                 const el = _makeMenu({ label, id, items });
                 const existing = mb.querySelectorAll('.menu-item');
                 if (position === 'first') mb.insertBefore(el, mb.firstChild);
-                else if (position === 'last' || position >= existing.length) mb.appendChild(el);
-                else mb.insertBefore(el, existing[position]);
+                else if (position === 'last' || position >= existing.length) {
+                    /* insert before hamburger if present */
+                    const hb = mb.querySelector('.menubar-hamburger');
+                    hb ? mb.insertBefore(el, hb) : mb.appendChild(el);
+                } else mb.insertBefore(el, existing[position]);
             },
 
             /** Usuwa menu po data-menu-id */
@@ -697,11 +836,18 @@ class View {
                     height: win.style.height
                 };
             }
-            // Ustaw na pełny kontener
-            win.style.left = '0px';
-            win.style.top = '0px';
-            win.style.width = container.offsetWidth + 'px';
-            win.style.height = container.offsetHeight + 'px';
+            // Ustaw na obszar roboczy (z uwzględnieniem taskbara)
+            const root = document.documentElement;
+            const style  = getComputedStyle(root);
+            const tbTop    = parseFloat(root.style.getPropertyValue('--tb-top')    || style.getPropertyValue('--tb-top'))    || 0;
+            const tbLeft   = parseFloat(root.style.getPropertyValue('--tb-left')   || style.getPropertyValue('--tb-left'))   || 0;
+            const tbBottom = parseFloat(root.style.getPropertyValue('--tb-bottom') || style.getPropertyValue('--tb-bottom')) || 48;
+            const tbRight  = parseFloat(root.style.getPropertyValue('--tb-right')  || style.getPropertyValue('--tb-right'))  || 0;
+
+            win.style.left   = tbLeft + 'px';
+            win.style.top    = tbTop  + 'px';
+            win.style.width  = (window.innerWidth  - tbLeft - tbRight)  + 'px';
+            win.style.height = (window.innerHeight - tbTop  - tbBottom) + 'px';
 
         } else if (action === 'restore') {
             win.classList.remove('minimized', 'maximized');
@@ -736,7 +882,7 @@ class View {
         const win = this._windowEl; if (!win) return;
         const s = win._wmState || {};
         if (s.maximized) {
-            win.style.width = '100vw'; win.style.height = '100vh';
+            this._wmAction('maximize'); /* recalculate with current taskbar offset */
         } else {
             win.style.width  = `${Math.min(900, window.innerWidth  - 40)}px`;
             win.style.height = `${Math.min(600, window.innerHeight - 40)}px`;
@@ -894,6 +1040,54 @@ class TaskbarManager {
     addItem(id, cfg = {})    { this._tb.addItem({ id, ...cfg }); }
     removeItem(id)           { this._tb.removeItem(id); }
     updateItem(id, cfg = {}) { this._tb.updateItem(id, cfg); }
+
+    /**
+     * Ustawia pozycję paska zadań
+     * @param {'bottom'|'top'|'left'|'right'} position
+     */
+    setPosition(position = 'bottom') {
+        const bar  = this._view._taskbarEl;
+        const root = document.documentElement;
+        const body = document.body;
+
+        /* remove old position classes / attribute */
+        bar.removeAttribute('data-pos');
+        ['bottom','top','left','right'].forEach(p => body.classList.remove(`taskbar-pos-${p}`));
+
+        bar.dataset.pos = position;
+        body.classList.add(`taskbar-pos-${position}`);
+
+        /* Read taskbar dimensions from CSS variables to avoid duplication */
+        const style  = getComputedStyle(root);
+        const tbH    = style.getPropertyValue('--tb-size-h').trim(); /* e.g. "48px" */
+        const tbW    = style.getPropertyValue('--tb-size-v').trim(); /* e.g. "56px" */
+
+        root.style.setProperty('--tb-top',    position === 'top'    ? tbH : '0px');
+        root.style.setProperty('--tb-bottom', position === 'bottom' ? tbH : '0px');
+        root.style.setProperty('--tb-left',   position === 'left'   ? tbW : '0px');
+        root.style.setProperty('--tb-right',  position === 'right'  ? tbW : '0px');
+
+        /* re-size any already-maximized windows */
+        if (window._wm) {
+            window._wm.instances.forEach(wm =>
+                wm._windows.forEach(v => { if (v.isMaximized()) v._wmAction('maximize'); })
+            );
+        }
+    }
+
+    /**
+     * Włącza / wyłącza automatyczne ukrywanie paska zadań
+     * @param {boolean} enabled
+     */
+    setAutoHide(enabled = false) {
+        const bar = this._view._taskbarEl;
+        bar.classList.toggle('autohide', enabled);
+    }
+
+    /** Przełącza automatyczne ukrywanie paska zadań */
+    toggleAutoHide() {
+        this.setAutoHide(!this._view._taskbarEl.classList.contains('autohide'));
+    }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -903,6 +1097,7 @@ class TaskbarManager {
 /* ── 1. Taskbar ── */
 const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
 taskbar.refresh({ showStart: true, items: [] });
+taskbar.setPosition('bottom'); /* domyślna pozycja */
 
 /* ── 2. WindowManager + pierwsze okno ── */
 const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
@@ -1008,6 +1203,14 @@ const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'tas
 
   // Usuń element z paska:
   taskbar.removeItem('tb-notes');
+
+  // Ustaw pozycję paska zadań:
+  taskbar.setPosition('bottom'); // 'bottom' | 'top' | 'left' | 'right'
+
+  // Włącz / wyłącz automatyczne ukrywanie paska zadań:
+  taskbar.setAutoHide(true);
+  taskbar.setAutoHide(false);
+  taskbar.toggleAutoHide();
 
   ── Pełny przykład – dwa okna z paskiem zadań ──────────────
 
