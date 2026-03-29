@@ -1855,7 +1855,7 @@ view.refreshMenubar('win-calc', [
 ]);
 
 
-taskbar.setAutoHide(true);
+//taskbar.setAutoHide(true);
 
 taskbar.refreshStartMenu([
     { id: 'sm-notes', icon: '📝', label: 'Notatnik', onClick: () => view.restore('win-notes') },
