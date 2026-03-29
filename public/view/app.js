@@ -181,6 +181,43 @@
   taskbar.addStartMenuItem('separator');
   taskbar.removeStartMenuItem('sm-browser');
 
+  ── DesktopIconsManager ────────────────────────────────────
+
+  // Dodaj ikonę aplikacji (klik otwiera okno):
+  desktop.addIcon('di-notes', { icon: '📝', label: 'Notatnik', onClick: () => view.restore('win-notes') });
+
+  // Dodaj ikonę-folder (klik lewym = rozwinięcie menu):
+  desktop.addIcon('di-folder', {
+      icon: '📁', label: 'Moje pliki',
+      menuItems: [
+          { icon: '📄', label: 'Dokument.txt', onClick: () => alert('Otwórz plik') },
+          { icon: '📊', label: 'Arkusz.xlsx',  onClick: () => alert('Otwórz arkusz') },
+          'separator',
+          { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Otwórz folder') }
+      ]
+  });
+
+  // Dodaj ikonę z własną pozycją (x, y w pikselach):
+  desktop.addIcon('di-calc', { icon: '🧮', label: 'Kalkulator', position: { x: 100, y: 20 },
+      onClick: () => view.restore('win-calc') });
+
+  // Usuń ikonę:
+  desktop.removeIcon('di-notes');
+
+  // Zaktualizuj ikonę (zmień etykietę / emoji / pozycję / handler):
+  desktop.updateIcon('di-notes', { label: 'Notatnik *', icon: '📋' });
+
+  // Pobierz pozycję ikony:
+  const pos = desktop.getIconPosition('di-notes');
+  console.log(pos); // { x: 20, y: 20 }
+
+  // Ustaw pozycję ikony:
+  desktop.setIconPosition('di-notes', { x: 100, y: 200 });
+
+  // Pobierz listę wszystkich ikon z ich bieżącymi pozycjami:
+  const icons = desktop.getIcons();
+  // [ { id: 'di-notes', icon: '📝', label: 'Notatnik', position: { x: 20, y: 20 } }, … ]
+
  * ════════════════════════════════════════════════════════════ */
 
 /* ════════════════════════════════════════════════════════════
@@ -1454,6 +1491,345 @@ class TaskbarManager {
 }
 
 /* ════════════════════════════════════════════════════════════
+ *  class DesktopIconsManager
+ *  Zarządza ikonami pulpitu:
+ *    desktop.addIcon(id, cfg)          – dodaj ikonę
+ *    desktop.removeIcon(id)            – usuń ikonę
+ *    desktop.updateIcon(id, cfg)       – zaktualizuj ikonę
+ *    desktop.getIconPosition(id)       – pobierz pozycję { x, y }
+ *    desktop.setIconPosition(id, pos)  – ustaw pozycję { x, y }
+ *    desktop.getIcons()                – lista wszystkich ikon
+ * ════════════════════════════════════════════════════════════ */
+class DesktopIconsManager {
+    /**
+     * @param {object} [cfg]
+     * @param {string} [cfg.containerId='desktopIcons']
+     */
+    constructor({ containerId = 'desktopIcons' } = {}) {
+        this._container  = document.getElementById(containerId);
+        this._icons      = new Map();   // id → { el, cfg }
+        this._gridX      = 20;
+        this._gridY      = 20;
+        this._gridCellW  = 88;
+        this._gridCellH  = 96;
+        this._activeMenu = null;
+
+        document.addEventListener('click',       () => this._closeMenu());
+        document.addEventListener('contextmenu', e => {
+            if (!e.target.closest('.desktop-icon')) this._closeMenu();
+        });
+    }
+
+    /* ── Publiczne API ── */
+
+    /**
+     * Dodaje ikonę na pulpit.
+     * @param {string} id  Unikalny identyfikator
+     * @param {object} cfg
+     * @param {string}   cfg.icon       Emoji lub HTML ikony (np. '📝')
+     * @param {string}   cfg.label      Etykieta pod ikoną
+     * @param {object}   [cfg.position] { x, y } – jeśli pominięte, pozycja siatki
+     * @param {Function} [cfg.onClick]  Handler kliknięcia lewym przyciskiem
+     * @param {Array}    [cfg.menuItems] Pozycje menu (prawy klik / folder)
+     */
+    addIcon(id, cfg = {}) {
+        if (this._icons.has(id)) this.removeIcon(id);
+
+        const pos = cfg.position ? { ...cfg.position } : this._nextGridPos();
+        const el  = this._createEl(id, cfg, pos);
+        this._container.appendChild(el);
+        this._icons.set(id, { el, cfg: { ...cfg, position: pos } });
+        this._makeDraggable(el, id);
+        return this;
+    }
+
+    /**
+     * Usuwa ikonę z pulpitu.
+     * @param {string} id
+     */
+    removeIcon(id) {
+        const entry = this._icons.get(id);
+        if (!entry) return this;
+        entry.el.remove();
+        this._icons.delete(id);
+        return this;
+    }
+
+    /**
+     * Aktualizuje właściwości istniejącej ikony.
+     * @param {string} id
+     * @param {object} cfg  Pola do nadpisania (icon / label / position / onClick / menuItems)
+     */
+    updateIcon(id, cfg = {}) {
+        const entry = this._icons.get(id);
+        if (!entry) return this;
+        const newCfg = { ...entry.cfg, ...cfg };
+        const pos    = newCfg.position;
+        const newEl  = this._createEl(id, newCfg, pos);
+        entry.el.replaceWith(newEl);
+        this._icons.set(id, { el: newEl, cfg: newCfg });
+        this._makeDraggable(newEl, id);
+        return this;
+    }
+
+    /**
+     * Zwraca bieżącą pozycję ikony.
+     * @param  {string} id
+     * @returns {{ x: number, y: number } | null}
+     */
+    getIconPosition(id) {
+        const entry = this._icons.get(id);
+        if (!entry) return null;
+        return { ...entry.cfg.position };
+    }
+
+    /**
+     * Ustawia pozycję ikony.
+     * @param {string} id
+     * @param {{ x: number, y: number }} pos
+     */
+    setIconPosition(id, { x, y } = {}) {
+        const entry = this._icons.get(id);
+        if (!entry) return this;
+        entry.cfg.position = { x, y };
+        entry.el.style.left = x + 'px';
+        entry.el.style.top  = y + 'px';
+        return this;
+    }
+
+    /**
+     * Zwraca tablicę wszystkich ikon wraz z bieżącymi pozycjami.
+     * @returns {Array<{ id: string, icon: string, label: string, position: { x, y } }>}
+     */
+    getIcons() {
+        const result = [];
+        this._icons.forEach((entry, id) => {
+            result.push({ id, ...entry.cfg });
+        });
+        return result;
+    }
+
+    /* ── Wewnętrzne ── */
+
+    _nextGridPos() {
+        const vh      = window.innerHeight;
+        const DEFAULT_TASKBAR_HEIGHT = 48; /* zapasowa wartość gdy CSS-var nie jest dostępna */
+        const tbSize  = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--tb-bottom')
+        ) || DEFAULT_TASKBAR_HEIGHT;
+        const maxY = vh - tbSize - this._gridCellH - 10;
+
+        const pos = { x: this._gridX, y: this._gridY };
+        this._gridY += this._gridCellH;
+        if (this._gridY > maxY) {
+            this._gridY  = 20;
+            this._gridX += this._gridCellW;
+        }
+        return pos;
+    }
+
+    _createEl(id, cfg, pos) {
+        const el = document.createElement('div');
+        el.className    = 'desktop-icon';
+        el.dataset.iconId = id;
+        el.style.left   = pos.x + 'px';
+        el.style.top    = pos.y + 'px';
+
+        const imgEl = document.createElement('div');
+        imgEl.className   = 'desktop-icon-img';
+        imgEl.textContent = cfg.icon || '📄';
+
+        const labelEl = document.createElement('div');
+        labelEl.className   = 'desktop-icon-label';
+        labelEl.textContent = cfg.label || '';
+
+        el.appendChild(imgEl);
+        el.appendChild(labelEl);
+
+        const menuItems = cfg.menuItems || [];
+
+        /* klik lewym: onClick LUB (jeśli brak onClick i są menuItems) rozwiń menu */
+        el.addEventListener('click', e => {
+            e.stopPropagation();
+            if (el._wasDragged) { el._wasDragged = false; return; }
+            this._selectIcon(id);
+            if (typeof cfg.onClick === 'function') {
+                cfg.onClick(e);
+            } else if (menuItems.length) {
+                this._openMenu(e, id, cfg, menuItems);
+            }
+        });
+
+        /* prawy klik – zawsze menu kontekstowe */
+        el.addEventListener('contextmenu', e => {
+            e.preventDefault(); e.stopPropagation();
+            this._selectIcon(id);
+            if (menuItems.length) this._openMenu(e, id, cfg, menuItems);
+        });
+
+        return el;
+    }
+
+    _selectIcon(id) {
+        this._container.querySelectorAll('.desktop-icon.selected')
+            .forEach(el => el.classList.remove('selected'));
+        const entry = this._icons.get(id);
+        if (entry) entry.el.classList.add('selected');
+    }
+
+    _openMenu(e, id, cfg, items) {
+        this._closeMenu();
+
+        const menu = document.createElement('div');
+        menu.className = 'desktop-icon-menu';
+
+        items.forEach(item => {
+            if (item === 'separator') {
+                const sep = document.createElement('div');
+                sep.className = 'desktop-icon-menu-sep';
+                menu.appendChild(sep);
+                return;
+            }
+            const mi = document.createElement('div');
+            mi.className = 'desktop-icon-menu-item' + (item.disabled ? ' disabled' : '');
+            if (item.icon) {
+                const iconSpan = document.createElement('span');
+                iconSpan.className   = 'desktop-icon-menu-item-icon';
+                iconSpan.textContent = item.icon;
+                const labelSpan = document.createElement('span');
+                labelSpan.textContent = item.label || '';
+                mi.appendChild(iconSpan);
+                mi.appendChild(labelSpan);
+            } else {
+                mi.textContent = item.label || '';
+            }
+            if (!item.disabled && typeof item.onClick === 'function') {
+                mi.addEventListener('click', ev => {
+                    ev.stopPropagation();
+                    this._closeMenu();
+                    item.onClick(ev);
+                });
+            }
+            menu.appendChild(mi);
+        });
+
+        document.body.appendChild(menu);
+        this._activeMenu = menu;
+
+        /* pozycjonowanie – korekta gdy menu wychodzi poza ekran */
+        let mx = e.clientX, my = e.clientY;
+        menu.style.left = mx + 'px';
+        menu.style.top  = my + 'px';
+        requestAnimationFrame(() => {
+            const r  = menu.getBoundingClientRect();
+            const vw = window.innerWidth, vh = window.innerHeight;
+            if (r.right  > vw) menu.style.left = Math.max(0, mx - r.width)  + 'px';
+            if (r.bottom > vh) menu.style.top  = Math.max(0, my - r.height) + 'px';
+        });
+    }
+
+    _closeMenu() {
+        if (this._activeMenu) { this._activeMenu.remove(); this._activeMenu = null; }
+    }
+
+    _makeDraggable(el, id) {
+        const DRAG_THRESHOLD   = 5;   /* px – minimalne przesunięcie aby uznać za przeciąganie */
+        const LONG_PRESS_DELAY = 600; /* ms – czas długiego naciśnięcia (menu kontekstowe) */
+        let startX, startY, startLeft, startTop, elW, elH, isDragging;
+
+        /* ── Mouse ── */
+        el.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            e.preventDefault();
+            startX    = e.clientX; startY    = e.clientY;
+            startLeft = parseInt(el.style.left) || 0;
+            startTop  = parseInt(el.style.top)  || 0;
+            elW = el.offsetWidth; elH = el.offsetHeight; /* cache aby uniknąć reflow w onMove */
+            isDragging = false;
+
+            const onMove = mv => {
+                const dx = mv.clientX - startX, dy = mv.clientY - startY;
+                if (!isDragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+                isDragging = true;
+                el.classList.add('dragging');
+                const vw = window.innerWidth, vh = window.innerHeight;
+                el.style.left = Math.max(0, Math.min(vw - elW, startLeft + dx)) + 'px';
+                el.style.top  = Math.max(0, Math.min(vh - elH, startTop  + dy)) + 'px';
+            };
+
+            const onUp = () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup',   onUp);
+                el.classList.remove('dragging');
+                if (isDragging) {
+                    el._wasDragged = true;
+                    this._savePos(id, el);
+                }
+            };
+
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup',   onUp);
+        });
+
+        /* ── Touch ── */
+        el.addEventListener('touchstart', e => {
+            if (e.touches.length !== 1) return;
+            const t = e.touches[0];
+            startX    = t.clientX; startY    = t.clientY;
+            startLeft = parseInt(el.style.left) || 0;
+            startTop  = parseInt(el.style.top)  || 0;
+            elW = el.offsetWidth; elH = el.offsetHeight; /* cache aby uniknąć reflow w onTouchMove */
+            isDragging = false;
+
+            /* długie naciśnięcie = menu kontekstowe */
+            const longPress = setTimeout(() => {
+                if (!isDragging) {
+                    const entry = this._icons.get(id);
+                    if (entry && (entry.cfg.menuItems || []).length) {
+                        this._openMenu(
+                            { clientX: startX, clientY: startY },
+                            id, entry.cfg, entry.cfg.menuItems
+                        );
+                    }
+                }
+            }, LONG_PRESS_DELAY);
+
+            const onTouchMove = mv => {
+                mv.preventDefault();
+                const tc = mv.touches[0];
+                const dx = tc.clientX - startX, dy = tc.clientY - startY;
+                if (!isDragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+                clearTimeout(longPress);
+                isDragging = true;
+                el.classList.add('dragging');
+                const vw = window.innerWidth, vh = window.innerHeight;
+                el.style.left = Math.max(0, Math.min(vw - elW, startLeft + dx)) + 'px';
+                el.style.top  = Math.max(0, Math.min(vh - elH, startTop  + dy)) + 'px';
+            };
+
+            const onTouchEnd = () => {
+                clearTimeout(longPress);
+                el.removeEventListener('touchmove', onTouchMove);
+                el.removeEventListener('touchend',  onTouchEnd);
+                el.classList.remove('dragging');
+                if (isDragging) {
+                    el._wasDragged = true;
+                    this._savePos(id, el);
+                }
+            };
+
+            el.addEventListener('touchmove', onTouchMove, { passive: false });
+            el.addEventListener('touchend',  onTouchEnd);
+        }, { passive: true });
+    }
+
+    _savePos(id, el) {
+        const entry = this._icons.get(id);
+        if (entry) entry.cfg.position = { x: parseInt(el.style.left), y: parseInt(el.style.top) };
+    }
+}
+
+/* ════════════════════════════════════════════════════════════
  *  INICJALIZACJA
  * ════════════════════════════════════════════════════════════ */
 
@@ -1464,6 +1840,9 @@ taskbar.setPosition('bottom'); /* domyślna pozycja */
 
 /* ── 2. WindowManager + pierwsze okno ── */
 const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
+
+/* ── 3. Desktop icons ── */
+const desktop = new DesktopIconsManager({ containerId: 'desktopIcons' });
 
 
 

@@ -13,6 +13,7 @@
 </head>
 <body>
     <div class="desktop-bg"></div>
+    <div class="desktop-icons" id="desktopIcons"></div>
     <div class="taskbar" id="taskbar"></div>
     <div class="window-container" id="windowContainer"></div>
 
