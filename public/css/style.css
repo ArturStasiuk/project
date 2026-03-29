@@ -387,6 +387,49 @@
     .taskbar-menu-item:hover { background: rgba(255,255,255,0.1); }
     .taskbar-menu-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 8px; }
 
+    /* menu Start */
+    .taskbar-start-menu {
+        position: absolute; bottom: calc(100% + 8px); left: 0;
+        min-width: 280px;
+        background: rgba(32,32,32,0.97);
+        backdrop-filter: blur(40px);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 8px; z-index: 20000;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+        opacity: 0; visibility: hidden; transform: translateY(8px);
+        transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .taskbar-start-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+
+    body.taskbar-pos-top .taskbar .taskbar-start-menu {
+        bottom: auto; top: calc(100% + 8px); transform: translateY(-8px);
+    }
+    body.taskbar-pos-top .taskbar .taskbar-start-menu.open { transform: translateY(0); }
+
+    body.taskbar-pos-left .taskbar .taskbar-start-menu {
+        bottom: auto; top: 0; left: calc(100% + 8px); transform: translateX(-8px);
+    }
+    body.taskbar-pos-left .taskbar .taskbar-start-menu.open { transform: translateX(0); }
+
+    body.taskbar-pos-right .taskbar .taskbar-start-menu {
+        bottom: auto; top: 0; left: auto; right: calc(100% + 8px); transform: translateX(8px);
+    }
+    body.taskbar-pos-right .taskbar .taskbar-start-menu.open { transform: translateX(0); }
+
+    .taskbar-start-menu-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 14px; border-radius: 6px; cursor: pointer;
+        font-size: 13px; color: #f0f0f0;
+        transition: background 0.08s ease;
+    }
+    .taskbar-start-menu-item:hover { background: rgba(255,255,255,0.1); }
+    .taskbar-start-menu-item.disabled { color: #a0a0a0; cursor: default; }
+    .taskbar-start-menu-item.disabled:hover { background: transparent; }
+    .taskbar-start-menu-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 8px; }
+    .taskbar-start-menu-icon { width: 24px; text-align: center; font-size: 16px; flex-shrink: 0; }
+    .taskbar-start-menu-label { flex: 1; }
+
     /* prawy obszar paska (ikona okien + zegar) */
     .taskbar-right {
         position: absolute; right: 8px;
@@ -472,13 +515,13 @@
     .mobile-menu-overlay.open { opacity: 1; visibility: visible; }
 
     .mobile-menu-sheet {
-        position: absolute; left: 0; right: 0; bottom: 0;
+        position: absolute; left: 0; right: 0; top: 0;
         max-height: 80%;
         background: rgba(249,249,249,0.98);
         backdrop-filter: blur(40px);
-        border-radius: 12px 12px 0 0;
+        border-radius: 0 0 12px 12px;
         overflow: hidden;
-        transform: translateY(100%);
+        transform: translateY(-100%);
         transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
         display: flex; flex-direction: column;
     }

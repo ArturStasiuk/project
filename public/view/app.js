@@ -42,6 +42,33 @@ class View {
         const bar  = this._taskbarEl;
         const self = this;
 
+        /* start menu state */
+        let _startMenuItems = [];
+        let _startMenuEl    = null;
+
+        /* pomocnicze – tworzy element menu Start */
+        const _makeStartMenuItem = item => {
+            if (item === 'separator') {
+                const sep = document.createElement('div');
+                sep.className = 'taskbar-start-menu-sep';
+                return sep;
+            }
+            const el = document.createElement('div');
+            el.className = 'taskbar-start-menu-item' + (item.disabled ? ' disabled' : '');
+            if (item.id) el.dataset.smId = item.id;
+            el.innerHTML =
+                `<span class="taskbar-start-menu-icon">${item.icon || ''}</span>` +
+                `<span class="taskbar-start-menu-label">${item.label || ''}</span>`;
+            if (!item.disabled && typeof item.onClick === 'function') {
+                el.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (_startMenuEl) _startMenuEl.classList.remove('open');
+                    item.onClick(e);
+                });
+            }
+            return el;
+        };
+
         /* pomocnicze – tworzy jeden element paska */
         const _makeItem = ({ id, icon, title, onClick, menuItems = [] }) => {
             const wrap = document.createElement('div');
@@ -106,7 +133,7 @@ class View {
         };
 
         const _closeAllMenus = () => {
-            bar.querySelectorAll('.taskbar-menu.open')
+            bar.querySelectorAll('.taskbar-menu.open, .taskbar-start-menu.open')
                .forEach(m => m.classList.remove('open'));
         };
 
@@ -131,7 +158,19 @@ class View {
                         <div class="taskbar-start-icon">
                             <span></span><span></span><span></span><span></span>
                         </div>`;
-                    startBtn.addEventListener('click', e => e.stopPropagation());
+
+                    /* start menu popup */
+                    const startMenu = document.createElement('div');
+                    startMenu.className = 'taskbar-start-menu';
+                    _startMenuEl = startMenu;
+                    _startMenuItems.forEach(item => startMenu.appendChild(_makeStartMenuItem(item)));
+                    startBtn.appendChild(startMenu);
+
+                    startBtn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        _closeAllMenus();
+                        if (_startMenuItems.length > 0) startMenu.classList.toggle('open');
+                    });
                     bar.appendChild(startBtn);
 
                     const sep = document.createElement('div');
@@ -254,6 +293,38 @@ class View {
                         e.stopPropagation(); _closeAllMenus(); onClick(e);
                     });
                     el.replaceWith(clone);
+                }
+            },
+
+            /**
+             * Odświeża całe menu Start
+             * @param {Array} items  – [{ id?, icon?, label, disabled?, onClick }|'separator']
+             */
+            refreshStartMenu(items = []) {
+                _startMenuItems = items;
+                if (!_startMenuEl) return;
+                _startMenuEl.innerHTML = '';
+                items.forEach(item => _startMenuEl.appendChild(_makeStartMenuItem(item)));
+            },
+
+            /**
+             * Dodaje pozycję do menu Start
+             * @param {{ id?, icon?, label, disabled?, onClick }|'separator'} item
+             */
+            addStartMenuItem(item) {
+                _startMenuItems.push(item);
+                if (_startMenuEl) _startMenuEl.appendChild(_makeStartMenuItem(item));
+            },
+
+            /**
+             * Usuwa pozycję z menu Start po id
+             * @param {string} id
+             */
+            removeStartMenuItem(id) {
+                _startMenuItems = _startMenuItems.filter(it => it !== 'separator' && it.id !== id);
+                if (_startMenuEl) {
+                    const el = _startMenuEl.querySelector(`[data-sm-id="${id}"]`);
+                    if (el) el.remove();
                 }
             }
         };
@@ -1032,8 +1103,13 @@ class WindowManager {
  * ════════════════════════════════════════════════════════════ */
 class TaskbarManager {
     constructor({ taskbarId = 'taskbar', containerId = 'windowContainer' } = {}) {
-        this._view = new View({ taskbarId, containerId });
-        this._tb   = this._view.taskbar;
+        this._view            = new View({ taskbarId, containerId });
+        this._tb              = this._view.taskbar;
+        this._position        = 'bottom';
+        this._autoHideActive  = false;
+        this._autoHideHovered = false;
+        this._autoHideEnter   = null;
+        this._autoHideLeave   = null;
     }
 
     refresh(cfg = {})        { this._tb.refresh(cfg); }
@@ -1041,33 +1117,27 @@ class TaskbarManager {
     removeItem(id)           { this._tb.removeItem(id); }
     updateItem(id, cfg = {}) { this._tb.updateItem(id, cfg); }
 
-    /**
-     * Ustawia pozycję paska zadań
-     * @param {'bottom'|'top'|'left'|'right'} position
-     */
-    setPosition(position = 'bottom') {
-        const bar  = this._view._taskbarEl;
-        const root = document.documentElement;
-        const body = document.body;
+    refreshStartMenu(items = [])   { this._tb.refreshStartMenu(items); }
+    addStartMenuItem(cfg = {})     { this._tb.addStartMenuItem(cfg); }
+    removeStartMenuItem(id)        { this._tb.removeStartMenuItem(id); }
 
-        /* remove old position classes / attribute */
-        bar.removeAttribute('data-pos');
-        ['bottom','top','left','right'].forEach(p => body.classList.remove(`taskbar-pos-${p}`));
-
-        bar.dataset.pos = position;
-        body.classList.add(`taskbar-pos-${position}`);
-
-        /* Read taskbar dimensions from CSS variables to avoid duplication */
+    /** Oblicza i ustawia CSS-owe zmienne --tb-* z uwzględnieniem autohide */
+    _syncCSSVars() {
+        const root   = document.documentElement;
         const style  = getComputedStyle(root);
-        const tbH    = style.getPropertyValue('--tb-size-h').trim(); /* e.g. "48px" */
-        const tbW    = style.getPropertyValue('--tb-size-v').trim(); /* e.g. "56px" */
+        const tbH    = style.getPropertyValue('--tb-size-h').trim();
+        const tbW    = style.getPropertyValue('--tb-size-v').trim();
+        const pos    = this._position;
+        const hidden = this._autoHideActive && !this._autoHideHovered;
 
-        root.style.setProperty('--tb-top',    position === 'top'    ? tbH : '0px');
-        root.style.setProperty('--tb-bottom', position === 'bottom' ? tbH : '0px');
-        root.style.setProperty('--tb-left',   position === 'left'   ? tbW : '0px');
-        root.style.setProperty('--tb-right',  position === 'right'  ? tbW : '0px');
+        root.style.setProperty('--tb-top',    (!hidden && pos === 'top')    ? tbH : '0px');
+        root.style.setProperty('--tb-bottom', (!hidden && pos === 'bottom') ? tbH : '0px');
+        root.style.setProperty('--tb-left',   (!hidden && pos === 'left')   ? tbW : '0px');
+        root.style.setProperty('--tb-right',  (!hidden && pos === 'right')  ? tbW : '0px');
+    }
 
-        /* re-size any already-maximized windows */
+    /** Przelicza rozmiar wszystkich zmaksymalizowanych okien */
+    _resizeAllWindows() {
         if (window._wm) {
             window._wm.instances.forEach(wm =>
                 wm._windows.forEach(v => { if (v.isMaximized()) v._wmAction('maximize'); })
@@ -1076,17 +1146,66 @@ class TaskbarManager {
     }
 
     /**
-     * Włącza / wyłącza automatyczne ukrywanie paska zadań
+     * Ustawia pozycję paska zadań
+     * @param {'bottom'|'top'|'left'|'right'} position
+     */
+    setPosition(position = 'bottom') {
+        const bar  = this._view._taskbarEl;
+        const body = document.body;
+
+        /* remove old position classes / attribute */
+        bar.removeAttribute('data-pos');
+        ['bottom','top','left','right'].forEach(p => body.classList.remove(`taskbar-pos-${p}`));
+
+        bar.dataset.pos = position;
+        body.classList.add(`taskbar-pos-${position}`);
+        this._position = position;
+
+        this._syncCSSVars();
+        this._resizeAllWindows();
+    }
+
+    /**
+     * Włącza / wyłącza automatyczne ukrywanie paska zadań.
+     * Gdy włączone: pasek nie zajmuje miejsca, okna rozszerzają się do pełnego ekranu.
+     * Przy najechaniu/interakcji pasek wysuwa się i okna zmniejszają się.
      * @param {boolean} enabled
      */
     setAutoHide(enabled = false) {
         const bar = this._view._taskbarEl;
+
+        /* usuń poprzednie listenery autohide */
+        if (this._autoHideEnter) bar.removeEventListener('mouseenter', this._autoHideEnter);
+        if (this._autoHideLeave) bar.removeEventListener('mouseleave', this._autoHideLeave);
+        this._autoHideEnter   = null;
+        this._autoHideLeave   = null;
+
+        this._autoHideActive  = enabled;
+        this._autoHideHovered = false;
         bar.classList.toggle('autohide', enabled);
+
+        if (enabled) {
+            this._autoHideEnter = () => {
+                this._autoHideHovered = true;
+                this._syncCSSVars();
+                this._resizeAllWindows();
+            };
+            this._autoHideLeave = () => {
+                this._autoHideHovered = false;
+                this._syncCSSVars();
+                this._resizeAllWindows();
+            };
+            bar.addEventListener('mouseenter', this._autoHideEnter);
+            bar.addEventListener('mouseleave', this._autoHideLeave);
+        }
+
+        this._syncCSSVars();
+        this._resizeAllWindows();
     }
 
     /** Przełącza automatyczne ukrywanie paska zadań */
     toggleAutoHide() {
-        this.setAutoHide(!this._view._taskbarEl.classList.contains('autohide'));
+        this.setAutoHide(!this._autoHideActive);
     }
 }
 
@@ -1208,9 +1327,31 @@ const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'tas
   taskbar.setPosition('bottom'); // 'bottom' | 'top' | 'left' | 'right'
 
   // Włącz / wyłącz automatyczne ukrywanie paska zadań:
+  // Gdy włączone – pasek chowa się i okna zajmują cały ekran;
+  // po najechaniu pasek się wysuwa, a okna zmniejszają się automatycznie.
   taskbar.setAutoHide(true);
   taskbar.setAutoHide(false);
   taskbar.toggleAutoHide();
+
+  // ── Menu Start – dodawanie pozycji do przycisku Start ──────
+
+  // Odśwież całe menu Start (zastępuje poprzednie pozycje):
+  taskbar.refreshStartMenu([
+      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore('win-notes') },
+      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore('win-calc')  },
+      'separator',
+      { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
+      { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
+  ]);
+
+  // Dodaj pojedynczą pozycję do menu Start:
+  taskbar.addStartMenuItem({ id: 'sm-browser', icon: '🌐', label: 'Przeglądarka', onClick: () => alert('Przeglądarka') });
+
+  // Dodaj separator:
+  taskbar.addStartMenuItem('separator');
+
+  // Usuń pozycję z menu Start po id:
+  taskbar.removeStartMenuItem('sm-browser');
 
   ── Pełny przykład – dwa okna z paskiem zadań ──────────────
 
