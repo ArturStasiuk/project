@@ -31,7 +31,7 @@
 </script>
 <script type="module">
     import api from '../api/api.js';
-    const info = await api.getInfoModules();
+    const info = await api.crud();
     console.log(info);
 </script>
 

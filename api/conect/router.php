@@ -1,10 +1,10 @@
 <?php
-//ini_set('display_errors', 1);
-//ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
-require_once 'session.php';
-require_once 'conect.php';
-require_once 'table.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/conect.php';
+require_once __DIR__ . '/../dataBase/table.php';
 class ROUTER {
     private $session;
     private $inputData=null;
@@ -15,10 +15,11 @@ class ROUTER {
     private $data;
    public function __construct()
     {
-       $this->session = new SESSION();
-      // $this->table = new TABLE(); 
+
+     $this->session = new SESSION();
+       $this->table = new TABLE(); 
        $this->db = new CONECT();
-         $this->conect = $this->db->connect();
+        $this->conect = $this->db->connect();
          if (!$this->conect) {
             echo json_encode(['status' => false, 'error' => 'Nie nawiązano połączenia z bazą danych']);
             exit;

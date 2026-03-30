@@ -1840,7 +1840,23 @@ taskbar.setPosition('bottom'); /* domyślna pozycja */
 
 /* ── 2. WindowManager + pierwsze okno ── */
 
+
 const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
+
+// Przypisz metody taskbara jako własności view
+// Użyj istniejącej instancji taskbar
+view.refreshStartMenu = (...args) => taskbar.refreshStartMenu(...args);
+view.addStartMenuItem = (...args) => taskbar.addStartMenuItem(...args);
+view.removeStartMenuItem = (...args) => taskbar.removeStartMenuItem(...args);
+view.addItem = (...args) => taskbar.addItem(...args);
+view.removeItem = (...args) => taskbar.removeItem(...args);
+view.updateItem = (...args) => taskbar.updateItem(...args);
+view.setPosition = (...args) => taskbar.setPosition(...args);
+view.setAutoHide = (...args) => taskbar.setAutoHide(...args);
+view.toggleAutoHide = (...args) => taskbar.toggleAutoHide(...args);
+view.hide = (...args) => taskbar.hide(...args);
+view.show = (...args) => taskbar.show(...args);
+
 export default view;
 
 
