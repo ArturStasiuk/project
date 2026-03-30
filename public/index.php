@@ -17,13 +17,22 @@
     <div class="taskbar" id="taskbar"></div>
     <div class="window-container" id="windowContainer"></div>
 
-<script src="view/app.js">
- 
-
-
-
-
-
+<script type="module">
+    import view from './view/app.js';
+    window.view = view;
+     window.view.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
+     window.view.refreshStartMenu([
+      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore('win-notes') },
+      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore('win-calc')  },
+      'separator',
+      { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
+      { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
+  ]);
+</script>
+<script type="module">
+    import api from '../api/api.js';
+    const info = await api.getInfoModules();
+    console.log(info);
 </script>
 
 </body>

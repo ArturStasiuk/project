@@ -1839,38 +1839,17 @@ taskbar.refresh({ showStart: true, items: [] });
 taskbar.setPosition('bottom'); /* domyślna pozycja */
 
 /* ── 2. WindowManager + pierwsze okno ── */
+
 const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
+export default view;
+
 
 /* ── 3. Desktop icons ── */
 const desktop = new DesktopIconsManager({ containerId: 'desktopIcons' });
 //
-view.create('win-calc', { title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
-view.refreshMenubar('win-calc', [
-    {
-        label: 'Widok', id: 'calc-view', items: [
-            { icon: '🔢', label: 'Standardowy', onClick: () => view.setStatus('win-calc', 'Tryb standardowy') },
-            { icon: '📐', label: 'Naukowy', onClick: () => view.setStatus('win-calc', 'Tryb naukowy') }
-        ]
-    }
-]);
+
+
 
 
 //taskbar.setAutoHide(true);
 
-taskbar.refreshStartMenu([
-    { id: 'sm-notes', icon: '📝', label: 'Notatnik', onClick: () => view.restore('win-notes') },
-    { id: 'sm-calc', icon: '🧮', label: 'Kalkulator', onClick: () => view.restore('win-calc') },
-    'separator',
-    { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia') },
-    { id: 'sm-off', icon: '⏻', label: 'Wyłącz', disabled: true }
-]);
-
-desktop.addIcon('di-folder', {
-    icon: '📁', label: 'Moje pliki',
-    menuItems: [
-        { icon: '📄', label: 'Dokument.txt', onClick: () => alert('Otwórz plik') },
-        { icon: '📊', label: 'Arkusz.xlsx', onClick: () => alert('Otwórz arkusz') },
-        'separator',
-        { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Otwórz folder') }
-    ]
-});
