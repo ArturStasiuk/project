@@ -646,11 +646,11 @@ class View {
                 });
 
                 /* poinformuj submoduły o nowym oknie */
-                self._onWindowCreated(win);
+                await self._onWindowCreated(win);
 
                 /* auto-maksymalizacja na małych ekranach */
                 if (isMobile) {
-                    self._wmAction('maximize');
+                    await self._wmAction('maximize');
                 }
             },
 
@@ -669,10 +669,10 @@ class View {
                 self._windowEl.querySelector('.status-bar span').textContent = text;
             },
 
-            async minimize() { self._wmAction('minimize'); },
-            async maximize() { self._wmAction('maximize'); },
-            async restore()  { self._wmAction('restore');  },
-            async close()    { self._wmAction('close');    }
+            async minimize() { await self._wmAction('minimize'); },
+            async maximize() { await self._wmAction('maximize'); },
+            async restore()  { await self._wmAction('restore');  },
+            async close()    { await self._wmAction('close');    }
         };
     }
 
@@ -1101,7 +1101,7 @@ class View {
         const container = this._containerEl;
 
         if (action === 'minimize') {
-            if (_state.minimized) { this._wmAction('restore'); return; }
+            if (_state.minimized) { await this._wmAction('restore'); return; }
             win.classList.remove('maximized');
             win.classList.add('minimized');
             document.body.classList.remove('window-maximized');
@@ -1113,7 +1113,7 @@ class View {
             if (regMin) regMin.isMinimized = true;
 
         } else if (action === 'maximize') {
-            if (_state.maximized) { this._wmAction('restore'); return; }
+            if (_state.maximized) { await this._wmAction('restore'); return; }
             win.classList.remove('minimized');
             win.classList.add('maximized');
             document.body.classList.add('window-maximized');
@@ -1155,7 +1155,7 @@ class View {
             /* na małych ekranach zawsze maksymalizuj */
             if (window.innerWidth <= MOBILE_BREAKPOINT) {
                 _state.prev = null;
-                this._wmAction('maximize');
+                await this._wmAction('maximize');
                 return;
             }
 
@@ -1167,7 +1167,7 @@ class View {
                 win.style.height = _state.prev.height;
                 _state.prev = null;
             } else {
-                this._updateSize();
+                await this._updateSize();
             }
 
         } else if (action === 'close') {
@@ -1182,7 +1182,7 @@ class View {
         const win = this._windowEl; if (!win) return;
         const s = win._wmState || {};
         if (s.maximized) {
-            this._wmAction('maximize'); /* recalculate with current taskbar offset */
+            await this._wmAction('maximize'); /* recalculate with current taskbar offset */
         } else {
             win.style.width  = `${Math.min(900, window.innerWidth  - 40)}px`;
             win.style.height = `${Math.min(600, window.innerHeight - 40)}px`;
@@ -1250,11 +1250,11 @@ class WindowManager {
             return null;
         }
         const v = new View({ taskbarId: this._taskbarId, containerId: this._containerId });
-        v.window.create({ title, icon, statusText });
-        v.titlebar.bindControls({
-            onMinimize: () => v.window.minimize(),
-            onMaximize: () => { if (v.isMaximized()) v.window.restore(); else v.window.maximize(); },
-            onClose:    () => { v.window.close(); this._windows.delete(windowId); }
+        await v.window.create({ title, icon, statusText });
+        await v.titlebar.bindControls({
+            onMinimize: async () => await v.window.minimize(),
+            onMaximize: async () => { if (await v.isMaximized()) await v.window.restore(); else await v.window.maximize(); },
+            onClose:    async () => { await v.window.close(); this._windows.delete(windowId); }
         });
         this._windows.set(windowId, v);
 
@@ -1262,10 +1262,12 @@ class WindowManager {
         if (!window._wm) window._wm = { resizeRegistered: false, instances: [] };
         if (!window._wm.resizeRegistered) {
             window._wm.resizeRegistered = true;
-            window.addEventListener('resize', () => {
-                window._wm.instances.forEach(wm =>
-                    wm._windows.forEach(view => { if (!view.isMaximized()) view._updateSize(); })
-                );
+            window.addEventListener('resize', async () => {
+                for (const wm of window._wm.instances) {
+                    for (const view of wm._windows.values()) {
+                        if (!await view.isMaximized()) await view._updateSize();
+                    }
+                }
             });
         }
         if (!window._wm.instances.includes(this)) {
@@ -1285,37 +1287,37 @@ class WindowManager {
     }
 
     /* ── operacje na oknie ────────────────────────────────── */
-    async setTitle(windowId, title)  { this._get(windowId)?.window.setTitle(title); }
-    async setStatus(windowId, text)  { this._get(windowId)?.window.setStatus(text); }
-    async minimize(windowId)         { this._get(windowId)?.window.minimize(); }
-    async maximize(windowId)         { this._get(windowId)?.window.maximize(); }
-    async restore(windowId)          { this._get(windowId)?.window.restore(); }
+    async setTitle(windowId, title)  { const v = await this._get(windowId); await v?.window.setTitle(title); }
+    async setStatus(windowId, text)  { const v = await this._get(windowId); await v?.window.setStatus(text); }
+    async minimize(windowId)         { const v = await this._get(windowId); await v?.window.minimize(); }
+    async maximize(windowId)         { const v = await this._get(windowId); await v?.window.maximize(); }
+    async restore(windowId)          { const v = await this._get(windowId); await v?.window.restore(); }
     async close(windowId)            {
-        const v = this._get(windowId);
-        if (v) { v.window.close(); this._windows.delete(windowId); }
+        const v = await this._get(windowId);
+        if (v) { await v.window.close(); this._windows.delete(windowId); }
     }
-    async isMinimized(windowId)      { return this._get(windowId)?.isMinimized() ?? null; }
-    async isMaximized(windowId)      { return this._get(windowId)?.isMaximized() ?? null; }
+    async isMinimized(windowId)      { const v = await this._get(windowId); return await v?.isMinimized() ?? null; }
+    async isMaximized(windowId)      { const v = await this._get(windowId); return await v?.isMaximized() ?? null; }
 
     /* ── pasek tytułu ─────────────────────────────────────── */
-    async bindControls(windowId, handlers = {}) { this._get(windowId)?.titlebar.bindControls(handlers); }
-    async addButton(windowId, cfg)              { this._get(windowId)?.titlebar.addButton(cfg); }
-    async removeButton(windowId, btnId)         { this._get(windowId)?.titlebar.removeButton(btnId); }
+    async bindControls(windowId, handlers = {}) { const v = await this._get(windowId); await v?.titlebar.bindControls(handlers); }
+    async addButton(windowId, cfg)              { const v = await this._get(windowId); await v?.titlebar.addButton(cfg); }
+    async removeButton(windowId, btnId)         { const v = await this._get(windowId); await v?.titlebar.removeButton(btnId); }
 
     /* ── zawartość ────────────────────────────────────────── */
-    async refreshContent(windowId, cfg)              { this._get(windowId)?.content.refresh(cfg); }
-    async setHeader(windowId, text)                  { this._get(windowId)?.content.setHeader(text); }
-    async setSubheader(windowId, text)               { this._get(windowId)?.content.setSubheader(text); }
-    async addCard(windowId, cfg)                     { this._get(windowId)?.content.addCard(cfg); }
-    async removeCard(windowId, cardId)               { this._get(windowId)?.content.removeCard(cardId); }
-    async updateCard(windowId, cardId, cfg)          { this._get(windowId)?.content.updateCard(cardId, cfg); }
+    async refreshContent(windowId, cfg)              { const v = await this._get(windowId); await v?.content.refresh(cfg); }
+    async setHeader(windowId, text)                  { const v = await this._get(windowId); await v?.content.setHeader(text); }
+    async setSubheader(windowId, text)               { const v = await this._get(windowId); await v?.content.setSubheader(text); }
+    async addCard(windowId, cfg)                     { const v = await this._get(windowId); await v?.content.addCard(cfg); }
+    async removeCard(windowId, cardId)               { const v = await this._get(windowId); await v?.content.removeCard(cardId); }
+    async updateCard(windowId, cardId, cfg)          { const v = await this._get(windowId); await v?.content.updateCard(cardId, cfg); }
 
     /* ── menubar ──────────────────────────────────────────── */
-    async refreshMenubar(windowId, menus)             { this._get(windowId)?.menubar.refresh({ menus }); }
-    async addMenu(windowId, cfg)                      { this._get(windowId)?.menubar.addMenu(cfg); }
-    async removeMenu(windowId, menuId)                { this._get(windowId)?.menubar.removeMenu(menuId); }
-    async addMenuItem(windowId, menuId, item)         { this._get(windowId)?.menubar.addMenuItem(menuId, item); }
-    async removeMenuItem(windowId, menuId, itemId)    { this._get(windowId)?.menubar.removeMenuItem(menuId, itemId); }
+    async refreshMenubar(windowId, menus)             { const v = await this._get(windowId); await v?.menubar.refresh({ menus }); }
+    async addMenu(windowId, cfg)                      { const v = await this._get(windowId); await v?.menubar.addMenu(cfg); }
+    async removeMenu(windowId, menuId)                { const v = await this._get(windowId); await v?.menubar.removeMenu(menuId); }
+    async addMenuItem(windowId, menuId, item)         { const v = await this._get(windowId); await v?.menubar.addMenuItem(menuId, item); }
+    async removeMenuItem(windowId, menuId, itemId)    { const v = await this._get(windowId); await v?.menubar.removeMenuItem(menuId, itemId); }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1344,14 +1346,14 @@ class TaskbarManager {
         this._isHidden              = false;
     }
 
-    async refresh(cfg = {})        { this._tb.refresh(cfg); }
-    async addItem(id, cfg = {})    { this._tb.addItem({ id, ...cfg }); }
-    async removeItem(id)           { this._tb.removeItem(id); }
-    async updateItem(id, cfg = {}) { this._tb.updateItem(id, cfg); }
+    async refresh(cfg = {})        { await this._tb.refresh(cfg); }
+    async addItem(id, cfg = {})    { await this._tb.addItem({ id, ...cfg }); }
+    async removeItem(id)           { await this._tb.removeItem(id); }
+    async updateItem(id, cfg = {}) { await this._tb.updateItem(id, cfg); }
 
-    async refreshStartMenu(items = [])   { this._tb.refreshStartMenu(items); }
-    async addStartMenuItem(cfg = {})     { this._tb.addStartMenuItem(cfg); }
-    async removeStartMenuItem(id)        { this._tb.removeStartMenuItem(id); }
+    async refreshStartMenu(items = [])   { await this._tb.refreshStartMenu(items); }
+    async addStartMenuItem(cfg = {})     { await this._tb.addStartMenuItem(cfg); }
+    async removeStartMenuItem(id)        { await this._tb.removeStartMenuItem(id); }
 
     /** Oblicza i ustawia CSS-owe zmienne --tb-* z uwzględnieniem autohide */
     async _syncCSSVars() {
@@ -1371,9 +1373,11 @@ class TaskbarManager {
     /** Przelicza rozmiar wszystkich zmaksymalizowanych okien */
     async _resizeAllWindows() {
         if (window._wm) {
-            window._wm.instances.forEach(wm =>
-                wm._windows.forEach(v => { if (v.isMaximized()) v._wmAction('maximize'); })
-            );
+            for (const wm of window._wm.instances) {
+                for (const v of wm._windows.values()) {
+                    if (await v.isMaximized()) await v._wmAction('maximize');
+                }
+            }
         }
     }
 
@@ -1393,8 +1397,8 @@ class TaskbarManager {
         body.classList.add(`taskbar-pos-${position}`);
         this._position = position;
 
-        this._syncCSSVars();
-        this._resizeAllWindows();
+        await this._syncCSSVars();
+        await this._resizeAllWindows();
     }
 
     /**
@@ -1421,34 +1425,34 @@ class TaskbarManager {
         bar.classList.toggle('autohide', enabled);
 
         if (enabled) {
-            this._autoHideEnter = () => {
+            this._autoHideEnter = async () => {
                 this._autoHideHovered = true;
-                this._syncCSSVars();
-                this._resizeAllWindows();
+                await this._syncCSSVars();
+                await this._resizeAllWindows();
             };
-            this._autoHideLeave = () => {
+            this._autoHideLeave = async () => {
                 this._autoHideHovered = false;
-                this._syncCSSVars();
-                this._resizeAllWindows();
+                await this._syncCSSVars();
+                await this._resizeAllWindows();
             };
             /* obsługa dotykowa – wysuń pasek przy dotknięciu */
             let touchOnBar = false;
-            this._autoHideTouch = () => {
+            this._autoHideTouch = async () => {
                 touchOnBar = true;
                 this._autoHideHovered = true;
                 bar.classList.add('autohide-show');
-                this._syncCSSVars();
-                this._resizeAllWindows();
+                await this._syncCSSVars();
+                await this._resizeAllWindows();
             };
-            this._autoHideTouchOutside = () => {
+            this._autoHideTouchOutside = async () => {
                 if (touchOnBar) {
                     touchOnBar = false;
                     return;
                 }
                 this._autoHideHovered = false;
                 bar.classList.remove('autohide-show');
-                this._syncCSSVars();
-                this._resizeAllWindows();
+                await this._syncCSSVars();
+                await this._resizeAllWindows();
             };
             bar.addEventListener('mouseenter', this._autoHideEnter);
             bar.addEventListener('mouseleave', this._autoHideLeave);
@@ -1458,13 +1462,13 @@ class TaskbarManager {
             bar.classList.remove('autohide-show');
         }
 
-        this._syncCSSVars();
-        this._resizeAllWindows();
+        await this._syncCSSVars();
+        await this._resizeAllWindows();
     }
 
     /** Przełącza automatyczne ukrywanie paska zadań */
     async toggleAutoHide() {
-        this.setAutoHide(!this._autoHideActive);
+        await this.setAutoHide(!this._autoHideActive);
     }
 
     /**
@@ -1474,8 +1478,8 @@ class TaskbarManager {
     async hide() {
         this._view._taskbarEl.style.display = 'none';
         this._isHidden = true;
-        this._syncCSSVars();
-        this._resizeAllWindows();
+        await this._syncCSSVars();
+        await this._resizeAllWindows();
     }
 
     /**
@@ -1485,8 +1489,8 @@ class TaskbarManager {
     async show() {
         this._view._taskbarEl.style.display = '';
         this._isHidden = false;
-        this._syncCSSVars();
-        this._resizeAllWindows();
+        await this._syncCSSVars();
+        await this._resizeAllWindows();
     }
 }
 
@@ -1514,9 +1518,9 @@ class DesktopIconsManager {
         this._gridCellH  = 96;
         this._activeMenu = null;
 
-        document.addEventListener('click',       () => this._closeMenu());
-        document.addEventListener('contextmenu', e => {
-            if (!e.target.closest('.desktop-icon')) this._closeMenu();
+        document.addEventListener('click',       async () => await this._closeMenu());
+        document.addEventListener('contextmenu', async e => {
+            if (!e.target.closest('.desktop-icon')) await this._closeMenu();
         });
     }
 
@@ -1533,13 +1537,13 @@ class DesktopIconsManager {
      * @param {Array}    [cfg.menuItems] Pozycje menu (prawy klik / folder)
      */
     async addIcon(id, cfg = {}) {
-        if (this._icons.has(id)) this.removeIcon(id);
+        if (this._icons.has(id)) await this.removeIcon(id);
 
-        const pos = cfg.position ? { ...cfg.position } : this._nextGridPos();
-        const el  = this._createEl(id, cfg, pos);
+        const pos = cfg.position ? { ...cfg.position } : await this._nextGridPos();
+        const el  = await this._createEl(id, cfg, pos);
         this._container.appendChild(el);
         this._icons.set(id, { el, cfg: { ...cfg, position: pos } });
-        this._makeDraggable(el, id);
+        await this._makeDraggable(el, id);
         return this;
     }
 
@@ -1565,10 +1569,10 @@ class DesktopIconsManager {
         if (!entry) return this;
         const newCfg = { ...entry.cfg, ...cfg };
         const pos    = newCfg.position;
-        const newEl  = this._createEl(id, newCfg, pos);
+        const newEl  = await this._createEl(id, newCfg, pos);
         entry.el.replaceWith(newEl);
         this._icons.set(id, { el: newEl, cfg: newCfg });
-        this._makeDraggable(newEl, id);
+        await this._makeDraggable(newEl, id);
         return this;
     }
 
@@ -1649,22 +1653,22 @@ class DesktopIconsManager {
         const menuItems = cfg.menuItems || [];
 
         /* klik lewym: onClick LUB (jeśli brak onClick i są menuItems) rozwiń menu */
-        el.addEventListener('click', e => {
+        el.addEventListener('click', async e => {
             e.stopPropagation();
             if (el._wasDragged) { el._wasDragged = false; return; }
-            this._selectIcon(id);
+            await this._selectIcon(id);
             if (typeof cfg.onClick === 'function') {
                 cfg.onClick(e);
             } else if (menuItems.length) {
-                this._openMenu(e, id, cfg, menuItems);
+                await this._openMenu(e, id, cfg, menuItems);
             }
         });
 
         /* prawy klik – zawsze menu kontekstowe */
-        el.addEventListener('contextmenu', e => {
+        el.addEventListener('contextmenu', async e => {
             e.preventDefault(); e.stopPropagation();
-            this._selectIcon(id);
-            if (menuItems.length) this._openMenu(e, id, cfg, menuItems);
+            await this._selectIcon(id);
+            if (menuItems.length) await this._openMenu(e, id, cfg, menuItems);
         });
 
         return el;
@@ -1678,7 +1682,7 @@ class DesktopIconsManager {
     }
 
     async _openMenu(e, id, cfg, items) {
-        this._closeMenu();
+        await this._closeMenu();
 
         const menu = document.createElement('div');
         menu.className = 'desktop-icon-menu';
@@ -1704,9 +1708,9 @@ class DesktopIconsManager {
                 mi.textContent = item.label || '';
             }
             if (!item.disabled && typeof item.onClick === 'function') {
-                mi.addEventListener('click', ev => {
+                mi.addEventListener('click', async ev => {
                     ev.stopPropagation();
-                    this._closeMenu();
+                    await this._closeMenu();
                     item.onClick(ev);
                 });
             }
@@ -1757,13 +1761,13 @@ class DesktopIconsManager {
                 el.style.top  = Math.max(0, Math.min(vh - elH, startTop  + dy)) + 'px';
             };
 
-            const onUp = () => {
+            const onUp = async () => {
                 document.removeEventListener('mousemove', onMove);
                 document.removeEventListener('mouseup',   onUp);
                 el.classList.remove('dragging');
                 if (isDragging) {
                     el._wasDragged = true;
-                    this._savePos(id, el);
+                    await this._savePos(id, el);
                 }
             };
 
@@ -1782,11 +1786,11 @@ class DesktopIconsManager {
             isDragging = false;
 
             /* długie naciśnięcie = menu kontekstowe */
-            const longPress = setTimeout(() => {
+            const longPress = setTimeout(async () => {
                 if (!isDragging) {
                     const entry = this._icons.get(id);
                     if (entry && (entry.cfg.menuItems || []).length) {
-                        this._openMenu(
+                        await this._openMenu(
                             { clientX: startX, clientY: startY },
                             id, entry.cfg, entry.cfg.menuItems
                         );
@@ -1807,14 +1811,14 @@ class DesktopIconsManager {
                 el.style.top  = Math.max(0, Math.min(vh - elH, startTop  + dy)) + 'px';
             };
 
-            const onTouchEnd = () => {
+            const onTouchEnd = async () => {
                 clearTimeout(longPress);
                 el.removeEventListener('touchmove', onTouchMove);
                 el.removeEventListener('touchend',  onTouchEnd);
                 el.classList.remove('dragging');
                 if (isDragging) {
                     el._wasDragged = true;
-                    this._savePos(id, el);
+                    await this._savePos(id, el);
                 }
             };
 
@@ -1835,8 +1839,8 @@ class DesktopIconsManager {
 
 /* ── 1. Taskbar ── */
 const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
-taskbar.refresh({ showStart: true, items: [] });
-taskbar.setPosition('bottom'); /* domyślna pozycja */
+await taskbar.refresh({ showStart: true, items: [] });
+await taskbar.setPosition('bottom'); /* domyślna pozycja */
 
 /* ── 2. WindowManager + pierwsze okno ── */
 
@@ -1845,17 +1849,17 @@ const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'tas
 
 // Przypisz metody taskbara jako własności view
 // Użyj istniejącej instancji taskbar
-view.refreshStartMenu = (...args) => taskbar.refreshStartMenu(...args);
-view.addStartMenuItem = (...args) => taskbar.addStartMenuItem(...args);
-view.removeStartMenuItem = (...args) => taskbar.removeStartMenuItem(...args);
-view.addItem = (...args) => taskbar.addItem(...args);
-view.removeItem = (...args) => taskbar.removeItem(...args);
-view.updateItem = (...args) => taskbar.updateItem(...args);
-view.setPosition = (...args) => taskbar.setPosition(...args);
-view.setAutoHide = (...args) => taskbar.setAutoHide(...args);
-view.toggleAutoHide = (...args) => taskbar.toggleAutoHide(...args);
-view.hide = (...args) => taskbar.hide(...args);
-view.show = (...args) => taskbar.show(...args);
+view.refreshStartMenu = async (...args) => await taskbar.refreshStartMenu(...args);
+view.addStartMenuItem = async (...args) => await taskbar.addStartMenuItem(...args);
+view.removeStartMenuItem = async (...args) => await taskbar.removeStartMenuItem(...args);
+view.addItem = async (...args) => await taskbar.addItem(...args);
+view.removeItem = async (...args) => await taskbar.removeItem(...args);
+view.updateItem = async (...args) => await taskbar.updateItem(...args);
+view.setPosition = async (...args) => await taskbar.setPosition(...args);
+view.setAutoHide = async (...args) => await taskbar.setAutoHide(...args);
+view.toggleAutoHide = async (...args) => await taskbar.toggleAutoHide(...args);
+view.hide = async (...args) => await taskbar.hide(...args);
+view.show = async (...args) => await taskbar.show(...args);
 
 export default view;
 

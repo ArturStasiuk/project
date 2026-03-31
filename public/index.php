@@ -20,10 +20,10 @@
 <script type="module">
     import view from './view/app.js';
     window.view = view;
-     window.view.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
-     window.view.refreshStartMenu([
-      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore('win-notes') },
-      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore('win-calc')  },
+     await window.view.create('win-notes', { title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
+     await window.view.refreshStartMenu([
+      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: async () => await view.restore('win-notes') },
+      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: async () => await view.restore('win-calc')  },
       'separator',
       { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
       { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
