@@ -1,11 +1,10 @@
-
-class FUN {
+class CONFIG {
     constructor(parent) {
         this.parent = parent;
         this.init();
     }
     init() {
-        console.log('Inicjalizacja funkcji...');
+        console.log('Inicjalizacja konfiguracji...');
     }
 }
-export default FUN;
+export default CONFIG;
