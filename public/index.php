@@ -17,11 +17,11 @@
     <div class="taskbar" id="taskbar"></div>
     <div class="window-container" id="windowContainer"></div>
 
-<script type="module">
-    import view from './view/app.js';
-    window.view = view;
 
-</script>
+
+
+
+
 <script type="module">
     import sys from '../public/sys/sys.js';
 

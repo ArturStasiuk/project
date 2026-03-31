@@ -2,7 +2,7 @@ import view from '../view/app.js';
 import api from '../../api/api.js';
 class SYS {
     constructor() {
-       this.api = api;
+        this.api = api;
         this.view = view;
         this.init();
 
@@ -19,6 +19,7 @@ class SYS {
             { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia') },
             { id: 'sm-off', icon: '⏻', label: 'Wyłącz', disabled: true }
         ]);
+
 
 
 
