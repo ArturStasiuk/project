@@ -5,7 +5,7 @@ import FUN from './func.js';
 class SYS {
     constructor() {
         this.api = api;
-        this.view = view;
+        this.view =  view;
         this.con = new CONFIG(this);
         this.fun = new FUN(this);
         this.init();
@@ -16,7 +16,8 @@ class SYS {
     async init() {
         console.log('Inicjalizacja systemu...');
         const info = await this.api.getInfoModules();
-
+        
+    await this.view.refreshStartMenu(await this.con.getMenuStart());
 
 
 
