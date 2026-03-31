@@ -369,7 +369,7 @@ class View {
              * @param {boolean} [cfg.showStart=true]
              * @param {Array}   [cfg.items]
              */
-            refresh({ showStart = true, items = [] } = {}) {
+            async refresh({ showStart = true, items = [] } = {}) {
                 bar.innerHTML = '';
 
                 if (showStart) {
@@ -482,13 +482,13 @@ class View {
              * Dodaje pojedynczy element
              * @param {{ id, icon?, title, onClick, menuItems? }} cfg
              */
-            addItem({ id, icon, title, onClick, menuItems = [] } = {}) {
+            async addItem({ id, icon, title, onClick, menuItems = [] } = {}) {
                 if (id && bar.querySelector(`[data-tb-id="${id}"]`)) return;
                 bar.appendChild(_makeItem({ id, icon, title, onClick, menuItems }));
             },
 
             /** Usuwa element po id */
-            removeItem(id) {
+            async removeItem(id) {
                 const el = bar.querySelector(`[data-tb-id="${id}"]`);
                 if (el) el.remove();
             },
@@ -498,7 +498,7 @@ class View {
              * @param {string} id
              * @param {{ title?, icon?, onClick?, menuItems? }} cfg
              */
-            updateItem(id, { title, icon, onClick, menuItems } = {}) {
+            async updateItem(id, { title, icon, onClick, menuItems } = {}) {
                 const el = bar.querySelector(`[data-tb-id="${id}"]`);
                 if (!el) return;
                 if (title !== undefined)
@@ -522,7 +522,7 @@ class View {
              * Odświeża całe menu Start
              * @param {Array} items  – [{ id?, icon?, label, disabled?, onClick }|'separator']
              */
-            refreshStartMenu(items = []) {
+            async refreshStartMenu(items = []) {
                 _startMenuItems = items;
                 if (!_startMenuEl) return;
                 _startMenuEl.innerHTML = '';
@@ -533,7 +533,7 @@ class View {
              * Dodaje pozycję do menu Start
              * @param {{ id?, icon?, label, disabled?, onClick }|'separator'} item
              */
-            addStartMenuItem(item) {
+            async addStartMenuItem(item) {
                 _startMenuItems.push(item);
                 if (_startMenuEl) _startMenuEl.appendChild(_makeStartMenuItem(item));
             },
@@ -542,7 +542,7 @@ class View {
              * Usuwa pozycję z menu Start po id
              * @param {string} id
              */
-            removeStartMenuItem(id) {
+            async removeStartMenuItem(id) {
                 _startMenuItems = _startMenuItems.filter(it => it !== 'separator' && it.id !== id);
                 if (_startMenuEl) {
                     const el = _startMenuEl.querySelector(`[data-sm-id="${id}"]`);
@@ -572,7 +572,7 @@ class View {
              * Tworzy szkielet okna i dołącza do kontenera
              * @param {{ title, icon?, statusText? }} cfg
              */
-            create({ title = '', icon = null, statusText = 'Gotowe' } = {}) {
+            async create({ title = '', icon = null, statusText = 'Gotowe' } = {}) {
                 const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
 
                 const win = document.createElement('div');
@@ -655,7 +655,7 @@ class View {
             },
 
             /** Zmienia tytuł okna */
-            setTitle(title) {
+            async setTitle(title) {
                 if (!self._windowEl) return;
                 self._windowEl.querySelector('.window-title').textContent = title;
                 /* synchronizuj rejestr */
@@ -664,15 +664,15 @@ class View {
             },
 
             /** Ustawia tekst paska stanu */
-            setStatus(text) {
+            async setStatus(text) {
                 if (!self._windowEl) return;
                 self._windowEl.querySelector('.status-bar span').textContent = text;
             },
 
-            minimize() { self._wmAction('minimize'); },
-            maximize() { self._wmAction('maximize'); },
-            restore()  { self._wmAction('restore');  },
-            close()    { self._wmAction('close');    }
+            async minimize() { self._wmAction('minimize'); },
+            async maximize() { self._wmAction('maximize'); },
+            async restore()  { self._wmAction('restore');  },
+            async close()    { self._wmAction('close');    }
         };
     }
 
@@ -690,7 +690,7 @@ class View {
              * Podpina handlery pod przyciski min/max/close
              * @param {{ onMinimize, onMaximize, onClose }} cfg
              */
-            bindControls({ onMinimize, onMaximize, onClose } = {}) {
+            async bindControls({ onMinimize, onMaximize, onClose } = {}) {
                 if (!self._windowEl) return;
                 const win = self._windowEl;
                 win.querySelector('.minimize').onclick = e => { e.stopPropagation(); onMinimize && onMinimize(e); };
@@ -703,7 +703,7 @@ class View {
              * Dodaje własny przycisk do paska tytułowego
              * @param {{ id, label, onClick, position?: 'before-controls'|'after-icon' }} cfg
              */
-            addButton({ id, label, onClick, position = 'before-controls' } = {}) {
+            async addButton({ id, label, onClick, position = 'before-controls' } = {}) {
                 if (!self._windowEl) return;
                 const btn = document.createElement('button');
                 btn.className = 'titlebar-button';
@@ -721,7 +721,7 @@ class View {
             },
 
             /** Usuwa przycisk po data-tbtn-id */
-            removeButton(id) {
+            async removeButton(id) {
                 if (!self._windowEl) return;
                 const btn = self._windowEl.querySelector(`[data-tbtn-id="${id}"]`);
                 if (btn) btn.remove();
@@ -930,7 +930,7 @@ class View {
 
         return {
             /** Pełne odświeżenie menu */
-            refresh({ menus = [] } = {}) {
+            async refresh({ menus = [] } = {}) {
                 const mb = _getMenubar(); if (!mb) return;
                 mb.innerHTML = '';
                 menus.forEach(m => mb.appendChild(_makeMenu(m)));
@@ -953,7 +953,7 @@ class View {
              * Dodaje nowe menu
              * @param {{ label, id, items, position?: number|'first'|'last' }} cfg
              */
-            addMenu({ label, id, items = [], position = 'last' } = {}) {
+            async addMenu({ label, id, items = [], position = 'last' } = {}) {
                 const mb = _getMenubar(); if (!mb) return;
                 const el = _makeMenu({ label, id, items });
                 const existing = mb.querySelectorAll('.menu-item');
@@ -966,7 +966,7 @@ class View {
             },
 
             /** Usuwa menu po data-menu-id */
-            removeMenu(id) {
+            async removeMenu(id) {
                 const mb = _getMenubar(); if (!mb) return;
                 const el = mb.querySelector(`[data-menu-id="${id}"]`);
                 if (el) el.remove();
@@ -977,7 +977,7 @@ class View {
              * @param {string} menuId
              * @param {object} item  – { id?, icon?, label, shortcut?, disabled?, separator?, submenu?, onClick }
              */
-            addMenuItem(menuId, item) {
+            async addMenuItem(menuId, item) {
                 const mb = _getMenubar(); if (!mb) return;
                 const menu = mb.querySelector(`[data-menu-id="${menuId}"] .dropdown-menu`);
                 if (!menu) return;
@@ -991,7 +991,7 @@ class View {
              * @param {string} menuId
              * @param {string} itemId
              */
-            removeMenuItem(menuId, itemId) {
+            async removeMenuItem(menuId, itemId) {
                 const mb = _getMenubar(); if (!mb) return;
                 const el = mb.querySelector(
                     `[data-menu-id="${menuId}"] .dropdown-menu [data-mi-id="${itemId}"]`
@@ -1026,7 +1026,7 @@ class View {
 
         return {
             /** Pełne odświeżenie zawartości */
-            refresh({ header = '', subheader = '', cards = [] } = {}) {
+            async refresh({ header = '', subheader = '', cards = [] } = {}) {
                 const c = _getContent(); if (!c) return;
                 c.innerHTML = '';
                 if (header) {
@@ -1042,14 +1042,14 @@ class View {
                 cards.forEach(card => c.appendChild(_makeCard(card)));
             },
 
-            setHeader(text) {
+            async setHeader(text) {
                 const c = _getContent(); if (!c) return;
                 let h = c.querySelector('.content-header');
                 if (!h) { h = document.createElement('div'); h.className = 'content-header'; c.prepend(h); }
                 h.textContent = text;
             },
 
-            setSubheader(text) {
+            async setSubheader(text) {
                 const c = _getContent(); if (!c) return;
                 let s = c.querySelector('.content-subheader');
                 if (!s) {
@@ -1060,18 +1060,18 @@ class View {
                 s.textContent = text;
             },
 
-            addCard({ id, title = '', text = '' } = {}) {
+            async addCard({ id, title = '', text = '' } = {}) {
                 const c = _getContent(); if (!c) return;
                 c.appendChild(_makeCard({ id, title, text }));
             },
 
-            removeCard(id) {
+            async removeCard(id) {
                 const c = _getContent(); if (!c) return;
                 const card = c.querySelector(`[data-card-id="${id}"]`);
                 if (card) card.remove();
             },
 
-            updateCard(id, { title, text } = {}) {
+            async updateCard(id, { title, text } = {}) {
                 const c = _getContent(); if (!c) return;
                 const card = c.querySelector(`[data-card-id="${id}"]`);
                 if (!card) return;
@@ -1085,7 +1085,7 @@ class View {
      *  _onWindowCreated – odpala się po create(), podpina
      *  wewnętrzne mechanizmy WindowManagera
      * ══════════════════════════════════════════════════════════ */
-    _onWindowCreated(win) {
+    async _onWindowCreated(win) {
         /* WindowManager podpinamy przez view.titlebar.bindControls()
            – dlatego tu nic nie robimy, inicjalizacja jest w kodzie użytkownika */
     }
@@ -1093,7 +1093,7 @@ class View {
     /* ══════════════════════════════════════════════════════════
      *  WindowManager – wewnętrzna logika min/max/restore/close
      * ══════════════════════════════════════════════════════════ */
-    _wmAction(action) {
+    async _wmAction(action) {
         const win  = this._windowEl;
         if (!win) return;
 
@@ -1178,7 +1178,7 @@ class View {
         }
     }
 
-    _updateSize() {
+    async _updateSize() {
         const win = this._windowEl; if (!win) return;
         const s = win._wmState || {};
         if (s.maximized) {
@@ -1189,10 +1189,10 @@ class View {
         }
     }
 
-    isMinimized() {
+    async isMinimized() {
         return this._windowEl && !!(this._windowEl._wmState || {}).minimized;
     }
-    isMaximized() {
+    async isMaximized() {
         return this._windowEl && !!(this._windowEl._wmState || {}).maximized;
     }
 }
@@ -1244,7 +1244,7 @@ class WindowManager {
     }
 
     /** Tworzy nowe okno; zwraca instancję View lub null jeśli id już zajęte */
-    create(windowId, { title = '', icon = null, statusText = 'Gotowe' } = {}) {
+    async create(windowId, { title = '', icon = null, statusText = 'Gotowe' } = {}) {
         if (this._windows.has(windowId)) {
             console.warn(`WindowManager: okno "${windowId}" już istnieje.`);
             return null;
@@ -1276,46 +1276,46 @@ class WindowManager {
     }
 
     /** Zwraca instancję View dla danego ID lub null */
-    getView(windowId) { return this._windows.get(windowId) || null; }
+    async getView(windowId) { return this._windows.get(windowId) || null; }
 
-    _get(windowId) {
+    async _get(windowId) {
         const v = this._windows.get(windowId);
         if (!v) console.warn(`WindowManager: brak okna "${windowId}".`);
         return v || null;
     }
 
     /* ── operacje na oknie ────────────────────────────────── */
-    setTitle(windowId, title)  { this._get(windowId)?.window.setTitle(title); }
-    setStatus(windowId, text)  { this._get(windowId)?.window.setStatus(text); }
-    minimize(windowId)         { this._get(windowId)?.window.minimize(); }
-    maximize(windowId)         { this._get(windowId)?.window.maximize(); }
-    restore(windowId)          { this._get(windowId)?.window.restore(); }
-    close(windowId)            {
+    async setTitle(windowId, title)  { this._get(windowId)?.window.setTitle(title); }
+    async setStatus(windowId, text)  { this._get(windowId)?.window.setStatus(text); }
+    async minimize(windowId)         { this._get(windowId)?.window.minimize(); }
+    async maximize(windowId)         { this._get(windowId)?.window.maximize(); }
+    async restore(windowId)          { this._get(windowId)?.window.restore(); }
+    async close(windowId)            {
         const v = this._get(windowId);
         if (v) { v.window.close(); this._windows.delete(windowId); }
     }
-    isMinimized(windowId)      { return this._get(windowId)?.isMinimized() ?? null; }
-    isMaximized(windowId)      { return this._get(windowId)?.isMaximized() ?? null; }
+    async isMinimized(windowId)      { return this._get(windowId)?.isMinimized() ?? null; }
+    async isMaximized(windowId)      { return this._get(windowId)?.isMaximized() ?? null; }
 
     /* ── pasek tytułu ─────────────────────────────────────── */
-    bindControls(windowId, handlers = {}) { this._get(windowId)?.titlebar.bindControls(handlers); }
-    addButton(windowId, cfg)              { this._get(windowId)?.titlebar.addButton(cfg); }
-    removeButton(windowId, btnId)         { this._get(windowId)?.titlebar.removeButton(btnId); }
+    async bindControls(windowId, handlers = {}) { this._get(windowId)?.titlebar.bindControls(handlers); }
+    async addButton(windowId, cfg)              { this._get(windowId)?.titlebar.addButton(cfg); }
+    async removeButton(windowId, btnId)         { this._get(windowId)?.titlebar.removeButton(btnId); }
 
     /* ── zawartość ────────────────────────────────────────── */
-    refreshContent(windowId, cfg)              { this._get(windowId)?.content.refresh(cfg); }
-    setHeader(windowId, text)                  { this._get(windowId)?.content.setHeader(text); }
-    setSubheader(windowId, text)               { this._get(windowId)?.content.setSubheader(text); }
-    addCard(windowId, cfg)                     { this._get(windowId)?.content.addCard(cfg); }
-    removeCard(windowId, cardId)               { this._get(windowId)?.content.removeCard(cardId); }
-    updateCard(windowId, cardId, cfg)          { this._get(windowId)?.content.updateCard(cardId, cfg); }
+    async refreshContent(windowId, cfg)              { this._get(windowId)?.content.refresh(cfg); }
+    async setHeader(windowId, text)                  { this._get(windowId)?.content.setHeader(text); }
+    async setSubheader(windowId, text)               { this._get(windowId)?.content.setSubheader(text); }
+    async addCard(windowId, cfg)                     { this._get(windowId)?.content.addCard(cfg); }
+    async removeCard(windowId, cardId)               { this._get(windowId)?.content.removeCard(cardId); }
+    async updateCard(windowId, cardId, cfg)          { this._get(windowId)?.content.updateCard(cardId, cfg); }
 
     /* ── menubar ──────────────────────────────────────────── */
-    refreshMenubar(windowId, menus)             { this._get(windowId)?.menubar.refresh({ menus }); }
-    addMenu(windowId, cfg)                      { this._get(windowId)?.menubar.addMenu(cfg); }
-    removeMenu(windowId, menuId)                { this._get(windowId)?.menubar.removeMenu(menuId); }
-    addMenuItem(windowId, menuId, item)         { this._get(windowId)?.menubar.addMenuItem(menuId, item); }
-    removeMenuItem(windowId, menuId, itemId)    { this._get(windowId)?.menubar.removeMenuItem(menuId, itemId); }
+    async refreshMenubar(windowId, menus)             { this._get(windowId)?.menubar.refresh({ menus }); }
+    async addMenu(windowId, cfg)                      { this._get(windowId)?.menubar.addMenu(cfg); }
+    async removeMenu(windowId, menuId)                { this._get(windowId)?.menubar.removeMenu(menuId); }
+    async addMenuItem(windowId, menuId, item)         { this._get(windowId)?.menubar.addMenuItem(menuId, item); }
+    async removeMenuItem(windowId, menuId, itemId)    { this._get(windowId)?.menubar.removeMenuItem(menuId, itemId); }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1344,17 +1344,17 @@ class TaskbarManager {
         this._isHidden              = false;
     }
 
-    refresh(cfg = {})        { this._tb.refresh(cfg); }
-    addItem(id, cfg = {})    { this._tb.addItem({ id, ...cfg }); }
-    removeItem(id)           { this._tb.removeItem(id); }
-    updateItem(id, cfg = {}) { this._tb.updateItem(id, cfg); }
+    async refresh(cfg = {})        { this._tb.refresh(cfg); }
+    async addItem(id, cfg = {})    { this._tb.addItem({ id, ...cfg }); }
+    async removeItem(id)           { this._tb.removeItem(id); }
+    async updateItem(id, cfg = {}) { this._tb.updateItem(id, cfg); }
 
-    refreshStartMenu(items = [])   { this._tb.refreshStartMenu(items); }
-    addStartMenuItem(cfg = {})     { this._tb.addStartMenuItem(cfg); }
-    removeStartMenuItem(id)        { this._tb.removeStartMenuItem(id); }
+    async refreshStartMenu(items = [])   { this._tb.refreshStartMenu(items); }
+    async addStartMenuItem(cfg = {})     { this._tb.addStartMenuItem(cfg); }
+    async removeStartMenuItem(id)        { this._tb.removeStartMenuItem(id); }
 
     /** Oblicza i ustawia CSS-owe zmienne --tb-* z uwzględnieniem autohide */
-    _syncCSSVars() {
+    async _syncCSSVars() {
         const root   = document.documentElement;
         const style  = getComputedStyle(root);
         const tbH    = style.getPropertyValue('--tb-size-h').trim();
@@ -1369,7 +1369,7 @@ class TaskbarManager {
     }
 
     /** Przelicza rozmiar wszystkich zmaksymalizowanych okien */
-    _resizeAllWindows() {
+    async _resizeAllWindows() {
         if (window._wm) {
             window._wm.instances.forEach(wm =>
                 wm._windows.forEach(v => { if (v.isMaximized()) v._wmAction('maximize'); })
@@ -1381,7 +1381,7 @@ class TaskbarManager {
      * Ustawia pozycję paska zadań
      * @param {'bottom'|'top'|'left'|'right'} position
      */
-    setPosition(position = 'bottom') {
+    async setPosition(position = 'bottom') {
         const bar  = this._view._taskbarEl;
         const body = document.body;
 
@@ -1403,7 +1403,7 @@ class TaskbarManager {
      * Przy najechaniu/interakcji pasek wysuwa się i okna zmniejszają się.
      * @param {boolean} enabled
      */
-    setAutoHide(enabled = false) {
+    async setAutoHide(enabled = false) {
         const bar = this._view._taskbarEl;
 
         /* usuń poprzednie listenery autohide */
@@ -1463,7 +1463,7 @@ class TaskbarManager {
     }
 
     /** Przełącza automatyczne ukrywanie paska zadań */
-    toggleAutoHide() {
+    async toggleAutoHide() {
         this.setAutoHide(!this._autoHideActive);
     }
 
@@ -1471,7 +1471,7 @@ class TaskbarManager {
      * Całkowicie ukrywa pasek zadań.
      * Okna automatycznie rozszerzają się na całą dostępną przestrzeń.
      */
-    hide() {
+    async hide() {
         this._view._taskbarEl.style.display = 'none';
         this._isHidden = true;
         this._syncCSSVars();
@@ -1482,7 +1482,7 @@ class TaskbarManager {
      * Pokazuje pasek zadań po wcześniejszym ukryciu.
      * Okna automatycznie zwalniają miejsce dla paska.
      */
-    show() {
+    async show() {
         this._view._taskbarEl.style.display = '';
         this._isHidden = false;
         this._syncCSSVars();
@@ -1532,7 +1532,7 @@ class DesktopIconsManager {
      * @param {Function} [cfg.onClick]  Handler kliknięcia lewym przyciskiem
      * @param {Array}    [cfg.menuItems] Pozycje menu (prawy klik / folder)
      */
-    addIcon(id, cfg = {}) {
+    async addIcon(id, cfg = {}) {
         if (this._icons.has(id)) this.removeIcon(id);
 
         const pos = cfg.position ? { ...cfg.position } : this._nextGridPos();
@@ -1547,7 +1547,7 @@ class DesktopIconsManager {
      * Usuwa ikonę z pulpitu.
      * @param {string} id
      */
-    removeIcon(id) {
+    async removeIcon(id) {
         const entry = this._icons.get(id);
         if (!entry) return this;
         entry.el.remove();
@@ -1560,7 +1560,7 @@ class DesktopIconsManager {
      * @param {string} id
      * @param {object} cfg  Pola do nadpisania (icon / label / position / onClick / menuItems)
      */
-    updateIcon(id, cfg = {}) {
+    async updateIcon(id, cfg = {}) {
         const entry = this._icons.get(id);
         if (!entry) return this;
         const newCfg = { ...entry.cfg, ...cfg };
@@ -1577,7 +1577,7 @@ class DesktopIconsManager {
      * @param  {string} id
      * @returns {{ x: number, y: number } | null}
      */
-    getIconPosition(id) {
+    async getIconPosition(id) {
         const entry = this._icons.get(id);
         if (!entry) return null;
         return { ...entry.cfg.position };
@@ -1588,7 +1588,7 @@ class DesktopIconsManager {
      * @param {string} id
      * @param {{ x: number, y: number }} pos
      */
-    setIconPosition(id, { x, y } = {}) {
+    async setIconPosition(id, { x, y } = {}) {
         const entry = this._icons.get(id);
         if (!entry) return this;
         entry.cfg.position = { x, y };
@@ -1601,7 +1601,7 @@ class DesktopIconsManager {
      * Zwraca tablicę wszystkich ikon wraz z bieżącymi pozycjami.
      * @returns {Array<{ id: string, icon: string, label: string, position: { x, y } }>}
      */
-    getIcons() {
+    async getIcons() {
         const result = [];
         this._icons.forEach((entry, id) => {
             result.push({ id, ...entry.cfg });
@@ -1611,7 +1611,7 @@ class DesktopIconsManager {
 
     /* ── Wewnętrzne ── */
 
-    _nextGridPos() {
+    async _nextGridPos() {
         const vh      = window.innerHeight;
         const DEFAULT_TASKBAR_HEIGHT = 48; /* zapasowa wartość gdy CSS-var nie jest dostępna */
         const tbSize  = parseFloat(
@@ -1628,7 +1628,7 @@ class DesktopIconsManager {
         return pos;
     }
 
-    _createEl(id, cfg, pos) {
+    async _createEl(id, cfg, pos) {
         const el = document.createElement('div');
         el.className    = 'desktop-icon';
         el.dataset.iconId = id;
@@ -1670,14 +1670,14 @@ class DesktopIconsManager {
         return el;
     }
 
-    _selectIcon(id) {
+    async _selectIcon(id) {
         this._container.querySelectorAll('.desktop-icon.selected')
             .forEach(el => el.classList.remove('selected'));
         const entry = this._icons.get(id);
         if (entry) entry.el.classList.add('selected');
     }
 
-    _openMenu(e, id, cfg, items) {
+    async _openMenu(e, id, cfg, items) {
         this._closeMenu();
 
         const menu = document.createElement('div');
@@ -1728,11 +1728,11 @@ class DesktopIconsManager {
         });
     }
 
-    _closeMenu() {
+    async _closeMenu() {
         if (this._activeMenu) { this._activeMenu.remove(); this._activeMenu = null; }
     }
 
-    _makeDraggable(el, id) {
+    async _makeDraggable(el, id) {
         const DRAG_THRESHOLD   = 5;   /* px – minimalne przesunięcie aby uznać za przeciąganie */
         const LONG_PRESS_DELAY = 600; /* ms – czas długiego naciśnięcia (menu kontekstowe) */
         let startX, startY, startLeft, startTop, elW, elH, isDragging;
@@ -1823,7 +1823,7 @@ class DesktopIconsManager {
         }, { passive: true });
     }
 
-    _savePos(id, el) {
+    async _savePos(id, el) {
         const entry = this._icons.get(id);
         if (entry) entry.cfg.position = { x: parseInt(el.style.left), y: parseInt(el.style.top) };
     }
