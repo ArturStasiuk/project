@@ -644,12 +644,15 @@ class View {
                 // Przeciąganie okna
                 let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
                 const titlebar = win.querySelector('.titlebar');
-                titlebar.style.cursor = 'move';
                 titlebar.addEventListener('mousedown', e => {
+                    if (e.button !== 0) return;
+                    /* nie przeciągaj gdy klik na przycisk tytułpaska */
+                    if (e.target.closest('.titlebar-button')) return;
                     isDragging = true;
                     dragOffsetX = e.clientX - win.offsetLeft;
                     dragOffsetY = e.clientY - win.offsetTop;
                     win.style.transition = 'none';
+                    titlebar.style.cursor = 'grabbing';
                     // Na wierzch przy rozpoczęciu przeciągania
                     win.style.zIndex = ++window._windowZ;
                 });
@@ -661,6 +664,7 @@ class View {
                 document.addEventListener('mouseup', () => {
                     if (isDragging) {
                         isDragging = false;
+                        titlebar.style.cursor = '';
                         win.style.transition = '';
                     }
                 });
@@ -669,6 +673,74 @@ class View {
                 win.addEventListener('mousedown', () => {
                     win.style.zIndex = ++window._windowZ;
                 });
+
+                /* Uchwyty do zmiany rozmiaru – tylko gdy okno obsługuje maksymalizację */
+                if (showMaximize) {
+                    const _getCursorForDir = dir => {
+                        if (dir === 'n' || dir === 's') return 'ns-resize';
+                        if (dir === 'e' || dir === 'w') return 'ew-resize';
+                        if (dir === 'nw' || dir === 'se') return 'nwse-resize';
+                        return 'nesw-resize';
+                    };
+                    ['n', 's', 'e', 'w', 'nw', 'ne', 'sw', 'se'].forEach(dir => {
+                        const handle = document.createElement('div');
+                        handle.className = `window-resize-handle ${dir}`;
+                        win.appendChild(handle);
+                        handle.addEventListener('mousedown', e => {
+                            if (e.button !== 0) return;
+                            e.stopPropagation();
+                            /* nie zmieniaj rozmiaru zmaksymalizowanego okna */
+                            if (win._wmState && win._wmState.maximized) return;
+
+                            const startX = e.clientX;
+                            const startY = e.clientY;
+                            const startLeft   = win.offsetLeft;
+                            const startTop    = win.offsetTop;
+                            const startWidth  = win.offsetWidth;
+                            const startHeight = win.offsetHeight;
+
+                            win.style.transition = 'none';
+                            document.body.style.cursor    = _getCursorForDir(dir);
+                            document.body.style.userSelect = 'none';
+
+                            const onResizeMove = ev => {
+                                const dx = ev.clientX - startX;
+                                const dy = ev.clientY - startY;
+                                let newLeft   = startLeft;
+                                let newTop    = startTop;
+                                let newWidth  = startWidth;
+                                let newHeight = startHeight;
+
+                                if (dir.includes('e')) newWidth  = Math.max(200, startWidth  + dx);
+                                if (dir.includes('s')) newHeight = Math.max(100, startHeight + dy);
+                                if (dir.includes('w')) {
+                                    const w = Math.max(200, startWidth - dx);
+                                    newLeft  = startLeft + (startWidth - w);
+                                    newWidth = w;
+                                }
+                                if (dir.includes('n')) {
+                                    const h = Math.max(100, startHeight - dy);
+                                    newTop    = startTop + (startHeight - h);
+                                    newHeight = h;
+                                }
+
+                                win.style.left   = newLeft   + 'px';
+                                win.style.top    = newTop    + 'px';
+                                win.style.width  = newWidth  + 'px';
+                                win.style.height = newHeight + 'px';
+                            };
+                            const onResizeUp = () => {
+                                document.removeEventListener('mousemove', onResizeMove);
+                                document.removeEventListener('mouseup',   onResizeUp);
+                                document.body.style.cursor     = '';
+                                document.body.style.userSelect = '';
+                                win.style.transition = '';
+                            };
+                            document.addEventListener('mousemove', onResizeMove);
+                            document.addEventListener('mouseup',   onResizeUp);
+                        });
+                    });
+                }
 
                 container.appendChild(win);
                 self._windowEl = win;
@@ -1143,6 +1215,14 @@ class View {
 
         if (action === 'minimize') {
             if (_state.minimized) { await this._wmAction('restore'); return; }
+            /* Zapamiętaj rozmiar i pozycję sprzed minimalizacji */
+            _state.prevMinimize = {
+                left: win.style.left,
+                top: win.style.top,
+                width: win.style.width,
+                height: win.style.height,
+                wasMaximized: _state.maximized
+            };
             win.classList.remove('maximized');
             win.classList.add('minimized');
             document.body.classList.remove('window-maximized');
@@ -1184,6 +1264,7 @@ class View {
             win.style.height = (window.innerHeight - tbTop  - tbBottom) + 'px';
 
         } else if (action === 'restore') {
+            const wasMinimized = _state.minimized;
             win.classList.remove('minimized', 'maximized');
             document.body.classList.remove('window-maximized');
             _state.maximized = false;
@@ -1196,11 +1277,30 @@ class View {
             /* na małych ekranach zawsze maksymalizuj */
             if (window.innerWidth <= MOBILE_BREAKPOINT) {
                 _state.prev = null;
+                _state.prevMinimize = null;
                 await this._wmAction('maximize');
                 return;
             }
 
-            // Przywróć poprzednie pozycje i rozmiar
+            /* Przywróć stan sprzed minimalizacji */
+            if (wasMinimized && _state.prevMinimize) {
+                const pm = _state.prevMinimize;
+                _state.prevMinimize = null;
+                if (pm.wasMaximized) {
+                    /* okno było zmaksymalizowane przed minimalizacją – zmaksymalizuj ponownie */
+                    await this._wmAction('maximize');
+                    return;
+                }
+                if (pm.left !== undefined || pm.width !== undefined) {
+                    win.style.left   = pm.left;
+                    win.style.top    = pm.top;
+                    win.style.width  = pm.width;
+                    win.style.height = pm.height;
+                    return;
+                }
+            }
+
+            // Przywróć poprzednie pozycje i rozmiar (po maximize → restore)
             if (_state.prev) {
                 win.style.left = _state.prev.left;
                 win.style.top = _state.prev.top;
