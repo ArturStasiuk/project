@@ -4,8 +4,26 @@
 
   ── WindowManager ──────────────────────────────────────────
 
-  // Utwórz nowe okno:
+  // Utwórz nowe okno (domyślny rozmiar, wszystkie przyciski):
   view.create({ id: 'win-notes', title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
+
+  // Utwórz okno z podanym rozmiarem (w pikselach):
+  view.create({ id: 'win-sm', title: 'Małe okno', size: { width: 400, height: 300 } });
+
+  // Utwórz okno z rozmiarem jako ciąg CSS:
+  view.create({ id: 'win-wide', title: 'Szerokie', size: { width: '80%', height: '60%' } });
+
+  // Utwórz okno bez przycisku maksymalizacji:
+  view.create({ id: 'win-nomax', title: 'Bez max', controls: { maximize: false } });
+
+  // Utwórz okno bez przycisku zamknięcia (np. modal):
+  view.create({ id: 'win-modal', title: 'Modal', controls: { close: false } });
+
+  // Utwórz okno tylko z przyciskiem zamknięcia:
+  view.create({ id: 'win-alert', title: 'Alert', controls: { minimize: false, maximize: false } });
+
+  // Utwórz okno bez żadnych przycisków tytułpasek:
+  view.create({ id: 'win-bare', title: 'Splash', controls: { minimize: false, maximize: false, close: false } });
 
   // Utwórz drugie okno z własnym menu:
   view.create({ id: 'win-calc', title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
@@ -572,10 +590,23 @@ class View {
         return {
             /**
              * Tworzy szkielet okna i dołącza do kontenera
-             * @param {{ title, icon?, statusText? }} cfg
+             * @param {{ title, icon?, statusText?, size?, controls? }} cfg
+             * @param {string|{width:number|string, height:number|string}} [cfg.size='auto']
+             *   'auto' – rozmiar dobierany automatycznie; lub obiekt { width, height }
+             *   z wartościami numerycznymi (px) lub ciągiem CSS (np. '50%').
+             * @param {{ minimize?, maximize?, close? }} [cfg.controls={}]
+             *   Flagi boolean sterujące widocznością przycisków paska tytułowego.
+             *   Pominięte lub true = przycisk widoczny, false = ukryty.
+             *   Przycisk maksymalizacji jest zawsze ukryty na małych ekranach
+             *   (szerokość ≤ MOBILE_BREAKPOINT), niezależnie od tego ustawienia.
              */
-            async create({ title = '', icon = null, statusText = 'Gotowe' } = {}) {
+            async create({ title = '', icon = null, statusText = 'Gotowe', size = 'auto', controls = {} } = {}) {
                 const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+
+                /* Widoczność przycisków tytułpasek */
+                const showMinimize = controls.minimize !== false;
+                const showMaximize = controls.maximize !== false && !isMobile;
+                const showClose    = controls.close    !== false;
 
                 const win = document.createElement('div');
                 win.className = 'window';
@@ -586,15 +617,15 @@ class View {
                             <span class="window-title">${title}</span>
                         </div>
                         <div class="titlebar-controls">
-                            <button class="titlebar-button minimize" title="Minimalizuj">
+                            ${showMinimize ? `<button class="titlebar-button minimize" title="Minimalizuj">
                                 <div class="minimize-icon"></div>
-                            </button>
-                            ${isMobile ? '' : `<button class="titlebar-button maximize" title="Maksymalizuj">
+                            </button>` : ''}
+                            ${showMaximize ? `<button class="titlebar-button maximize" title="Maksymalizuj">
                                 <div class="maximize-icon"></div>
-                            </button>`}
-                            <button class="titlebar-button close" title="Zamknij">
+                            </button>` : ''}
+                            ${showClose ? `<button class="titlebar-button close" title="Zamknij">
                                 <div class="close-icon"></div>
-                            </button>
+                            </button>` : ''}
                         </div>
                     </div>
                     <div class="menubar"></div>
@@ -641,6 +672,12 @@ class View {
 
                 container.appendChild(win);
                 self._windowEl = win;
+
+                /* Zastosuj podany rozmiar okna (pomijane przy mobilnej auto-maksymalizacji) */
+                if (!isMobile && size !== 'auto' && size && typeof size === 'object') {
+                    if (size.width  != null) win.style.width  = typeof size.width  === 'number' ? size.width  + 'px' : size.width;
+                    if (size.height != null) win.style.height = typeof size.height === 'number' ? size.height + 'px' : size.height;
+                }
 
                 /* rejestruj w globalnym rejestrze okien */
                 window._windowRegistry.push({
@@ -695,10 +732,12 @@ class View {
             async bindControls({ onMinimize, onMaximize, onClose } = {}) {
                 if (!self._windowEl) return;
                 const win = self._windowEl;
-                win.querySelector('.minimize').onclick = e => { e.stopPropagation(); onMinimize && onMinimize(e); };
+                const minBtn = win.querySelector('.minimize');
                 const maxBtn = win.querySelector('.maximize');
+                const clsBtn = win.querySelector('.close');
+                if (minBtn) minBtn.onclick = e => { e.stopPropagation(); onMinimize && onMinimize(e); };
                 if (maxBtn) maxBtn.onclick = e => { e.stopPropagation(); onMaximize && onMaximize(e); };
-                win.querySelector('.close').onclick    = e => { e.stopPropagation(); onClose    && onClose(e);    };
+                if (clsBtn) clsBtn.onclick = e => { e.stopPropagation(); onClose    && onClose(e);    };
             },
 
             /**
@@ -1205,7 +1244,10 @@ class View {
  *  Każda metoda przyjmuje jeden obiekt konfiguracyjny z polem id.
  *
  *  Tworzenie/usuwanie okna:
- *    wm.create({ id, title?, icon?, statusText? })   → View
+ *    wm.create({ id, title?, icon?, statusText?, size?, controls? })  → View
+ *      size: 'auto' (domyślnie) lub { width, height } – rozmiar okna w px lub CSS.
+ *      controls: { minimize?, maximize?, close? } – widoczność przycisków tytułpasek
+ *        (false = ukryty). Maksymalizacja jest zawsze ukryta na małych ekranach.
  *    wm.close({ id })
  *    wm.getView({ id })                              → View | null
  *
@@ -1247,16 +1289,21 @@ class WindowManager {
 
     /**
      * Tworzy nowe okno; zwraca instancję View lub null jeśli id już zajęte
-     * @param {{ id, title?, icon?, statusText? }} cfg
+     * @param {{ id, title?, icon?, statusText?, size?, controls? }} cfg
+     * @param {string|{width:number|string, height:number|string}} [cfg.size='auto']
+     *   'auto' – rozmiar dobierany automatycznie; lub { width, height } w px / CSS.
+     * @param {{ minimize?, maximize?, close? }} [cfg.controls={}]
+     *   Steruje widocznością przycisków tytułpasek. Pominięte lub true = widoczny.
+     *   Przycisk maksymalizacji jest zawsze ukryty na małych ekranach.
      */
-    async create({ id, title = '', icon = null, statusText = 'Gotowe' } = {}) {
+    async create({ id, title = '', icon = null, statusText = 'Gotowe', size = 'auto', controls = {} } = {}) {
         if (typeof id !== 'string' || !id.trim()) { console.warn('WindowManager: id okna musi być niepustym ciągiem znaków.'); return null; }
         if (this._windows.has(id)) {
             console.warn(`WindowManager: okno "${id}" już istnieje.`);
             return null;
         }
         const v = new View({ taskbarId: this._taskbarId, containerId: this._containerId });
-        await v.window.create({ title, icon, statusText });
+        await v.window.create({ title, icon, statusText, size, controls });
         await v.titlebar.bindControls({
             onMinimize: async () => await v.window.minimize(),
             onMaximize: async () => { if (await v.isMaximized()) await v.window.restore(); else await v.window.maximize(); },
