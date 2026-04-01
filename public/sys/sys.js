@@ -18,7 +18,7 @@ class SYS {
         const info = await this.api.getInfoModules();
         
 
-        await this.view.refreshStartMenu(await this.con.getMenuStart());
+        await this.view.refreshStartMenu({ items: await this.con.getMenuStart() });
 
         await this.view.addIcon(await this.con.getIconsPulpit());
      
