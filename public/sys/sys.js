@@ -20,9 +20,8 @@ class SYS {
         
 
         await this.view.refreshStartMenu(await this.con.getMenuStart());
-        const icons = await this.con.getIconsPulpit();
-        console.log('Pulpit:', icons);
-        await this.view.addIcon(icons);
+
+        await this.view.addIcon(await this.con.getIconsPulpit());
      
 
 

@@ -1527,18 +1527,19 @@ class DesktopIconsManager {
     /* ── Publiczne API ── */
 
     /**
-     * Dodaje ikonę na pulpit.
-     * @param {string} id  Unikalny identyfikator
-     * @param {object} cfg
-     * @param {string}   cfg.icon       Emoji lub HTML ikony (np. '📝')
-     * @param {string}   cfg.label      Etykieta pod ikoną
-     * @param {object}   [cfg.position] { x, y } – jeśli pominięte, pozycja siatki
-     * @param {Function} [cfg.onClick]  Handler kliknięcia lewym przyciskiem
-     * @param {Array}    [cfg.menuItems] Pozycje menu (prawy klik / folder)
+     * Dodaje ikonę lub ikony na pulpit.
+     * @param {object|object[]} iconObj Obiekt { id, icon, ... } lub tablica takich obiektów
+     * Przykład: { id: 'di-folder', icon: '📁', ... }
      */
-    async addIcon(id, cfg = {}) {
+    async addIcon(iconObj) {
+        if (Array.isArray(iconObj)) {
+            for (const icon of iconObj) {
+                await this.addIcon(icon);
+            }
+            return this;
+        }
+        const { id, ...cfg } = iconObj;
         if (this._icons.has(id)) await this.removeIcon(id);
-
         const pos = cfg.position ? { ...cfg.position } : await this._nextGridPos();
         const el  = await this._createEl(id, cfg, pos);
         this._container.appendChild(el);
@@ -1560,11 +1561,18 @@ class DesktopIconsManager {
     }
 
     /**
-     * Aktualizuje właściwości istniejącej ikony.
-     * @param {string} id
-     * @param {object} cfg  Pola do nadpisania (icon / label / position / onClick / menuItems)
+     * Aktualizuje właściwości istniejącej ikony lub wielu ikon.
+     * @param {object|object[]} iconObj Obiekt { id, ...cfg } lub tablica takich obiektów
+     * Przykład: { id: 'di-folder', label: 'Nowa nazwa', ... }
      */
-    async updateIcon(id, cfg = {}) {
+    async updateIcon(iconObj) {
+        if (Array.isArray(iconObj)) {
+            for (const icon of iconObj) {
+                await this.updateIcon(icon);
+            }
+            return this;
+        }
+        const { id, ...cfg } = iconObj;
         const entry = this._icons.get(id);
         if (!entry) return this;
         const newCfg = { ...entry.cfg, ...cfg };
@@ -1578,23 +1586,34 @@ class DesktopIconsManager {
 
     /**
      * Zwraca bieżącą pozycję ikony.
-     * @param  {string} id
+     * @param  {object|string} iconObj Obiekt { id } lub id jako string
      * @returns {{ x: number, y: number } | null}
+     * Przykład: { id: 'di-folder' } lub 'di-folder'
      */
-    async getIconPosition(id) {
+    async getIconPosition(iconObj) {
+        const id = typeof iconObj === 'object' ? iconObj.id : iconObj;
         const entry = this._icons.get(id);
         if (!entry) return null;
         return { ...entry.cfg.position };
     }
 
     /**
-     * Ustawia pozycję ikony.
-     * @param {string} id
-     * @param {{ x: number, y: number }} pos
+     * Ustawia pozycję ikony lub wielu ikon.
+     * @param {object|object[]} iconObj Obiekt { id, position: { x, y } } lub tablica takich obiektów
+     * Przykład: { id: 'di-folder', position: { x: 100, y: 200 } }
      */
-    async setIconPosition(id, { x, y } = {}) {
+    async setIconPosition(iconObj) {
+        if (Array.isArray(iconObj)) {
+            for (const icon of iconObj) {
+                await this.setIconPosition(icon);
+            }
+            return this;
+        }
+        const { id, position } = iconObj;
+        if (!id || !position) return this;
         const entry = this._icons.get(id);
         if (!entry) return this;
+        const { x, y } = position;
         entry.cfg.position = { x, y };
         entry.el.style.left = x + 'px';
         entry.el.style.top  = y + 'px';
