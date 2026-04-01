@@ -37,9 +37,26 @@ class CONFIG {
             ]
         }];
     }
- 
-
-
+    
+    async getWinLogin() {
+        return { id: 'win-login', title: 'Logowanie', icon: '🔐', statusText: 'Podaj login i hasło' };
+    }
+    async getContentWinLogin() { 
+            return {
+                id: 'win-login',
+                cardId: 'card-1',
+                title: '🔐 Logowanie',
+                text: `
+                    <form id="login-form" style="display: flex; flex-direction: column; gap: 1em; min-width: 220px;">
+                        <label for="login-username">Login</label>
+                        <input id="login-username" name="username" type="text" placeholder="Wpisz login" autocomplete="username" required style="padding: 0.5em; border-radius: 4px; border: 1px solid #ccc;">
+                        <label for="login-password">Hasło</label>
+                        <input id="login-password" name="password" type="password" placeholder="Wpisz hasło" autocomplete="current-password" required style="padding: 0.5em; border-radius: 4px; border: 1px solid #ccc;">
+                        <button type="submit" style="padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Zaloguj się</button>
+                    </form>
+                `
+            };
+    }
 
 
 }

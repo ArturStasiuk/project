@@ -21,7 +21,8 @@ class SYS {
         await this.view.refreshStartMenu({ items: await this.con.getMenuStart() });
 
         await this.view.addIcon(await this.con.getIconsPulpit());
-     
+        await this.view.create(await this.con.getWinLogin());
+        await this.view.addCard(await this.con.getContentWinLogin());
 
 
 
