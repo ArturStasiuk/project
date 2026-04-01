@@ -1837,15 +1837,14 @@ class DesktopIconsManager {
  *  INICJALIZACJA
  * ════════════════════════════════════════════════════════════ */
 
+
 const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
-/* ── 1. Taskbar ── */
 const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
 await taskbar.refresh({ showStart: true, items: [] });
 await taskbar.setPosition('bottom'); /* domyślna pozycja */
-
 const desktopIcons = new DesktopIconsManager({ containerId: 'desktopIcons' });
 
-// Przypisz wszystkie publiczne metody desktopIcons do view
+// Przypisz wszystkie publiczne metody DesktopIconsManager do view
 const desktopProto = DesktopIconsManager.prototype;
 for (const key of Object.getOwnPropertyNames(desktopProto)) {
     if (key !== 'constructor' && typeof desktopProto[key] === 'function') {
@@ -1858,25 +1857,26 @@ for (const key of Object.keys(desktopIcons)) {
     }
 }
 
+// Przypisz wszystkie publiczne metody TaskbarManager do view
+const taskbarProto = TaskbarManager.prototype;
+for (const key of Object.getOwnPropertyNames(taskbarProto)) {
+    if (key !== 'constructor' && typeof taskbarProto[key] === 'function') {
+        view[key] = taskbar[key].bind(taskbar);
+    }
+}
+for (const key of Object.keys(taskbar)) {
+    if (typeof taskbar[key] === 'function') {
+        view[key] = taskbar[key].bind(taskbar);
+    }
+}
 
-
-
-// Przypisz metody taskbara jako własności view
-// Użyj istniejącej instancji taskbar
-// przypisz metody dectopIcons jako własności view
-
-
-view.refreshStartMenu = async (...args) => await taskbar.refreshStartMenu(...args);
-view.addStartMenuItem = async (...args) => await taskbar.addStartMenuItem(...args);
-view.removeStartMenuItem = async (...args) => await taskbar.removeStartMenuItem(...args);
-view.addItem = async (...args) => await taskbar.addItem(...args);
-view.removeItem = async (...args) => await taskbar.removeItem(...args);
-view.updateItem = async (...args) => await taskbar.updateItem(...args);
-view.setPosition = async (...args) => await taskbar.setPosition(...args);
-view.setAutoHide = async (...args) => await taskbar.setAutoHide(...args);
-view.toggleAutoHide = async (...args) => await taskbar.toggleAutoHide(...args);
-view.hide = async (...args) => await taskbar.hide(...args);
-view.show = async (...args) => await taskbar.show(...args);
+// Przypisz wszystkie publiczne metody WindowManager do view (oprócz tych, które już są)
+const wmProto = WindowManager.prototype;
+for (const key of Object.getOwnPropertyNames(wmProto)) {
+    if (key !== 'constructor' && typeof wmProto[key] === 'function' && !view[key]) {
+        view[key] = view[key].bind(view);
+    }
+}
 
 export default view;
 
