@@ -1,0 +1,472 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        DOKUMENTACJA – app.js                               ║
+║  Plik: public/view/app.js                                                  ║
+║  Język: JavaScript ES2022 (moduły ES, top-level await)                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Eksport domyślny: obiekt `view` (instancja WindowManager wzbogacona metodami
+TaskbarManager i DesktopIconsManager). Po załadowaniu modułu dostępne są też:
+  • view     – WindowManager + metody TaskbarManager + metody DesktopIconsManager
+  • taskbar  – TaskbarManager (niezależna instancja, ta sama co użyta przez view)
+  • desktopIcons – DesktopIconsManager (niezależna instancja)
+
+Stała MOBILE_BREAKPOINT = 768 px. Okna o szerokości ekranu ≤ 768 px są
+automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  class View
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Niskopoziomowy silnik UI pojedynczego okna. Każda instancja View obsługuje
+  dokładnie jedno okno. WindowManager tworzy osobną instancję View dla każdego
+  okna i zarządza nimi zbiorowo.
+
+  Konstruktor
+  ───────────
+  new View({ taskbarId, containerId })
+    taskbarId   – id elementu DOM paska zadań (atrybut id).
+    containerId – id elementu DOM kontenera okien.
+
+  Moduły (właściwości)
+  ────────────────────
+  view.taskbar  – moduł paska zadań (TaskbarModule)
+  view.window   – moduł okna (WindowModule)
+  view.titlebar – moduł paska tytułowego (TitlebarModule)
+  view.menubar  – moduł menu górnego (MenubarModule)
+  view.content  – moduł zawartości okna (ContentModule)
+
+  ── TaskbarModule (view.taskbar) ────────────────────────────────────────────
+
+  refresh({ showStart?, items? })                               → Promise<void>
+    Czyści i przebudowuje cały pasek zadań.
+    showStart  – czy wyświetlać przycisk Start (domyślnie: true).
+    items      – tablica elementów paska: [{ id, icon?, title, onClick, menuItems? }].
+    Zawsze rysuje prawy obszar (przycisk listy okien + zegar).
+
+  addItem({ id, icon?, title, onClick, menuItems? })            → Promise<void>
+    Dodaje pojedynczy element do paska. Pomija duplikaty (ten sam id).
+    menuItems – opcjonalna tablica pozycji menu kontekstowego (prawy klik).
+
+  removeItem(id)                                                → Promise<void>
+    Usuwa element o podanym id z paska.
+
+  updateItem(id, { title?, icon?, onClick?, menuItems? })       → Promise<void>
+    Aktualizuje tytuł, ikonę lub handler kliknięcia elementu paska.
+    Zmiana onClick wymaga klonowania elementu (usuwa poprzednie listenery).
+
+  refreshStartMenu(items)                                       → Promise<void>
+    Zastępuje całą zawartość menu Start nową listą pozycji.
+    items – tablica [{ id?, icon?, label, disabled?, onClick }|'separator'].
+
+  addStartMenuItem(item)                                        → Promise<void>
+    Dołącza jedną pozycję na końcu menu Start.
+    item – obiekt { id?, icon?, label, disabled?, onClick } lub ciąg 'separator'.
+
+  removeStartMenuItem(id)                                       → Promise<void>
+    Usuwa pozycję menu Start o podanym id.
+
+  ── WindowModule (view.window) ──────────────────────────────────────────────
+
+  create({ title?, icon?, statusText?, size?, controls? })      → Promise<void>
+    Tworzy szkielet okna i dołącza go do kontenera.
+    title      – tytuł wyświetlany na pasku tytułowym (domyślnie: '').
+    icon       – emoji lub tekst ikony okna (domyślnie: null).
+    statusText – tekst paska stanu (domyślnie: 'Gotowe').
+    size       – 'auto' (domyślnie) lub { width, height }:
+                   • 'auto' – rozmiar ustalany dynamicznie przez _updateSize().
+                   • { width, height } – liczba (traktowana jako px) lub ciąg CSS
+                     (np. '50%', '640px'). Ignorowane na małych ekranach, gdzie
+                     okno jest zawsze maksymalizowane.
+    controls   – obiekt { minimize?, maximize?, close? } (wartości boolean):
+                   • pominięty lub true  – przycisk widoczny,
+                   • false              – przycisk ukryty.
+                   Przycisk maksymalizacji jest zawsze ukryty gdy
+                   window.innerWidth ≤ MOBILE_BREAKPOINT, niezależnie od flagi.
+
+    Po utworzeniu okno jest przeciągalne za pasek tytułowy i wysuwa się na
+    wierzch przy kliknięciu. Na małych ekranach jest automatycznie
+    maksymalizowane.
+
+  setTitle(title)                                               → Promise<void>
+    Zmienia tytuł okna i aktualizuje wpis w globalnym rejestrze okien.
+
+  setStatus(text)                                               → Promise<void>
+    Ustawia tekst paska stanu.
+
+  minimize()                                                    → Promise<void>
+    Minimalizuje okno. Jeśli okno jest już zminimalizowane – przywraca.
+
+  maximize()                                                    → Promise<void>
+    Maksymalizuje okno na dostępny obszar roboczy (z uwzględnieniem paska
+    zadań). Zapamiętuje poprzedni rozmiar i pozycję. Jeśli okno jest już
+    zmaksymalizowane – przywraca.
+
+  restore()                                                     → Promise<void>
+    Przywraca okno z minimalizacji lub maksymalizacji. Na małych ekranach
+    przywrócenie zawsze skutkuje ponowną maksymalizacją.
+
+  close()                                                       → Promise<void>
+    Zamyka okno (animacja + ukrycie elementu DOM). Usuwa wpis z rejestru.
+
+  ── TitlebarModule (view.titlebar) ──────────────────────────────────────────
+
+  bindControls({ onMinimize?, onMaximize?, onClose? })          → Promise<void>
+    Podpina funkcje zwrotne pod przyciski paska tytułowego.
+    Przyciski, które nie istnieją (np. ukryte przez parametr controls), są
+    bezpiecznie pomijane.
+
+  addButton({ id?, label, onClick, position? })                 → Promise<void>
+    Dodaje własny przycisk do paska tytułowego.
+    id       – opcjonalny identyfikator (data-tbtn-id).
+    label    – tekst / emoji przycisku.
+    position – 'before-controls' (domyślnie) | 'after-icon':
+               'before-controls' – wstawia przed grupą przycisków min/max/close,
+               'after-icon'      – wstawia jako pierwszy w grupie przycisków.
+
+  removeButton(id)                                              → Promise<void>
+    Usuwa przycisk o podanym data-tbtn-id z paska tytułowego.
+
+  ── MenubarModule (view.menubar) ────────────────────────────────────────────
+
+  refresh({ menus? })                                           → Promise<void>
+    Czyści i przebudowuje całe menu górne okna.
+    menus – tablica [{ label, id, items }].
+    Automatycznie dodaje przycisk hamburger widoczny tylko na małych ekranach.
+
+  addMenu({ label, id, items?, position? })                     → Promise<void>
+    Dodaje nowe menu do paska.
+    position – indeks numeryczny, 'first' lub 'last' (domyślnie).
+
+  removeMenu(id)                                                → Promise<void>
+    Usuwa menu o podanym data-menu-id.
+
+  addMenuItem(menuId, item)                                     → Promise<void>
+    Dołącza pozycję do istniejącego menu (data-menu-id).
+    item – { id?, icon?, label, shortcut?, disabled?, separator?, submenu?,
+             onClick }.
+
+  removeMenuItem(menuId, itemId)                                → Promise<void>
+    Usuwa pozycję o podanym data-mi-id z menu o podanym data-menu-id.
+
+  ── ContentModule (view.content) ────────────────────────────────────────────
+
+  refresh({ header?, subheader?, cards? })                      → Promise<void>
+    Czyści i przebudowuje całą zawartość okna.
+    cards – tablica [{ id?, title, text }].
+
+  setHeader(text)                                               → Promise<void>
+    Ustawia lub tworzy nagłówek sekcji zawartości.
+
+  setSubheader(text)                                            → Promise<void>
+    Ustawia lub tworzy podtytuł sekcji zawartości.
+
+  addCard({ id?, title?, text? })                               → Promise<void>
+    Dodaje kartę do zawartości okna.
+
+  removeCard(id)                                                → Promise<void>
+    Usuwa kartę o podanym data-card-id.
+
+  updateCard(id, { title?, text? })                             → Promise<void>
+    Aktualizuje tytuł lub treść istniejącej karty.
+
+  ── Metody pomocnicze View ───────────────────────────────────────────────────
+
+  isMinimized()                                                 → Promise<boolean>
+    Zwraca true jeśli okno jest aktualnie zminimalizowane.
+
+  isMaximized()                                                 → Promise<boolean>
+    Zwraca true jeśli okno jest aktualnie zmaksymalizowane.
+
+  _wmAction(action)                                             → Promise<void>
+    Wewnętrzna logika: 'minimize' | 'maximize' | 'restore' | 'close'.
+    Zarządza stanem okna, klasami CSS i rejestrem okien.
+
+  _updateSize()                                                 → Promise<void>
+    Przelicza rozmiar okna (max 900×600 lub bieżąca wielkość ekranu − 40 px).
+    Wywoływany przy przywracaniu i zdarzeniu window resize.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  class WindowManager
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Zarządza wieloma oknami za pomocą unikalnego id. Każde okno to osobna
+  instancja View. Metody przyjmują obiekt z polem `id` (i opcjonalnie innymi
+  parametrami).
+
+  Konstruktor
+  ───────────
+  new WindowManager({ containerId?, taskbarId? })
+    containerId – id kontenera okien DOM (domyślnie: 'windowContainer').
+    taskbarId   – id paska zadań DOM (domyślnie: 'taskbar').
+
+  Tworzenie i zarządzanie oknami
+  ──────────────────────────────
+  create({ id, title?, icon?, statusText?, size?, controls? })  → Promise<View|null>
+    Tworzy nowe okno i rejestruje je pod podanym id.
+    Zwraca instancję View lub null gdy id jest puste / już zajęte.
+    Parametry size i controls – patrz View.window.create() powyżej.
+    Automatycznie podpina przyciski min/max/close i rejestruje obsługę
+    zdarzenia window.resize dla zmaksymalizowanych okien.
+
+  getView({ id })                                               → Promise<View|null>
+    Zwraca instancję View dla danego id lub null.
+
+  close({ id })                                                 → Promise<void>
+    Zamyka okno i usuwa je z mapy okien.
+
+  Stan okna
+  ─────────
+  setTitle({ id, title })                                       → Promise<void>
+  setStatus({ id, text })                                       → Promise<void>
+  minimize({ id })                                              → Promise<void>
+  maximize({ id })                                              → Promise<void>
+  restore({ id })                                               → Promise<void>
+  isMinimized({ id })                                           → Promise<boolean|null>
+  isMaximized({ id })                                           → Promise<boolean|null>
+
+  Pasek tytułowy
+  ──────────────
+  bindControls({ id, onMinimize?, onMaximize?, onClose? })      → Promise<void>
+    Nadpisuje handlery przycisków min/max/close (np. po własnej logice zamknięcia).
+
+  addButton({ id, btnId?, label, onClick, position? })          → Promise<void>
+    Dodaje własny przycisk do paska tytułowego okna id.
+
+  removeButton({ id, btnId })                                   → Promise<void>
+    Usuwa przycisk o btnId z paska tytułowego okna id.
+
+  Zawartość okna
+  ──────────────
+  refreshContent({ id, header?, subheader?, cards? })           → Promise<void>
+  setHeader({ id, text })                                       → Promise<void>
+  setSubheader({ id, text })                                    → Promise<void>
+  addCard({ id, cardId?, title?, text? })                       → Promise<void>
+  removeCard({ id, cardId })                                    → Promise<void>
+  updateCard({ id, cardId, title?, text? })                     → Promise<void>
+
+  Menu górne okna
+  ───────────────
+  refreshMenubar({ id, menus })                                 → Promise<void>
+  addMenu({ id, menuId, label, items?, position? })             → Promise<void>
+  removeMenu({ id, menuId })                                    → Promise<void>
+  addMenuItem({ id, menuId, item })                             → Promise<void>
+  removeMenuItem({ id, menuId, itemId })                        → Promise<void>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  class TaskbarManager
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Zarządza paskiem zadań: pozycją, widocznością, auto-ukrywaniem oraz
+  zawartością (elementy, menu Start). Wewnętrznie deleguje operacje do
+  TaskbarModule wewnątrz instancji View.
+
+  Konstruktor
+  ───────────
+  new TaskbarManager({ taskbarId?, containerId? })
+    taskbarId   – id elementu DOM paska zadań (domyślnie: 'taskbar').
+    containerId – id kontenera okien DOM (domyślnie: 'windowContainer').
+
+  Zarządzanie zawartością
+  ───────────────────────
+  refresh(cfg)                                                  → Promise<void>
+    Pełne odświeżenie paska. cfg – patrz View.taskbar.refresh().
+
+  addItem({ id, icon?, title, onClick, menuItems? })            → Promise<void>
+    Dodaje element do paska.
+
+  removeItem({ id })                                            → Promise<void>
+    Usuwa element o podanym id.
+
+  updateItem({ id, title?, icon?, onClick?, menuItems? })       → Promise<void>
+    Aktualizuje właściwości elementu paska.
+
+  refreshStartMenu({ items })                                   → Promise<void>
+    Zastępuje całą zawartość menu Start.
+    items – [{ id?, icon?, label, disabled?, onClick }|'separator'].
+
+  addStartMenuItem(item)                                        → Promise<void>
+    Dodaje pozycję do menu Start.
+
+  removeStartMenuItem({ id })                                   → Promise<void>
+    Usuwa pozycję menu Start o podanym id.
+
+  Pozycja paska zadań
+  ───────────────────
+  setPosition(position)                                         → Promise<void>
+    Ustawia pozycję paska: 'bottom' | 'top' | 'left' | 'right'.
+    Aktualizuje CSS-owe zmienne --tb-top/bottom/left/right i przelicza
+    rozmiar wszystkich zmaksymalizowanych okien.
+
+  Automatyczne ukrywanie
+  ──────────────────────
+  setAutoHide(enabled)                                          → Promise<void>
+    Włącza (true) lub wyłącza (false) automatyczne ukrywanie paska.
+    Gdy włączone: pasek chowa się; okna zajmują cały ekran. Po najechaniu
+    myszą lub dotknięciu (urządzenia dotykowe) pasek wysuwa się, a okna
+    zmniejszają się automatycznie.
+
+  toggleAutoHide()                                              → Promise<void>
+    Przełącza tryb auto-ukrywania (włącza jeśli wyłączony, wyłącza jeśli
+    włączony).
+
+  Całkowite ukrycie/pokazanie
+  ───────────────────────────
+  hide()                                                        → Promise<void>
+    Całkowicie ukrywa pasek zadań (display: none). Okna automatycznie
+    rozszerzają się na całą dostępną przestrzeń.
+
+  show()                                                        → Promise<void>
+    Pokazuje pasek zadań po wcześniejszym ukryciu. Okna automatycznie
+    zwalniają miejsce dla paska.
+
+  Metody wewnętrzne
+  ─────────────────
+  _syncCSSVars()                                                → Promise<void>
+    Przelicza i ustawia zmienne CSS --tb-top/bottom/left/right na podstawie
+    aktualnej pozycji, stanu auto-ukrywania i widoczności paska.
+
+  _resizeAllWindows()                                           → Promise<void>
+    Przelicza rozmiar wszystkich aktualnie zmaksymalizowanych okien
+    (wywoływane po każdej zmianie paska, by okna zajęły prawidłowy obszar).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  class DesktopIconsManager
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Zarządza ikonami na pulpicie. Ikony są przeciągalne (mysz i dotyk).
+  Obsługuje menu kontekstowe (prawy klik / długie naciśnięcie).
+
+  Konstruktor
+  ───────────
+  new DesktopIconsManager({ containerId? })
+    containerId – id kontenera pulpitu DOM (domyślnie: 'desktopIcons').
+
+  Publiczne API
+  ─────────────
+  addIcon(iconObj)                                              → Promise<this>
+    Dodaje ikonę lub tablicę ikon na pulpit.
+    iconObj – { id, icon, label, position?, onClick?, menuItems?, disabled? }
+      id        – unikalny identyfikator ikony.
+      icon      – emoji / tekst ikony (domyślnie: '📄').
+      label     – etykieta pod ikoną.
+      position  – { x, y } w px (opcjonalne; domyślnie następna pozycja siatki).
+      onClick   – funkcja wywoływana przy kliknięciu lewym przyciskiem.
+      menuItems – tablica pozycji menu kontekstowego wyświetlanego zamiast
+                  onClick lub przy prawym kliku: [{ icon?, label, onClick,
+                  disabled? }|'separator'].
+    Jeśli ikona o danym id już istnieje, jest najpierw usuwana.
+
+  removeIcon({ id })                                            → Promise<this>
+    Usuwa ikonę o podanym id z pulpitu.
+
+  updateIcon(iconObj)                                           → Promise<this>
+    Aktualizuje właściwości istniejącej ikony (lub tablicę ikon).
+    iconObj – { id, ...cfg } – tylko podane pola są nadpisywane.
+
+  getIconPosition({ id })                               → Promise<{x,y}|null>
+    Zwraca bieżącą pozycję ikony { x, y } lub null jeśli ikona nie istnieje.
+
+  setIconPosition(iconObj)                                      → Promise<this>
+    Ustawia pozycję ikony lub tablicy ikon.
+    iconObj – { id, position: { x, y } }.
+
+  getIcons()                               → Promise<Array<{id,...cfg}>>
+    Zwraca tablicę wszystkich ikon wraz z ich bieżącymi pozycjami i
+    konfiguracją.
+
+  Wewnętrzne metody
+  ─────────────────
+  _nextGridPos()                                       → Promise<{x,y}>
+    Oblicza następną dostępną pozycję siatki (kolumna od góry, potem
+    kolejna kolumna). Uwzględnia wysokość paska zadań (--tb-bottom).
+
+  _createEl(id, cfg, pos)                              → Promise<HTMLElement>
+    Tworzy element DOM ikony i podpina zdarzenia kliknięcia i menu.
+
+  _selectIcon(id)                                               → Promise<void>
+    Zaznacza ikonę (klasa CSS 'selected'), odznaczając pozostałe.
+
+  _openMenu(e, id, cfg, items)                                  → Promise<void>
+    Wyświetla menu kontekstowe przy współrzędnych zdarzenia e.
+    Koryguje pozycję by menu nie wychodziło poza ekran.
+
+  _closeMenu()                                                  → Promise<void>
+    Zamyka aktualnie otwarte menu kontekstowe.
+
+  _makeDraggable(el, id)                                        → Promise<void>
+    Podpina obsługę przeciągania (mysz i dotyk) z progiem DRAG_THRESHOLD = 5 px.
+    Długie naciśnięcie (LONG_PRESS_DELAY = 600 ms) otwiera menu kontekstowe.
+    Po zakończeniu przeciągania zapisuje nową pozycję przez _savePos().
+
+  _savePos(id, el)                                              → Promise<void>
+    Zapisuje bieżącą pozycję ikony (left/top) do wewnętrznej mapy _icons.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INICJALIZACJA (bottom of app.js)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  const view     = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
+  const taskbar  = new TaskbarManager({ taskbarId: 'taskbar' });
+  const desktopIcons = new DesktopIconsManager({ containerId: 'desktopIcons' });
+
+  Pasek zadań jest inicjowany z pozycją 'bottom'.
+
+  Metody DesktopIconsManager są kopiowane (bind) na obiekt `view`, dzięki czemu
+  można wywoływać np. view.addIcon(...), view.removeIcon(...) itp.
+
+  Metody TaskbarManager są kopiowane (bind) na obiekt `view`, dzięki czemu
+  można wywoływać np. view.refresh(...), view.setPosition(...) itp.
+
+  Metody WindowManager, które nie są jeszcze w `view`, pozostają powiązane
+  z instancją WindowManager (view.create, view.close itp.).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PRZYKŁADY UŻYCIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ── Okno z automatycznym rozmiarem (domyślnie) ──────────────────────────────
+
+  view.create({ id: 'win-1', title: 'Notatnik', icon: '📝' });
+
+  ── Okno z podanym rozmiarem ────────────────────────────────────────────────
+
+  // Rozmiar w pikselach:
+  view.create({ id: 'win-2', title: 'Kalkulator', size: { width: 400, height: 300 } });
+
+  // Rozmiar jako ciąg CSS:
+  view.create({ id: 'win-3', title: 'Przeglądarka', size: { width: '80%', height: '70%' } });
+
+  ── Okno bez przycisku zamknięcia ───────────────────────────────────────────
+
+  view.create({ id: 'win-4', title: 'Modal', controls: { close: false } });
+
+  ── Okno tylko z przyciskiem zamknięcia ─────────────────────────────────────
+
+  view.create({ id: 'win-5', title: 'Alert', controls: { minimize: false, maximize: false } });
+
+  ── Okno bez żadnych przycisków ─────────────────────────────────────────────
+
+  view.create({ id: 'win-6', title: 'Splash', controls: { minimize: false, maximize: false, close: false } });
+
+  ── Pasek zadań ─────────────────────────────────────────────────────────────
+
+  // Zmień pozycję:
+  view.setPosition('top');
+
+  // Włącz auto-ukrywanie:
+  view.setAutoHide(true);
+
+  // Ukryj pasek:
+  view.hide();
+
+  // Pokaż pasek:
+  view.show();
+
+  ── Ikony pulpitu ────────────────────────────────────────────────────────────
+
+  view.addIcon({ id: 'di-notes', icon: '📝', label: 'Notatnik',
+      onClick: () => view.restore({ id: 'win-1' }) });
+
+  view.setIconPosition({ id: 'di-notes', position: { x: 100, y: 200 } });
+
+  view.removeIcon({ id: 'di-notes' });
