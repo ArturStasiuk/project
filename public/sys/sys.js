@@ -20,16 +20,10 @@ class SYS {
         
 
         await this.view.refreshStartMenu(await this.con.getMenuStart());
-
-        await this.view.addIcon('di-folder', {
-            icon: '📁', label: 'Moje pliki',
-            menuItems: [
-                { icon: '📄', label: 'Dokument.txt', onClick: () => alert('Otwórz plik') },
-                { icon: '📊', label: 'Arkusz.xlsx', onClick: () => alert('Otwórz arkusz') },
-                'separator',
-                { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Otwórz folder') }
-            ]
-        });
+        const icons = await this.con.getIconsPulpit();
+        console.log('Pulpit:', icons);
+        await this.view.addIcon(icons);
+     
 
 
 

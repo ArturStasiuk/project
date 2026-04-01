@@ -26,7 +26,8 @@ class CONFIG {
     }
 
     async getIconsPulpit() {
-        return[('di-folder', {
+        return [{
+            id: 'di-folder',
             icon: '📁', label: 'Moje pliki',
             menuItems: [
                 { icon: '📄', label: 'Dokument.txt', onClick: () => alert('Otwórz plik') },
@@ -34,10 +35,9 @@ class CONFIG {
                 'separator',
                 { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Otwórz folder') }
             ]
-        })];
+        }];
     }
-
-
+ 
 
 
 
