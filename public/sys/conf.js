@@ -25,6 +25,17 @@ class CONFIG {
         ];
     }
 
+    async getIconsPulpit() {
+        return[('di-folder', {
+            icon: '📁', label: 'Moje pliki',
+            menuItems: [
+                { icon: '📄', label: 'Dokument.txt', onClick: () => alert('Otwórz plik') },
+                { icon: '📊', label: 'Arkusz.xlsx', onClick: () => alert('Otwórz arkusz') },
+                'separator',
+                { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Otwórz folder') }
+            ]
+        })];
+    }
 
 
 

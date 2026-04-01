@@ -1837,18 +1837,35 @@ class DesktopIconsManager {
  *  INICJALIZACJA
  * ════════════════════════════════════════════════════════════ */
 
+const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
 /* ── 1. Taskbar ── */
 const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
 await taskbar.refresh({ showStart: true, items: [] });
 await taskbar.setPosition('bottom'); /* domyślna pozycja */
 
-/* ── 2. WindowManager + pierwsze okno ── */
+const desktopIcons = new DesktopIconsManager({ containerId: 'desktopIcons' });
+
+// Przypisz wszystkie publiczne metody desktopIcons do view
+const desktopProto = DesktopIconsManager.prototype;
+for (const key of Object.getOwnPropertyNames(desktopProto)) {
+    if (key !== 'constructor' && typeof desktopProto[key] === 'function') {
+        view[key] = desktopIcons[key].bind(desktopIcons);
+    }
+}
+for (const key of Object.keys(desktopIcons)) {
+    if (typeof desktopIcons[key] === 'function') {
+        view[key] = desktopIcons[key].bind(desktopIcons);
+    }
+}
 
 
-const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
+
 
 // Przypisz metody taskbara jako własności view
 // Użyj istniejącej instancji taskbar
+// przypisz metody dectopIcons jako własności view
+
+
 view.refreshStartMenu = async (...args) => await taskbar.refreshStartMenu(...args);
 view.addStartMenuItem = async (...args) => await taskbar.addStartMenuItem(...args);
 view.removeStartMenuItem = async (...args) => await taskbar.removeStartMenuItem(...args);
@@ -1864,9 +1881,6 @@ view.show = async (...args) => await taskbar.show(...args);
 export default view;
 
 
-/* ── 3. Desktop icons ── */
-const desktop = new DesktopIconsManager({ containerId: 'desktopIcons' });
-//
 
 
 
