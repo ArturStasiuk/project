@@ -39,7 +39,7 @@ class CONFIG {
     }
     
     async getWinLogin() {
-        return { id: 'win-login', title: 'Logowanie', icon: '🔐', statusText: 'Podaj login i hasło' };
+        return { id: 'win-login', title: 'Logowanie', icon: '🔐', statusText: 'Podaj login i hasło', controls: { minimize: true, maximize: false, close: false }, size: { width: 400, height: 440 } };
     }
     async getContentWinLogin() { 
             return {

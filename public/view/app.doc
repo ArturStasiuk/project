@@ -110,7 +110,7 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
 
   ── TitlebarModule (view.titlebar) ──────────────────────────────────────────
 
-  bindControls({ onMinimize?, onMaximize?, onClose? })          → Promise<void>
+    ({ onMinimize?, onMaximize?, onClose? })          → Promise<void>
     Podpina funkcje zwrotne pod przyciski paska tytułowego.
     Przyciski, które nie istnieją (np. ukryte przez parametr controls), są
     bezpiecznie pomijane.
