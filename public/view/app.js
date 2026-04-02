@@ -503,7 +503,13 @@ class View {
              * @param {{ id, icon?, title, onClick, menuItems? }} cfg
              */
             async addItem({ id, icon, title, onClick, menuItems = [] } = {}) {
-                if (id && bar.querySelector(`[data-tb-id="${id}"]`)) return;
+                if (id) {
+                    const existing = bar.querySelector(`[data-tb-id="${id}"]`);
+                    if (existing) {
+                        existing.replaceWith(_makeItem({ id, icon, title, onClick, menuItems }));
+                        return;
+                    }
+                }
                 bar.appendChild(_makeItem({ id, icon, title, onClick, menuItems }));
             },
 
@@ -554,6 +560,17 @@ class View {
              * @param {{ id?, icon?, label, disabled?, onClick }|'separator'} item
              */
             async addStartMenuItem(item) {
+                if (item !== 'separator' && item.id) {
+                    const existingIdx = _startMenuItems.findIndex(it => it !== 'separator' && it.id === item.id);
+                    if (existingIdx !== -1) {
+                        _startMenuItems[existingIdx] = item;
+                        if (_startMenuEl) {
+                            const existingEl = _startMenuEl.querySelector(`[data-sm-id="${item.id}"]`);
+                            if (existingEl) existingEl.replaceWith(_makeStartMenuItem(item));
+                        }
+                        return;
+                    }
+                }
                 _startMenuItems.push(item);
                 if (_startMenuEl) _startMenuEl.appendChild(_makeStartMenuItem(item));
             },
@@ -818,12 +835,26 @@ class View {
              */
             async addButton({ id, label, onClick, position = 'before-controls' } = {}) {
                 if (!self._windowEl) return;
-                const btn = document.createElement('button');
-                btn.className = 'titlebar-button';
-                btn.title = label;
-                if (id) btn.dataset.tbtnId = id;
-                btn.innerHTML = `<span style="font-size:14px">${label}</span>`;
-                btn.addEventListener('click', e => { e.stopPropagation(); onClick && onClick(e); });
+                const _makeBtn = () => {
+                    const btn = document.createElement('button');
+                    btn.className = 'titlebar-button';
+                    btn.title = label;
+                    if (id) btn.dataset.tbtnId = id;
+                    const span = document.createElement('span');
+                    span.style.fontSize = '14px';
+                    span.textContent = label;
+                    btn.appendChild(span);
+                    btn.addEventListener('click', e => { e.stopPropagation(); onClick && onClick(e); });
+                    return btn;
+                };
+                if (id) {
+                    const existing = self._windowEl.querySelector(`[data-tbtn-id="${id}"]`);
+                    if (existing) {
+                        existing.replaceWith(_makeBtn());
+                        return;
+                    }
+                }
+                const btn = _makeBtn();
 
                 const controls = self._windowEl.querySelector('.titlebar-controls');
                 if (position === 'before-controls') {
@@ -1068,6 +1099,13 @@ class View {
              */
             async addMenu({ label, id, items = [], position = 'last' } = {}) {
                 const mb = _getMenubar(); if (!mb) return;
+                if (id) {
+                    const existing = mb.querySelector(`[data-menu-id="${id}"]`);
+                    if (existing) {
+                        existing.replaceWith(_makeMenu({ label, id, items }));
+                        return;
+                    }
+                }
                 const el = _makeMenu({ label, id, items });
                 const existing = mb.querySelectorAll('.menu-item');
                 if (position === 'first') mb.insertBefore(el, mb.firstChild);
@@ -1094,6 +1132,15 @@ class View {
                 const mb = _getMenubar(); if (!mb) return;
                 const menu = mb.querySelector(`[data-menu-id="${menuId}"] .dropdown-menu`);
                 if (!menu) return;
+                if (item.id) {
+                    const existing = menu.querySelector(`[data-mi-id="${item.id}"]`);
+                    if (existing) {
+                        const tmp = document.createElement('div');
+                        _buildItems([item], tmp);
+                        existing.replaceWith(...tmp.children);
+                        return;
+                    }
+                }
                 const tmp = document.createElement('div');
                 _buildItems([item], tmp);
                 [...tmp.children].forEach(c => menu.appendChild(c));
@@ -1175,6 +1222,16 @@ class View {
 
             async addCard({ id, title = '', text = '' } = {}) {
                 const c = _getContent(); if (!c) return;
+                if (id) {
+                    const existing = c.querySelector(`[data-card-id="${id}"]`);
+                    if (existing) {
+                        const titleEl = existing.querySelector('.card-title');
+                        const textEl  = existing.querySelector('.card-text');
+                        if (titleEl) titleEl.innerHTML = title;
+                        if (textEl)  textEl.innerHTML  = text;
+                        return;
+                    }
+                }
                 c.appendChild(_makeCard({ id, title, text }));
             },
 
@@ -1188,8 +1245,8 @@ class View {
                 const c = _getContent(); if (!c) return;
                 const card = c.querySelector(`[data-card-id="${id}"]`);
                 if (!card) return;
-                if (title !== undefined) card.querySelector('.card-title').textContent = title;
-                if (text  !== undefined) card.querySelector('.card-text').textContent  = text;
+                if (title !== undefined) card.querySelector('.card-title').innerHTML = title;
+                if (text  !== undefined) card.querySelector('.card-text').innerHTML  = text;
             }
         };
     }
@@ -1348,6 +1405,7 @@ class View {
  *      size: 'auto' (domyślnie) lub { width, height } – rozmiar okna w px lub CSS.
  *      controls: { minimize?, maximize?, close? } – widoczność przycisków tytułpasek
  *        (false = ukryty). Maksymalizacja jest zawsze ukryta na małych ekranach.
+ *      Jeśli okno o podanym id już istnieje – aktualizuje tytuł/status i przywraca je.
  *    wm.close({ id })
  *    wm.getView({ id })                              → View | null
  *
@@ -1388,7 +1446,8 @@ class WindowManager {
     }
 
     /**
-     * Tworzy nowe okno; zwraca instancję View lub null jeśli id już zajęte
+     * Tworzy nowe okno lub aktualizuje istniejące (upsert).
+     * Jeśli okno o podanym id już istnieje, aktualizuje tytuł/status i przywraca je.
      * @param {{ id, title?, icon?, statusText?, size?, controls? }} cfg
      * @param {string|{width:number|string, height:number|string}} [cfg.size='auto']
      *   'auto' – rozmiar dobierany automatycznie; lub { width, height } w px / CSS.
@@ -1399,8 +1458,11 @@ class WindowManager {
     async create({ id, title = '', icon = null, statusText = 'Gotowe', size = 'auto', controls = {} } = {}) {
         if (typeof id !== 'string' || !id.trim()) { console.warn('WindowManager: id okna musi być niepustym ciągiem znaków.'); return null; }
         if (this._windows.has(id)) {
-            console.warn(`WindowManager: okno "${id}" już istnieje.`);
-            return null;
+            const v = this._windows.get(id);
+            await v.window.setTitle(title);
+            await v.window.setStatus(statusText);
+            if (await v.isMinimized()) await v.window.restore();
+            return v;
         }
         const v = new View({ taskbarId: this._taskbarId, containerId: this._containerId });
         await v.window.create({ title, icon, statusText, size, controls });
