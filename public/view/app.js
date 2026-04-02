@@ -252,6 +252,37 @@
 
 const MOBILE_BREAKPOINT = 768;  // px – granica małego ekranu
 
+/* ════════════════════════════════════════════════════════════
+ *  Script execution helpers
+ *  Skrypty wstrzyknięte przez innerHTML nie są wykonywane –
+ *  poniższe funkcje wyodrębniają je i uruchamiają dynamicznie,
+ *  a także usuwają powiązane elementy przy zamknięciu/aktualizacji.
+ * ════════════════════════════════════════════════════════════ */
+const _scriptRegistry = new Map(); // Maps HTMLElement (card) to HTMLScriptElement[]
+
+function _execScripts(container) {
+    const scripts = [...container.querySelectorAll('script')];
+    if (!scripts.length) return;
+    const created = [];
+    scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        [...oldScript.attributes].forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.textContent = oldScript.textContent;
+        document.head.appendChild(newScript);
+        created.push(newScript);
+        oldScript.remove();
+    });
+    _scriptRegistry.set(container, (_scriptRegistry.get(container) || []).concat(created));
+}
+
+function _cleanScripts(container) {
+    const scripts = _scriptRegistry.get(container);
+    if (scripts) {
+        scripts.forEach(s => { try { s.remove(); } catch (e) { /* element may already be detached */ } });
+        _scriptRegistry.delete(container);
+    }
+}
+
 class View {
     constructor({ taskbarId, containerId }) {
         this._taskbarEl   = document.getElementById(taskbarId);
@@ -1188,6 +1219,7 @@ class View {
             /** Pełne odświeżenie zawartości */
             async refresh({ header = '', subheader = '', cards = [] } = {}) {
                 const c = _getContent(); if (!c) return;
+                c.querySelectorAll('[data-card-id]').forEach(card => _cleanScripts(card));
                 c.innerHTML = '';
                 if (header) {
                     const h = document.createElement('div');
@@ -1199,7 +1231,11 @@ class View {
                     s.className = 'content-subheader'; s.textContent = subheader;
                     c.appendChild(s);
                 }
-                cards.forEach(card => c.appendChild(_makeCard(card)));
+                cards.forEach(cardCfg => {
+                    const el = _makeCard(cardCfg);
+                    c.appendChild(el);
+                    _execScripts(el);
+                });
             },
 
             async setHeader(text) {
@@ -1225,28 +1261,39 @@ class View {
                 if (id) {
                     const existing = c.querySelector(`[data-card-id="${id}"]`);
                     if (existing) {
+                        _cleanScripts(existing);
                         const titleEl = existing.querySelector('.card-title');
                         const textEl  = existing.querySelector('.card-text');
                         if (titleEl) titleEl.innerHTML = title;
                         if (textEl)  textEl.innerHTML  = text;
+                        _execScripts(existing);
                         return;
                     }
                 }
-                c.appendChild(_makeCard({ id, title, text }));
+                const card = _makeCard({ id, title, text });
+                c.appendChild(card);
+                _execScripts(card);
             },
 
             async removeCard(id) {
                 const c = _getContent(); if (!c) return;
                 const card = c.querySelector(`[data-card-id="${id}"]`);
-                if (card) card.remove();
+                if (card) {
+                    _cleanScripts(card);
+                    card.remove();
+                }
             },
 
             async updateCard(id, { title, text } = {}) {
                 const c = _getContent(); if (!c) return;
                 const card = c.querySelector(`[data-card-id="${id}"]`);
                 if (!card) return;
-                if (title !== undefined) card.querySelector('.card-title').innerHTML = title;
-                if (text  !== undefined) card.querySelector('.card-text').innerHTML  = text;
+                _cleanScripts(card);
+                const titleEl2 = card.querySelector('.card-title');
+                const textEl2  = card.querySelector('.card-text');
+                if (title !== undefined && titleEl2) titleEl2.innerHTML = title;
+                if (text  !== undefined && textEl2)  textEl2.innerHTML  = text;
+                _execScripts(card);
             }
         };
     }
@@ -1369,6 +1416,7 @@ class View {
             }
 
         } else if (action === 'close') {
+            win.querySelectorAll('[data-card-id]').forEach(card => _cleanScripts(card));
             win.classList.add('closing');
             setTimeout(() => { win.style.display = 'none'; }, 300);
             /* usuń z globalnego rejestru */
