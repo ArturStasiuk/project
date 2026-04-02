@@ -44,7 +44,8 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     Zawsze rysuje prawy obszar (przycisk listy okien + zegar).
 
   addItem({ id, icon?, title, onClick, menuItems? })            → Promise<void>
-    Dodaje pojedynczy element do paska. Pomija duplikaty (ten sam id).
+    Dodaje element do paska lub aktualizuje istniejący (upsert).
+    Jeśli element o danym id już istnieje, jest zastępowany nowym.
     menuItems – opcjonalna tablica pozycji menu kontekstowego (prawy klik).
 
   removeItem(id)                                                → Promise<void>
@@ -59,7 +60,8 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     items – tablica [{ id?, icon?, label, disabled?, onClick }|'separator'].
 
   addStartMenuItem(item)                                        → Promise<void>
-    Dołącza jedną pozycję na końcu menu Start.
+    Dołącza pozycję do menu Start lub aktualizuje istniejącą (upsert).
+    Jeśli pozycja o danym id już istnieje, jest zastępowana nową.
     item – obiekt { id?, icon?, label, disabled?, onClick } lub ciąg 'separator'.
 
   removeStartMenuItem(id)                                       → Promise<void>
@@ -116,7 +118,8 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     bezpiecznie pomijane.
 
   addButton({ id?, label, onClick, position? })                 → Promise<void>
-    Dodaje własny przycisk do paska tytułowego.
+    Dodaje własny przycisk do paska tytułowego lub aktualizuje istniejący (upsert).
+    Jeśli przycisk o danym id już istnieje, jest zastępowany nowym.
     id       – opcjonalny identyfikator (data-tbtn-id).
     label    – tekst / emoji przycisku.
     position – 'before-controls' (domyślnie) | 'after-icon':
@@ -134,14 +137,16 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     Automatycznie dodaje przycisk hamburger widoczny tylko na małych ekranach.
 
   addMenu({ label, id, items?, position? })                     → Promise<void>
-    Dodaje nowe menu do paska.
+    Dodaje nowe menu do paska lub aktualizuje istniejące (upsert).
+    Jeśli menu o danym id już istnieje, jest zastępowane nowym.
     position – indeks numeryczny, 'first' lub 'last' (domyślnie).
 
   removeMenu(id)                                                → Promise<void>
     Usuwa menu o podanym data-menu-id.
 
   addMenuItem(menuId, item)                                     → Promise<void>
-    Dołącza pozycję do istniejącego menu (data-menu-id).
+    Dołącza pozycję do istniejącego menu lub aktualizuje istniejącą (upsert).
+    Jeśli pozycja o danym id już istnieje, jest zastępowana nową.
     item – { id?, icon?, label, shortcut?, disabled?, separator?, submenu?,
              onClick }.
 
@@ -161,13 +166,14 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     Ustawia lub tworzy podtytuł sekcji zawartości.
 
   addCard({ id?, title?, text? })                               → Promise<void>
-    Dodaje kartę do zawartości okna.
+    Dodaje kartę do zawartości okna lub aktualizuje istniejącą (upsert).
+    Jeśli karta o danym id już istnieje, jej zawartość jest odświeżana.
 
   removeCard(id)                                                → Promise<void>
     Usuwa kartę o podanym data-card-id.
 
   updateCard(id, { title?, text? })                             → Promise<void>
-    Aktualizuje tytuł lub treść istniejącej karty.
+    Aktualizuje tytuł lub treść (HTML) istniejącej karty.
 
   ── Metody pomocnicze View ───────────────────────────────────────────────────
 
@@ -202,8 +208,9 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
   Tworzenie i zarządzanie oknami
   ──────────────────────────────
   create({ id, title?, icon?, statusText?, size?, controls? })  → Promise<View|null>
-    Tworzy nowe okno i rejestruje je pod podanym id.
-    Zwraca instancję View lub null gdy id jest puste / już zajęte.
+    Tworzy nowe okno lub aktualizuje istniejące (upsert).
+    Jeśli okno o danym id już istnieje – aktualizuje tytuł/status i je przywraca.
+    Zwraca instancję View lub null gdy id jest puste.
     Parametry size i controls – patrz View.window.create() powyżej.
     Automatycznie podpina przyciski min/max/close i rejestruje obsługę
     zdarzenia window.resize dla zmaksymalizowanych okien.
@@ -230,7 +237,8 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     Nadpisuje handlery przycisków min/max/close (np. po własnej logice zamknięcia).
 
   addButton({ id, btnId?, label, onClick, position? })          → Promise<void>
-    Dodaje własny przycisk do paska tytułowego okna id.
+    Dodaje własny przycisk do paska tytułowego okna id lub aktualizuje istniejący (upsert).
+    Jeśli przycisk o danym btnId już istnieje, jest zastępowany nowym.
 
   removeButton({ id, btnId })                                   → Promise<void>
     Usuwa przycisk o btnId z paska tytułowego okna id.
@@ -243,13 +251,16 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
   addCard({ id, cardId?, title?, text? })                       → Promise<void>
   removeCard({ id, cardId })                                    → Promise<void>
   updateCard({ id, cardId, title?, text? })                     → Promise<void>
+    addCard stosuje upsert: jeśli karta o danym cardId już istnieje, aktualizuje jej treść HTML.
 
   Menu górne okna
   ───────────────
   refreshMenubar({ id, menus })                                 → Promise<void>
   addMenu({ id, menuId, label, items?, position? })             → Promise<void>
+    Dodaje menu lub aktualizuje istniejące (upsert) – jeśli menuId już istnieje, zastępuje je.
   removeMenu({ id, menuId })                                    → Promise<void>
   addMenuItem({ id, menuId, item })                             → Promise<void>
+    Dodaje pozycję do menu lub aktualizuje istniejącą (upsert) – jeśli item.id już istnieje, zastępuje ją.
   removeMenuItem({ id, menuId, itemId })                        → Promise<void>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -272,7 +283,8 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     Pełne odświeżenie paska. cfg – patrz View.taskbar.refresh().
 
   addItem({ id, icon?, title, onClick, menuItems? })            → Promise<void>
-    Dodaje element do paska.
+    Dodaje element do paska lub aktualizuje istniejący (upsert).
+    Jeśli element o danym id już istnieje, jest zastępowany nowym.
 
   removeItem({ id })                                            → Promise<void>
     Usuwa element o podanym id.
@@ -285,7 +297,8 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     items – [{ id?, icon?, label, disabled?, onClick }|'separator'].
 
   addStartMenuItem(item)                                        → Promise<void>
-    Dodaje pozycję do menu Start.
+    Dodaje pozycję do menu Start lub aktualizuje istniejącą (upsert).
+    Jeśli pozycja o danym id już istnieje, jest zastępowana nową.
 
   removeStartMenuItem({ id })                                   → Promise<void>
     Usuwa pozycję menu Start o podanym id.
