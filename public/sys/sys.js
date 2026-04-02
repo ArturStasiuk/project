@@ -1,5 +1,6 @@
 import view from '../view/app.js';
 import api from '../../api/api.js';
+//
 import CONFIG from './conf.js';
 import FUN from './func.js';
 class SYS {
@@ -18,11 +19,12 @@ class SYS {
         const info = await this.api.getInfoModules();
         
 
-        await this.view.refreshStartMenu({ items: await this.con.getMenuStart() });
 
-        await this.view.addIcon(await this.con.getIconsPulpit());
-        await this.view.create(await this.con.getWinLogin());
-        await this.view.addCard(await this.con.getContentWinLogin());
+
+        
+        await this.fun.showMenuStart();
+        await this.fun.showWinLogin();
+        await this.fun.showWinLogout();
 
 
 

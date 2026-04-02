@@ -58,6 +58,25 @@ class CONFIG {
             };
     }
 
+    async getWinLogut() {
+        return { id: 'win-logout', title: 'Wylogowywanie', icon: '⏻', statusText: 'Czy na pewno chcesz się wylogować?', controls: { minimize: false, maximize: false, close: true }, size: { width: 400, height: 350 } };
+    }
+    async getContentWinLogout() {
+        return {
+            id: 'win-logout',
+            cardId: 'card-1',
+            title: '⏻ Wylogowywanie',
+            text: `
+                <div style="display: flex; flex-direction: column; gap: 1em; align-items: center;">
+                    <p>Czy na pewno chcesz się wylogować?</p>
+                    <div style="display: flex; gap: 1em;">
+                        <button id="confirm-logout" style="padding: 0.5em; border-radius: 4px; background: #d32f2f; color: #fff; border: none; cursor: pointer;">Tak</button>
+                        <button id="cancel-logout" style="padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Nie</button>
+                    </div>
+                </div>
+            `
+        };
+    }
 
 }
 export default CONFIG;
