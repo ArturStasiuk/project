@@ -48,12 +48,10 @@ class ROUTER {
   }
    
     // Przykładowa funkcja do obsługi klasy 
-     private function execut(){
-       return [
-        'status' => true,
-        'message' => 'Function executed successfully',
-         ];
-     }
+   private function isLoggedIn()
+    {
+        return ['status' => true, 'loggedIn' => $this->session->isLoggedIn()];  
+    }
 
 
 

@@ -1,12 +1,19 @@
 
 <?php
 class SESSION {
+    private $logIn;
+
     public function __construct()
     {
         session_start();
+        $this->logIn = false;
     }
  // Metody do zarządzania sesją
-
+    // sprawdzenie czy użytkownik jest zalogowany
+    public function isLoggedIn()
+     {
+        return $this->logIn;
+    }
 
     // sprawdzenie czy sesja jest aktywna
     public function isActive()
@@ -38,6 +45,7 @@ class SESSION {
     public function destroy()
     {
         session_destroy();
+        $this->logIn = false;
     }
 
 }

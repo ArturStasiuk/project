@@ -1,6 +1,9 @@
 class CONFIG {
     constructor(parent) {
         this.parent = parent;
+        this.api = parent.api;
+        this.fun = parent.fun;
+
         this.init();
     }
     init() {
@@ -8,7 +11,9 @@ class CONFIG {
     }
     
     async getMenuStart() { 
-        return[
+        const isLoggedIn = await this.api.crud({ function: 'isLoggedIn' });
+        console.log('Pobieranie menu startowego, zalogowany:', isLoggedIn);
+        return [
             {
                 id: 'sm-notes', icon: '📝', label: 'Notatnik', onClick: () => { }
             },
@@ -19,9 +24,14 @@ class CONFIG {
             {
                 id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', disabled: true, onClick: () => { }
             },
-            {
-                id: 'sm-off', icon: '⏻', label: 'Wyloguj', disabled: false, onClick: () => { }
-            }
+            isLoggedIn
+                ? {
+                    id: 'sm-login', icon: '🔐', label: 'Zaloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogin(); }
+
+                }
+                : {
+                    id: 'sm-logout', icon: '⏻', label: 'Wyloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogout(); }
+                }
         ];
     }
 
@@ -69,9 +79,9 @@ class CONFIG {
             text: `
                 <div style="display: flex; flex-direction: column; gap: 1em; align-items: center;">
                     <p>Czy na pewno chcesz się wylogować?</p>
-                    <div style="display: flex; gap: 1em;">
-                        <button id="confirm-logout" style="padding: 0.5em; border-radius: 4px; background: #d32f2f; color: #fff; border: none; cursor: pointer;">Tak</button>
-                        <button id="cancel-logout" style="padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Nie</button>
+                    <div style="display: flex; gap: 1em; width: 100%;">
+                        <button id="confirm-logout" style="flex:1; padding: 0.5em; border-radius: 4px; background: #d32f2f; color: #fff; border: none; cursor: pointer;">Tak</button>
+                        <button id="cancel-logout" style="flex:1; padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Nie</button>
                     </div>
                 </div>
             `

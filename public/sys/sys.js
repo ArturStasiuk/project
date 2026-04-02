@@ -23,8 +23,7 @@ class SYS {
 
         
         await this.fun.showMenuStart();
-        await this.fun.showWinLogin();
-        await this.fun.showWinLogout();
+
 
 
 
