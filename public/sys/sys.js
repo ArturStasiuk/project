@@ -16,7 +16,7 @@ class SYS {
     //================================================
     async init() {
         console.log('Inicjalizacja systemu...');
-        const info = await this.api.getInfoModules();
+
         
 
 
@@ -28,7 +28,7 @@ class SYS {
 
 
 
-        console.log(info);
+
     }
 
 

@@ -12,6 +12,7 @@ class SESSION {
     // sprawdzenie czy użytkownik jest zalogowany
     public function isLoggedIn()
      {
+       
         return $this->logIn;
     }
 

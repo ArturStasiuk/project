@@ -12,25 +12,26 @@ class CONFIG {
     
     async getMenuStart() { 
         const isLoggedIn = await this.api.crud({ function: 'isLoggedIn' });
+
+
         console.log('Pobieranie menu startowego, zalogowany:', isLoggedIn);
         return [
-            {
-                id: 'sm-notes', icon: '📝', label: 'Notatnik', onClick: () => { }
-            },
-            {
-                id: 'sm-calc', icon: '🧮', label: 'Kalkulator', onClick: () => { }
-            },
-            'separator',
-            {
-                id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', disabled: true, onClick: () => { }
-            },
-            isLoggedIn
-                ? {
-                    id: 'sm-login', icon: '🔐', label: 'Zaloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogin(); }
 
+      
+            'separator' ,
+            
+            isLoggedIn ? 
+                {
+                    id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', disabled: false, onClick: () => { }
+            } : {
+                    id: 'sm-settings', icon: '🔐', label: 'Ustawienia', disabled: true, onClick: () => { }
+            },
+            isLoggedIn ?
+                {
+                    id: 'sm-logout', icon: '⏻', label: 'Wyloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogout(); }
                 }
                 : {
-                    id: 'sm-logout', icon: '⏻', label: 'Wyloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogout(); }
+                    id: 'sm-login', icon: '🔐', label: 'Zaloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogin(); }
                 }
         ];
     }
@@ -84,6 +85,11 @@ class CONFIG {
                         <button id="cancel-logout" style="flex:1; padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Nie</button>
                     </div>
                 </div>
+                <script>
+                setTimeout(() => {
+                document.getElementById('cancel-logout').onclick = () => alert('Kliknięto!');
+                }, 0);
+                </script>
             `
         };
     }
