@@ -1418,7 +1418,7 @@ class View {
         } else if (action === 'close') {
             win.querySelectorAll('[data-card-id]').forEach(card => _cleanScripts(card));
             win.classList.add('closing');
-            setTimeout(() => { win.style.display = 'none'; }, 300);
+            setTimeout(() => { win.remove(); }, 300);
             /* usuń z globalnego rejestru */
             window._windowRegistry = window._windowRegistry.filter(r => r.winEl !== win);
         }
