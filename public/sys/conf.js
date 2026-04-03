@@ -85,11 +85,6 @@ class CONFIG {
                         <button id="cancel-logout" style="flex:1; padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Nie</button>
                     </div>
                 </div>
-                <script>
-                setTimeout(() => {
-                document.getElementById('cancel-logout').onclick = async () => { await this.sys.fun.closeWinLogout(); };
-                }, 0);
-                </script>
             `
         };
     }

@@ -20,10 +20,15 @@ class FUN {
     async showWinLogout() {
         await this.view.create(await this.con.getWinLogout());
         await this.view.addCard(await this.con.getContentWinLogout());
+        setTimeout(() => {
+            const btn = document.getElementById('cancel-logout');
+            if (btn) {
+                btn.onclick = null;
+                btn.onclick = async () => { await this.view.close({ id: 'win-logout' }); };
+            }
+        }, 10);
     }
-    async closeWinLogout() {
-        await this.view.close({ id: 'win-logout' });
-    }
+
     
 
 }
