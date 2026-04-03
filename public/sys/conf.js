@@ -69,7 +69,7 @@ class CONFIG {
             };
     }
 
-    async getWinLogut() {
+    async getWinLogout() {
         return { id: 'win-logout', title: 'Wylogowywanie', icon: '⏻', statusText: 'Czy na pewno chcesz się wylogować?', controls: { minimize: false, maximize: false, close: true }, size: { width: 400, height: 350 } };
     }
     async getContentWinLogout() {
@@ -87,7 +87,7 @@ class CONFIG {
                 </div>
                 <script>
                 setTimeout(() => {
-                document.getElementById('cancel-logout').onclick = () => alert('Kliknięto!');
+                document.getElementById('cancel-logout').onclick = async () => { await this.sys.fun.closeWinLogout(); };
                 }, 0);
                 </script>
             `

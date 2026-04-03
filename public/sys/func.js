@@ -18,8 +18,11 @@ class FUN {
     }
 
     async showWinLogout() {
-        await this.view.create(await this.con.getWinLogut());
+        await this.view.create(await this.con.getWinLogout());
         await this.view.addCard(await this.con.getContentWinLogout());
+    }
+    async closeWinLogout() {
+        await this.view.close({ id: 'win-logout' });
     }
     
 
