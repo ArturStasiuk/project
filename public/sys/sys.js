@@ -17,15 +17,9 @@ class SYS {
     async init() {
         console.log('Inicjalizacja systemu...');
 
-        
-    
 
-
-        
-       // await this.fun.showMenuStart();
        // await this.fun.showIconsPulpit();
-      // await this.api.crud({ function: 'getUsersInfo' });
-      //  await this.api.crud({ function: 'loginUsers', data: { email: 'you@email.pl', password: 'yourPassword' } });
+
         await this.fun.showMenuStart();
 
 
