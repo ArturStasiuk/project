@@ -10,31 +10,22 @@ class CONFIG {
         console.log('Inicjalizacja konfiguracji...');
     }
     
-    async getMenuStart() { 
+    async getMenuStart() {
         const isLoggedIn = await this.api.crud({ function: 'isLoggedIn' });
-
-
         console.log('Pobieranie menu startowego, zalogowany:', isLoggedIn);
-        return [
-
-      
-            'separator' ,
-            
-            isLoggedIn ? 
-                {
-                    id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', disabled: false, onClick: () => { }
-            } : {
-                    id: 'sm-settings', icon: '🔐', label: 'Ustawienia', disabled: true, onClick: () => { }
-            },
-            isLoggedIn ?
-                {
-                    id: 'sm-logout', icon: '⏻', label: 'Wyloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogout(); }
-                }
-                : {
-                    id: 'sm-login', icon: '🔐', label: 'Zaloguj się', disabled: false, onClick: async () => { await this.parent.fun.showWinLogin(); }
-                }
-        ];
-    }
+        let meniu = {
+            items: [
+                { id: 'sm-notes', icon: '📝', label: 'Notatnik', onClick: () => view.restore({ id: 'win-notes' }) },
+                { id: 'sm-calc', icon: '🧮', label: 'Kalkulator', onClick: () => view.restore({ id: 'win-calc' }) },
+                'separator',
+                { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia') },
+                isLoggedIn ? 
+                    { id: 'sm-off', icon: '⏻', label: 'Wyłącz', disabled: true }
+                    : { id: 'sm-off', icon: '⏻', label: 'Włącz', disabled: false}
+            ]
+        };
+    return meniu;
+}
 
     async getIconsPulpit() {
         return [{

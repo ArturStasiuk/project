@@ -30,13 +30,7 @@ class SYS {
 
 
     }
-    async consola() {
-        console.log('Test konsoli:');
-        console.log('API:', this.api);
-        console.log('View:', this.view);
-        console.log('Config:', this.con);
-        console.log('Fun:', this.fun);
-    }
+
 
 }
 const sys = new SYS();

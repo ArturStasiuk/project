@@ -6,7 +6,7 @@ class SESSION {
     public function __construct()
     {
         session_start();
-        $this->logIn = false;
+        $this->logIn = false; // Ustawienie logowania na true, można to zmienić w zależności od potrzeb
     }
  // Metody do zarządzania sesją
     // sprawdzenie czy użytkownik jest zalogowany

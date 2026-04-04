@@ -1,7 +1,7 @@
 
 class FUN {
     constructor(parent) {
-        this.parent = parent;
+      //  this.parent = parent;
         this.view = parent.view;
         this.con = parent.con;
         this.init();
@@ -10,7 +10,9 @@ class FUN {
         console.log('Inicjalizacja funkcji...');
     }
     async showMenuStart() {
-        await this.view.refreshStartMenu({ items: await this.con.getMenuStart() });
+     
+         await this.view.refreshStartMenu(await this.con.getMenuStart() );
+    
     }
    async showWinLogin() {
        await this.view.create(await this.con.getWinLogin());
