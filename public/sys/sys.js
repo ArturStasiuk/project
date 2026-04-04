@@ -1,12 +1,12 @@
 import view from '../view/app.js';
 import api from '../../api/api.js';
-//
 import CONFIG from './conf.js';
 import FUN from './func.js';
 class SYS {
     constructor() {
         this.api = api;
-        this.view =  view;
+        this.view = view;
+        
         this.con = new CONFIG(this);
         this.fun = new FUN(this);
         this.init();
@@ -18,18 +18,33 @@ class SYS {
         console.log('Inicjalizacja systemu...');
 
         
-
+    
 
 
         
+       // await this.fun.showMenuStart();
+       // await this.fun.showIconsPulpit();
+      // await this.api.crud({ function: 'getUsersInfo' });
+      //  await this.api.crud({ function: 'loginUsers', data: { email: 'you@email.pl', password: 'yourPassword' } });
         await this.fun.showMenuStart();
-        await this.fun.showIconsPulpit();
-        await this.api.crud({ function: 'getUserInfo' });
-
 
 
 
     }
+    
+    // logowanie uzytkownika
+    async logIn(email, password) {
+        await this.fun.closeWinLogin();
+        await this.api.crud({ function: 'loginUsers', data: { email: email, password: password } });
+        await this.init(); // Odświeżenie systemu po zalogowaniu
+    }
+    // wylogowanie użytkownika
+    async logOut() {
+        await this.fun.closeWinLogout();
+        await this.api.crud({ function: 'logoutUsers' });
+        await this.init(); // Odświeżenie systemu po wylogowaniu
+    }
+
 
 
 }

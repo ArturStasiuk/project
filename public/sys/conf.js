@@ -11,8 +11,9 @@ class CONFIG {
    
     // Menu startowe - dynamiczne w zależności od stanu połączenia i logowania
     async getMenuStart() {
+        const conect = await this.parent.api.crud({ function: 'getConectInfo' });
         const isLoggedIn = await this.parent.api.crud({ function: 'isLoggedIn' });
-        const conect = await this.parent.api.crud({ function: 'getInfo' });
+       
 
         if (conect.status === true) {
             return {
@@ -69,11 +70,11 @@ class CONFIG {
                 title: '🔐 Logowanie',
                 text: `
                     <form id="login-form" style="display: flex; flex-direction: column; gap: 1em; min-width: 220px;">
-                        <label for="login-username">Login</label>
-                        <input id="login-username" name="username" type="text" placeholder="Wpisz login" autocomplete="username" required style="padding: 0.5em; border-radius: 4px; border: 1px solid #ccc;">
+                        <label for="login-email">Email</label>
+                        <input id="login-email" name="email" type="email" placeholder="Wpisz email" autocomplete="email" required style="padding: 0.5em; border-radius: 4px; border: 1px solid #ccc;">
                         <label for="login-password">Hasło</label>
                         <input id="login-password" name="password" type="password" placeholder="Wpisz hasło" autocomplete="current-password" required style="padding: 0.5em; border-radius: 4px; border: 1px solid #ccc;">
-                        <button type="submit" style="padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Zaloguj się</button>
+                        <button type="button" id="login-button" style="padding: 0.5em; border-radius: 4px; background: #1976d2; color: #fff; border: none; cursor: pointer;">Zaloguj się</button>
                     </form>
                 `
             };

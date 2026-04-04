@@ -4,24 +4,22 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/conect.php';
-require_once __DIR__ . '/../dataBase/table.php';
-require_once __DIR__ . '/../dataBase/user.php';
+require_once __DIR__ . '/../dataBase/users.php';
 class ROUTER {
     private $session;
     private $inputData=null;
     private $_function = null;
     private $conect;
     private $db;
-    private $user;
-    private $table;
+    private $users;
     private $data;
    public function __construct()
     {
 
      $this->session = new SESSION();
-       $this->table = new TABLE(); 
+
        $this->db = new CONECT();
-       $this->user = new USER();
+       $this->users = new USERS();
         $this->conect = $this->db->connect();
          if (!$this->conect) {
             echo json_encode(['status' => false, 'error' => 'Nie nawiązano połączenia z bazą danych']);
@@ -50,20 +48,53 @@ class ROUTER {
        exit;
   }
    
-    // Przykładowa funkcja do obsługi klasy 
+    // sprawdzenie czy użytkownik jest zalogowany
    private function isLoggedIn()
     {
-        return ['status' => true, 'loggedIn' => $this->session->isLoggedIn()];  
+        return ['status' => true, 'loggedIn' => $this->session->getKey('logIn')];  
     }
-   private function getInfo(){
+   // sprawdzenie połączenia z bazą danych
+   private function getConectInfo(){
         return ['status' => true, 'info' => $this->db->getConectInfo($this->conect)];
    }
 
-   private function getUserInfo(){
-        return $this->user->getUserInfo($this->conect);
-   }
+    // logowanie użytkownika
+    private function loginUsers(){
+          $email = $this->data['email'] ?? null;
+          $password = $this->data['password'] ?? null;
+           $this->session->setKey('logIn', false);
+          $odp =$this->users->loginUsers($this->conect, $email, $password);
+          if($odp['status']!== true){
+              $this->session->destroy();
+              return [
+                  'status' => false,
+                  'message' => 'Login failed: '
+              ];
+          }
+           else {
+            $this->session->setKey('logIn', true);
+            $this->session->setKey('id', $odp['data']['id']);
+            $this->session->setKey('email', $odp['data']['email']);
+            $this->session->setKey('name', $odp['data']['name']);
+            $this->session->setKey('last_name', $odp['data']['last_name']);
+
+              return [
+                  'status' => true,
+                  'message' => 'Login successful'
+              ];
+           }
+         
 
 
+    }
+    // wylogowanie użytkownika
+    private function logoutUsers(){
+        $this->session->destroy();
+        return [
+            'status' => true,
+            'message' => 'Logout successful'
+        ];
+    }
 
 
 

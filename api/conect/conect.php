@@ -36,18 +36,7 @@ class CONECT {
  {
     if ($conn) {
         return [
-    'host_info' => $conn->host_info,
-    'server_info' => $conn->server_info,
-    'protocol_version' => $conn->protocol_version,
-    'client_info' => $conn->client_info,
-    'client_version' => $conn->client_version,
-    'server_version' => $conn->server_version,
-    'thread_id' => $conn->thread_id,
-    'stat' => $conn->stat(),
-    'sqlstate' => $conn->sqlstate,
-    'info' => $conn->info,
-    'errno' => $conn->errno,
-    'error' => $conn->error
+            'status' => true,
         ];
     }
     return null;
