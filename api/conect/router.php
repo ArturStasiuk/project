@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/conect.php';
 require_once __DIR__ . '/../dataBase/users.php';
+require_once __DIR__ . '/../sys/system.php';
 class ROUTER {
     private $session;
     private $inputData=null;
@@ -12,9 +13,11 @@ class ROUTER {
     private $conect;
     private $db;
     private $users;
+    private $system;
     private $data;
    public function __construct()
     {
+        $this->system = new SYSTEM();
 
      $this->session = new SESSION();
 
@@ -95,7 +98,10 @@ class ROUTER {
             'message' => 'Logout successful'
         ];
     }
-
+    // pobranie informacji o dostępnych modułach
+    private function getInfoModules(){
+        return $this->system->getInfoModules();
+    }
 
 
 }

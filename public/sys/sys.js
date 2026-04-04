@@ -18,10 +18,17 @@ class SYS {
         console.log('Inicjalizacja systemu...');
 
 
-       // await this.fun.showIconsPulpit();
+       
 
         await this.fun.showMenuStart();
-
+        await this.api.crud({ function: 'getInfoModules' }).then(info => {
+            if (info) {
+                console.log('Dostępne moduły:', info);
+            } else {
+                console.warn('Nie można pobrać informacji o modułach.');
+            }
+        }
+        );
 
 
     }
