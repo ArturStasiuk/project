@@ -9,10 +9,6 @@ class API {
         
 
     }
-   // informacja o module 
-   async getInfoModules() {
-       return this.infoModules;
-    }
     // uniwersalna funkcja POST do wysyłania danych do dowolnego endpointa w katalogu data
     async crud( data) {
       
