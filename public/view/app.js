@@ -2224,9 +2224,9 @@ class ContextMenuManager {
         this._bindings   = new Map();   /* element → { handler, touchStart, touchMove, touchEnd } */
 
         /* globalny klik i prawy-klik poza menu zamyka je */
-        document.addEventListener('click', async () => await this.close());
-        document.addEventListener('contextmenu', async e => {
-            if (!e.target.closest('.context-menu')) await this.close();
+        document.addEventListener('click', () => this.close());
+        document.addEventListener('contextmenu', e => {
+            if (!e.target.closest('.context-menu')) this.close();
         });
     }
 
