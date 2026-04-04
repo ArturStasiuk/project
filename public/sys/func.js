@@ -2,8 +2,7 @@
 class FUN {
     constructor(parent) {
         this.parent = parent;
-      // this.view = parent.view;
-      //  this.con = parent.con;
+
         this.init();
     }
     init() {
