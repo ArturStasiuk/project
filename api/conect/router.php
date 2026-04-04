@@ -5,12 +5,14 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/conect.php';
 require_once __DIR__ . '/../dataBase/table.php';
+require_once __DIR__ . '/../dataBase/user.php';
 class ROUTER {
     private $session;
     private $inputData=null;
     private $_function = null;
     private $conect;
     private $db;
+    private $user;
     private $table;
     private $data;
    public function __construct()
@@ -19,6 +21,7 @@ class ROUTER {
      $this->session = new SESSION();
        $this->table = new TABLE(); 
        $this->db = new CONECT();
+       $this->user = new USER();
         $this->conect = $this->db->connect();
          if (!$this->conect) {
             echo json_encode(['status' => false, 'error' => 'Nie nawiązano połączenia z bazą danych']);
@@ -52,6 +55,15 @@ class ROUTER {
     {
         return ['status' => true, 'loggedIn' => $this->session->isLoggedIn()];  
     }
+   private function getInfo(){
+        return ['status' => true, 'info' => $this->db->getConectInfo($this->conect)];
+   }
+
+   private function getUserInfo(){
+        return $this->user->getUserInfo($this->conect);
+   }
+
+
 
 
 

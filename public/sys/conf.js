@@ -8,26 +8,42 @@ class CONFIG {
     init() {
         console.log('Inicjalizacja konfiguracji...');
     }
-    
+   
+    // Menu startowe - dynamiczne w zależności od stanu połączenia i logowania
     async getMenuStart() {
         const isLoggedIn = await this.parent.api.crud({ function: 'isLoggedIn' });
+        const conect = await this.parent.api.crud({ function: 'getInfo' });
 
-        return {
-            items: [
-
-                isLoggedIn.loggedIn ?
+        if (conect.status === true) {
+            return {
+                items: [
+                    isLoggedIn.loggedIn ?
+                        {
+                            id: 'sm-logout', icon: '🔓', label: 'Wyloguj', onClick: async () => await this.parent.fun.showWinLogout()
+                        }
+                        :
+                        {
+                            id: 'sm-login', icon: '🔐', label: 'Zaloguj', onClick: async () => await this.parent.fun.showWinLogin()
+                        }
+                ]
+            };
+        } else {
+            return {
+                items: [
                     {
-                        id: 'sm-logout', icon: '🔓', label: 'Wyloguj', onClick: async () => await this.parent.fun.showWinLogout()
+                        id: 'sm-nodb',
+                        icon: '❌',
+                        label: 'Brak połączenia z serwerem/bazą danych',
+                        onClick: () => alert('Brak połączenia z serwerem lub bazą danych!')
                     }
-                    :
-                    { id: 'sm-login', icon: '🔐', label: 'Zaloguj', onClick: async () => await this.parent.fun.showWinLogin() }
-            ]
-        };
+                ]
+            };
+        }
 
  
     }
 
-
+    // Ikony na pulpicie - dynamiczne w zależności od stanu połączenia i logowania
     async getIconsPulpit() {
         return [{
             id: 'di-folder',
@@ -41,9 +57,11 @@ class CONFIG {
         }];
     }
     
+    // Okno logowania - dynamiczne w zależności od stanu połączenia i logowania
     async getWinLogin() {
         return { id: 'win-login', title: 'Logowanie', icon: '🔐', statusText: 'Podaj login i hasło', controls: { minimize: true, maximize: false, close: true }, size: { width: 400, height: 440 } };
     }
+    // Zawartość okna logowania - dynamiczna w zależności od stanu połączenia i logowania
     async getContentWinLogin() { 
             return {
                 id: 'win-login',
@@ -60,10 +78,12 @@ class CONFIG {
                 `
             };
     }
-
+    
+    // Okno wylogowywania - dynamiczne w zależności od stanu połączenia i logowania
     async getWinLogout() {
         return { id: 'win-logout', title: 'Wylogowywanie', icon: '⏻', statusText: 'Czy na pewno chcesz się wylogować?', controls: { minimize: false, maximize: false, close: true }, size: { width: 400, height: 350 } };
     }
+    // Zawartość okna wylogowywania - dynamiczna w zależności od stanu połączenia i logowania
     async getContentWinLogout() {
         return {
             id: 'win-logout',

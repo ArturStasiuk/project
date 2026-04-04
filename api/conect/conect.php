@@ -3,7 +3,7 @@ class CONECT {
 	private $host = 'localhost';
 	private $user = 'root';
 	private $password = 'azv470047azv';
-	private $database = 'dbd_basa_date_app';
+	private $database = 'project';
 
  public function __construct()
      {

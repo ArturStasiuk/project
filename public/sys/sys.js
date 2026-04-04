@@ -24,7 +24,7 @@ class SYS {
         
         await this.fun.showMenuStart();
         await this.fun.showIconsPulpit();
-
+        await this.api.crud({ function: 'getUserInfo' });
 
 
 
