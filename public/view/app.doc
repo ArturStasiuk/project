@@ -6,9 +6,10 @@
 
 Eksport domyślny: obiekt `view` (instancja WindowManager wzbogacona metodami
 TaskbarManager i DesktopIconsManager). Po załadowaniu modułu dostępne są też:
-  • view     – WindowManager + metody TaskbarManager + metody DesktopIconsManager
-  • taskbar  – TaskbarManager (niezależna instancja, ta sama co użyta przez view)
+  • view        – WindowManager + metody TaskbarManager + metody DesktopIconsManager
+  • taskbar     – TaskbarManager (niezależna instancja, ta sama co użyta przez view)
   • desktopIcons – DesktopIconsManager (niezależna instancja)
+  • contextMenu  – ContextMenuManager (niezależna instancja, eksport nazwany)
 
 Stała MOBILE_BREAKPOINT = 768 px. Okna o szerokości ekranu ≤ 768 px są
 automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
@@ -483,3 +484,135 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
   view.setIconPosition({ id: 'di-notes', position: { x: 100, y: 200 } });
 
   view.removeIcon({ id: 'di-notes' });
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  class ContextMenuManager
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Globalny menedżer menu kontekstowych. Pozwala dołączyć menu kontekstowe
+  (prawy klik na desktop / długie naciśnięcie na urządzeniach dotykowych)
+  do dowolnego elementu DOM lub do grupy elementów pasujących do selektora CSS.
+  Menu automatycznie koryguje swoją pozycję, aby nie wychodziło poza ekran
+  – działa zarówno na dużych, jak i małych ekranach.
+
+  Eksportowana instancja: `contextMenu`
+  Import: import view, { contextMenu } from './app.js';
+
+  Konstruktor
+  ───────────
+  new ContextMenuManager()
+    Tworzy menedżer. Automatycznie rejestruje globalny listener zamykający
+    aktywne menu po kliknięciu poza nim.
+
+  ── Publiczne metody ────────────────────────────────────────────────────────
+
+  attachTo({ element, items })                              → Promise<this>
+    Dołącza menu kontekstowe do konkretnego elementu DOM.
+    element – referencja do HTMLElement.
+    items   – tablica pozycji menu (patrz: format item poniżej).
+    Na urządzeniach dotykowych menu otwiera się po długim naciśnięciu (600 ms).
+    Jeśli element miał już przypisane menu, zostaje ono najpierw odłączone.
+
+  attachToSelector({ selector, items, container? })         → Promise<this>
+    Dołącza menu kontekstowe do wszystkich elementów pasujących do selektora CSS.
+    selector  – ciąg selektora CSS (np. '.lista-item', '#moj-id button').
+    items     – tablica pozycji menu.
+    container – opcjonalny HTMLElement ograniczający zakres querySelectorAll
+                (domyślnie: document).
+
+  detachFrom({ element })                                   → Promise<this>
+    Odłącza menu kontekstowe od elementu (usuwa listenery contextmenu i touch).
+
+  open({ x, y, items })                                     → Promise<this>
+    Otwiera menu programowo w podanej pozycji ekranowej (x, y w pikselach).
+    Przydatne do otwierania menu w reakcji na własny event (np. klik przycisku).
+
+  close()                                                   → Promise<this>
+    Zamyka aktywne menu kontekstowe.
+
+  ── Format pozycji menu (item) ──────────────────────────────────────────────
+
+  Każda pozycja tablicy items to obiekt lub ciąg 'separator':
+
+    { icon?, label, disabled?, onClick? }
+      icon     – emoji lub tekst (opcjonalnie, wyświetlane przed etykietą).
+      label    – wyświetlana etykieta pozycji.
+      disabled – jeśli true, pozycja jest wyszarzona i niepodpinalna.
+      onClick  – async function(event) wywoływana po kliknięciu pozycji.
+
+    'separator'
+      Wstawia poziomą linię rozdzielającą.
+
+  ── Przykłady użycia ────────────────────────────────────────────────────────
+
+  // Import contextMenu obok view:
+  import view, { contextMenu } from './app.js';
+
+  // 1. Menu kontekstowe na konkretnym elemencie:
+  const el = document.getElementById('moj-element');
+  contextMenu.attachTo({
+      element: el,
+      items: [
+          { icon: '✏️', label: 'Edytuj',  onClick: async () => { /* edytuj */ } },
+          { icon: '📋', label: 'Kopiuj',  onClick: async () => { /* kopiuj */ } },
+          'separator',
+          { icon: '🗑️', label: 'Usuń',    onClick: async () => { /* usuń */   } },
+          { label: 'Wyłączona opcja', disabled: true }
+      ]
+  });
+
+  // 2. Menu kontekstowe na wszystkich elementach listy:
+  contextMenu.attachToSelector({
+      selector: '.lista-item',
+      items: [
+          { icon: '🔍', label: 'Szczegóły', onClick: async ev => console.log('Szczegóły', ev) },
+          { icon: '⭐', label: 'Ulubione',  onClick: async ev => console.log('Ulubione',  ev) }
+      ]
+  });
+
+  // 3. Ograniczenie selektora do kontenera:
+  const container = document.getElementById('moj-kontener');
+  contextMenu.attachToSelector({
+      selector: 'button.akcja',
+      items: [ { label: 'Akcja', onClick: async () => alert('OK') } ],
+      container
+  });
+
+  // 4. Otwieranie menu ręcznie (np. z własnego przycisku):
+  document.getElementById('btn-menu').addEventListener('click', async e => {
+      const r = e.target.getBoundingClientRect();
+      await contextMenu.open({
+          x: r.left, y: r.bottom + 4,
+          items: [
+              { label: 'Opcja A', onClick: async () => {} },
+              'separator',
+              { label: 'Opcja B', onClick: async () => {} }
+          ]
+      });
+  });
+
+  // 5. Odłączenie menu od elementu:
+  await contextMenu.detachFrom({ element: el });
+
+  // 6. Zamknięcie aktywnego menu programowo:
+  await contextMenu.close();
+
+  // 7. Menu kontekstowe na ikonie pulpitu (prawy klik / długie naciśnięcie):
+  //    Używaj pola menuItems w addIcon zamiast attachTo – jest to wbudowana obsługa.
+  desktop.addIcon({
+      id: 'di-folder', icon: '📁', label: 'Moje pliki',
+      menuItems: [
+          { icon: '📄', label: 'Dokument.txt',  onClick: async () => alert('Plik') },
+          { icon: '📂', label: 'Otwórz folder', onClick: async () => alert('Folder') }
+      ]
+  });
+
+  // 8. Integracja z dynamicznie tworzonymi elementami:
+  //    Po wstawieniu nowych węzłów DOM dołącz menu do nich osobno.
+  const newRow = document.createElement('div');
+  newRow.className = 'lista-item';
+  document.getElementById('lista').appendChild(newRow);
+  await contextMenu.attachTo({
+      element: newRow,
+      items: [ { label: 'Usuń wiersz', onClick: async () => newRow.remove() } ]
+  });

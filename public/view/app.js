@@ -203,10 +203,10 @@
 
   ── DesktopIconsManager ────────────────────────────────────
 
-  // Dodaj ikonę aplikacji (klik otwiera okno):
+  // Dodaj ikonę aplikacji (klik lewym otwiera okno):
   desktop.addIcon({ id: 'di-notes', icon: '📝', label: 'Notatnik', onClick: () => view.restore({ id: 'win-notes' }) });
 
-  // Dodaj ikonę-folder (klik lewym = rozwinięcie menu):
+  // Dodaj ikonę z menu kontekstowym (prawy klik / długie naciśnięcie na dotyk):
   desktop.addIcon({
       id: 'di-folder', icon: '📁', label: 'Moje pliki',
       menuItems: [
@@ -237,6 +237,50 @@
   // Pobierz listę wszystkich ikon z ich bieżącymi pozycjami:
   const icons = desktop.getIcons();
   // [ { id: 'di-notes', icon: '📝', label: 'Notatnik', position: { x: 20, y: 20 } }, … ]
+
+  ── ContextMenuManager ────────────────────────────────────
+
+  // Dołącz menu kontekstowe do konkretnego elementu DOM:
+  const el = document.getElementById('moj-element');
+  contextMenu.attachTo({
+      element: el,
+      items: [
+          { icon: '✏️', label: 'Edytuj',  onClick: async () => { alert('Edytuj') } },
+          { icon: '📋', label: 'Kopiuj',  onClick: async () => { alert('Kopiuj') } },
+          'separator',
+          { icon: '🗑️', label: 'Usuń',    onClick: async () => { alert('Usuń') } },
+          { label: 'Wyłączona opcja', disabled: true }
+      ]
+  });
+
+  // Dołącz menu kontekstowe do wszystkich elementów pasujących do selektora:
+  contextMenu.attachToSelector({
+      selector: '.lista-item',
+      items: [
+          { icon: '🔍', label: 'Szczegóły', onClick: async ev => console.log('Szczegóły', ev) },
+          { icon: '⭐', label: 'Ulubione',  onClick: async ev => console.log('Ulubione',  ev) }
+      ]
+  });
+
+  // Ogranicz wyszukiwanie selektora do kontenera (opcjonalne):
+  const container = document.getElementById('moj-kontener');
+  contextMenu.attachToSelector({
+      selector: 'button.akcja',
+      items: [ { label: 'Akcja', onClick: async () => alert('OK') } ],
+      container
+  });
+
+  // Odłącz menu kontekstowe od elementu:
+  contextMenu.detachFrom({ element: el });
+
+  // Otwórz menu ręcznie w dowolnym miejscu ekranu (np. w reakcji na inny event):
+  contextMenu.open({
+      x: 300, y: 200,
+      items: [ { label: 'Opcja A', onClick: async () => {} }, 'separator', { label: 'Opcja B', onClick: async () => {} } ]
+  });
+
+  // Zamknij aktywne menu programowo:
+  contextMenu.close();
 
  * ════════════════════════════════════════════════════════════ */
 
@@ -1980,16 +2024,12 @@ class DesktopIconsManager {
 
         const menuItems = cfg.menuItems || [];
 
-        /* klik lewym: onClick LUB (jeśli brak onClick i są menuItems) rozwiń menu */
+        /* klik lewym: tylko onClick (jeśli zdefiniowany) */
         el.addEventListener('click', async e => {
             e.stopPropagation();
             if (el._wasDragged) { el._wasDragged = false; return; }
             await this._selectIcon(id);
-            if (typeof cfg.onClick === 'function') {
-                cfg.onClick(e);
-            } else if (menuItems.length) {
-                await this._openMenu(e, id, cfg, menuItems);
-            }
+            if (typeof cfg.onClick === 'function') cfg.onClick(e);
         });
 
         /* prawy klik – zawsze menu kontekstowe */
@@ -2162,6 +2202,176 @@ class DesktopIconsManager {
 }
 
 /* ════════════════════════════════════════════════════════════
+ *  class ContextMenuManager
+ *  Globalny menedżer menu kontekstowych.
+ *  Pozwala dołączyć menu kontekstowe (prawy klik / długie naciśnięcie)
+ *  do dowolnego elementu DOM lub do elementów pasujących do selektora CSS.
+ *
+ *  Publiczne API:
+ *    cm.attachTo({ element, items })              – dołącz do elementu
+ *    cm.attachToSelector({ selector, items,       – dołącz do selektora
+ *                          container? })
+ *    cm.detachFrom({ element })                   – odłącz od elementu
+ *    cm.open({ x, y, items })                     – otwórz ręcznie w pozycji x,y
+ *    cm.close()                                   – zamknij aktywne menu
+ *
+ *  item = { icon?, label, disabled?, onClick? } | 'separator'
+ *  onClick może być funkcją async.
+ * ════════════════════════════════════════════════════════════ */
+class ContextMenuManager {
+    constructor() {
+        this._activeMenu = null;
+        this._bindings   = new Map();   /* element → { handler, touchStart, touchMove, touchEnd } */
+
+        /* globalny klik i prawy-klik poza menu zamyka je */
+        document.addEventListener('click', async () => await this.close());
+        document.addEventListener('contextmenu', async e => {
+            if (!e.target.closest('.context-menu')) await this.close();
+        });
+    }
+
+    /* ── Publiczne API ── */
+
+    /**
+     * Dołącza menu kontekstowe do konkretnego elementu DOM.
+     * @param {{ element: HTMLElement, items: Array }} cfg
+     */
+    async attachTo({ element, items = [] } = {}) {
+        if (!element) return this;
+        await this._detachFrom(element);
+
+        const handler = async e => {
+            e.preventDefault(); e.stopPropagation();
+            await this._openAt(e.clientX, e.clientY, items);
+        };
+        element.addEventListener('contextmenu', handler);
+
+        /* dotyk: długie naciśnięcie (600 ms) = menu kontekstowe */
+        const LONG_PRESS = 600;
+        let lpTimer  = null;
+        let lpMoved  = false;
+
+        const touchStart = e => {
+            if (e.touches.length !== 1) return;
+            const t = e.touches[0];
+            lpMoved = false;
+            lpTimer = setTimeout(async () => {
+                if (!lpMoved) await this._openAt(t.clientX, t.clientY, items);
+            }, LONG_PRESS);
+        };
+        const touchMove = () => { lpMoved = true; clearTimeout(lpTimer); };
+        const touchEnd  = () => clearTimeout(lpTimer);
+
+        element.addEventListener('touchstart', touchStart, { passive: true });
+        element.addEventListener('touchmove',  touchMove,  { passive: true });
+        element.addEventListener('touchend',   touchEnd,   { passive: true });
+
+        this._bindings.set(element, { handler, touchStart, touchMove, touchEnd });
+        return this;
+    }
+
+    /**
+     * Dołącza menu kontekstowe do wszystkich elementów pasujących do selektora.
+     * @param {{ selector: string, items: Array, container?: HTMLElement }} cfg
+     */
+    async attachToSelector({ selector, items = [], container = document } = {}) {
+        const els = container.querySelectorAll(selector);
+        for (const el of els) await this.attachTo({ element: el, items });
+        return this;
+    }
+
+    /**
+     * Odłącza menu kontekstowe od elementu.
+     * @param {{ element: HTMLElement }} cfg
+     */
+    async detachFrom({ element } = {}) {
+        await this._detachFrom(element);
+        return this;
+    }
+
+    /**
+     * Otwiera menu w podanej pozycji ekranowej (x, y).
+     * @param {{ x: number, y: number, items: Array }} cfg
+     */
+    async open({ x, y, items = [] } = {}) {
+        await this._openAt(x, y, items);
+        return this;
+    }
+
+    /** Zamyka aktywne menu. */
+    async close() {
+        if (this._activeMenu) { this._activeMenu.remove(); this._activeMenu = null; }
+        return this;
+    }
+
+    /* ── Wewnętrzne ── */
+
+    async _detachFrom(element) {
+        if (!element) return;
+        const b = this._bindings.get(element);
+        if (!b) return;
+        element.removeEventListener('contextmenu', b.handler);
+        element.removeEventListener('touchstart',  b.touchStart);
+        element.removeEventListener('touchmove',   b.touchMove);
+        element.removeEventListener('touchend',    b.touchEnd);
+        this._bindings.delete(element);
+    }
+
+    async _openAt(x, y, items) {
+        await this.close();
+
+        const menu = document.createElement('div');
+        menu.className = 'context-menu';
+
+        items.forEach(item => {
+            if (item === 'separator') {
+                const sep = document.createElement('div');
+                sep.className = 'context-menu-sep';
+                menu.appendChild(sep);
+                return;
+            }
+            const mi = document.createElement('div');
+            mi.className = 'context-menu-item' + (item.disabled ? ' disabled' : '');
+            if (item.icon) {
+                const ic = document.createElement('span');
+                ic.className   = 'context-menu-item-icon';
+                ic.textContent = item.icon;
+                mi.appendChild(ic);
+            }
+            const lb = document.createElement('span');
+            lb.className   = 'context-menu-item-label';
+            lb.textContent = item.label || '';
+            mi.appendChild(lb);
+
+            if (!item.disabled && typeof item.onClick === 'function') {
+                mi.addEventListener('click', async ev => {
+                    ev.stopPropagation();
+                    await this.close();
+                    await item.onClick(ev);
+                });
+            }
+            menu.appendChild(mi);
+        });
+
+        /* klik na tle menu nie zamyka go (zatrzymaj propagację) */
+        menu.addEventListener('click', e => e.stopPropagation());
+
+        document.body.appendChild(menu);
+        this._activeMenu = menu;
+
+        /* korekta pozycji – menu nie może wyjść poza ekran */
+        menu.style.left = x + 'px';
+        menu.style.top  = y + 'px';
+        requestAnimationFrame(() => {
+            const r  = menu.getBoundingClientRect();
+            const vw = window.innerWidth, vh = window.innerHeight;
+            if (r.right  > vw) menu.style.left = Math.max(0, x - r.width)  + 'px';
+            if (r.bottom > vh) menu.style.top  = Math.max(0, y - r.height) + 'px';
+        });
+    }
+}
+
+/* ════════════════════════════════════════════════════════════
  *  INICJALIZACJA
  * ════════════════════════════════════════════════════════════ */
 
@@ -2171,6 +2381,7 @@ const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
 await taskbar.refresh({ showStart: true, items: [] });
 await taskbar.setPosition('bottom'); /* domyślna pozycja */
 const desktopIcons = new DesktopIconsManager({ containerId: 'desktopIcons' });
+const contextMenu  = new ContextMenuManager();
 
 // Przypisz wszystkie publiczne metody DesktopIconsManager do view
 const desktopProto = DesktopIconsManager.prototype;
@@ -2206,6 +2417,7 @@ for (const key of Object.getOwnPropertyNames(wmProto)) {
     }
 }
 
+export { contextMenu };
 export default view;
 
 

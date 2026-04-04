@@ -690,3 +690,33 @@
         .desktop-icon-img { width: 40px; height: 40px; font-size: 30px; }
         .desktop-icon-label { font-size: 11px; max-width: 64px; }
     }
+
+    /* ContextMenuManager – globalne menu kontekstowe */
+    .context-menu {
+        position: fixed;
+        background: rgba(30,30,30,0.97); backdrop-filter: blur(40px);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 8px; padding: 4px;
+        min-width: 170px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+        z-index: 40000;
+        animation: menuFadeIn 0.1s ease;
+        user-select: none;
+    }
+    .context-menu-item {
+        display: flex; align-items: center; gap: 8px;
+        padding: 7px 12px; font-size: 13px;
+        color: rgba(255,255,255,0.92);
+        cursor: pointer; border-radius: 5px;
+        transition: background 0.08s ease; white-space: nowrap;
+    }
+    .context-menu-item:hover { background: rgba(255,255,255,0.1); }
+    .context-menu-item.disabled { color: rgba(255,255,255,0.4); cursor: default; }
+    .context-menu-item.disabled:hover { background: transparent; }
+    .context-menu-item-icon {
+        width: 18px; text-align: center; flex-shrink: 0; font-size: 14px;
+    }
+    .context-menu-item-label { flex: 1; }
+    .context-menu-sep {
+        height: 1px; background: rgba(255,255,255,0.1); margin: 3px 8px;
+    }
