@@ -9,11 +9,12 @@ class FUN {
     init() {
         console.log('Inicjalizacja funkcji...');
     }
+
     async showMenuStart() {
-     
-         await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart() );
+        await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart() );
     
     }
+
    async showWinLogin() {
        await this.parent.view.create(await this.parent.con.getWinLogin());
        await this.parent.view.addCard(await this.parent.con.getContentWinLogin());
@@ -31,7 +32,9 @@ class FUN {
         }, 10);
     }
 
-    
+    async showIconsPulpit() {
+        await this.parent.view.addIcon(await this.parent.con.getIconsPulpit());
+    }
 
 }
 export default FUN;
