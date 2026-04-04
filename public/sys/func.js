@@ -53,7 +53,7 @@ class FUN {
     }
     
     // pobranie nazw modulow i dodanie do skryptu 
-    async showModules() {
+    async addModules() {
         const modules = await this.parent.api.crud({ function: 'getInfoModules' });
         if (modules && modules.status && Array.isArray(modules.jsFiles)) {
             modules.jsFiles.forEach(jsFile => {

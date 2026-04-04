@@ -21,7 +21,7 @@ class SYS {
        
 
         await this.fun.showMenuStart();
-        await this.fun.showModules();
+        await this.fun.addModules();
 
 
     }
