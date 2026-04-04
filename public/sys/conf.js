@@ -15,9 +15,7 @@ class CONFIG {
         console.log('Pobieranie menu startowego, zalogowany:', isLoggedIn);
         let meniu = {
             items: [
-                { id: 'sm-notes', icon: '📝', label: 'Notatnik', onClick: () => view.restore({ id: 'win-notes' }) },
-                { id: 'sm-calc', icon: '🧮', label: 'Kalkulator', onClick: () => view.restore({ id: 'win-calc' }) },
-                'separator',
+ 
                 { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia') },
                 isLoggedIn ? 
                     { id: 'sm-off', icon: '⏻', label: 'Wyłącz', disabled: true }
