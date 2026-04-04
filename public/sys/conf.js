@@ -1,8 +1,7 @@
 class CONFIG {
     constructor(parent) {
-        this.parent = parent;
-        this.api = parent.api;
-        this.fun = parent.fun;
+          this.parent = parent;
+
 
         this.init();
     }
@@ -11,19 +10,23 @@ class CONFIG {
     }
     
     async getMenuStart() {
-        const isLoggedIn = await this.api.crud({ function: 'isLoggedIn' });
-        console.log('Pobieranie menu startowego, zalogowany:', isLoggedIn);
-        let meniu = {
+        const isLoggedIn = await this.parent.api.crud({ function: 'isLoggedIn' });
+
+        return {
             items: [
- 
-                { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia') },
-                isLoggedIn ? 
-                    { id: 'sm-off', icon: '⏻', label: 'Wyłącz', disabled: true }
-                    : { id: 'sm-off', icon: '⏻', label: 'Włącz', disabled: false}
+
+                isLoggedIn.loggedIn ?
+                    {
+                        id: 'sm-logout', icon: '🔓', label: 'Wyloguj', onClick: async () => await this.parent.fun.showWinLogout()
+                    }
+                    :
+                    { id: 'sm-login', icon: '🔐', label: 'Zaloguj', onClick: async () => await this.parent.fun.showWinLogin() }
             ]
         };
-    return meniu;
-}
+
+ 
+    }
+
 
     async getIconsPulpit() {
         return [{

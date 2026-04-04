@@ -1,9 +1,9 @@
 
 class FUN {
     constructor(parent) {
-      //  this.parent = parent;
-        this.view = parent.view;
-        this.con = parent.con;
+        this.parent = parent;
+      // this.view = parent.view;
+      //  this.con = parent.con;
         this.init();
     }
     init() {
@@ -11,22 +11,22 @@ class FUN {
     }
     async showMenuStart() {
      
-         await this.view.refreshStartMenu(await this.con.getMenuStart() );
+         await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart() );
     
     }
    async showWinLogin() {
-       await this.view.create(await this.con.getWinLogin());
-       await this.view.addCard(await this.con.getContentWinLogin());
+       await this.parent.view.create(await this.parent.con.getWinLogin());
+       await this.parent.view.addCard(await this.parent.con.getContentWinLogin());
     }
 
     async showWinLogout() {
-        await this.view.create(await this.con.getWinLogout());
-        await this.view.addCard(await this.con.getContentWinLogout());
+        await this.parent.view.create(await this.parent.con.getWinLogout());
+        await this.parent.view.addCard(await this.parent.con.getContentWinLogout());
         setTimeout(() => {
             const btn = document.getElementById('cancel-logout');
             if (btn) {
                 btn.onclick = null;
-                btn.onclick = async () => { await this.view.close({ id: 'win-logout' }); };
+                btn.onclick = async () => { await this.parent.view.close({ id: 'win-logout' }); };
             }
         }, 10);
     }
