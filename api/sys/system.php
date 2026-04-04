@@ -10,19 +10,24 @@ class SYSTEM {
     // odczyt jakie katalogi i pliki sa dostempne w katalogu modules     
     public function getInfoModules(){
         $modulesDir = __DIR__ . '/../../modules';
-        $modules = [];
+        $jsFiles = [];
         if (is_dir($modulesDir)) {
             $dirHandle = opendir($modulesDir);
             if ($dirHandle) {
                 while (($entry = readdir($dirHandle)) !== false) {
                     if ($entry !== '.' && $entry !== '..' && is_dir($modulesDir . '/' . $entry)) {
-                        $modules[] = $entry;
+                        $jsFile = $modulesDir . '/' . $entry . '/' . $entry . '.js';
+                        if (file_exists($jsFile)) {
+                            // Ścieżka względem katalogu public
+                            $relativePath = '../modules/' . $entry . '/' . $entry . '.js';
+                            $jsFiles[] = $relativePath;
+                        }
                     }
                 }
                 closedir($dirHandle);
             }
         }
-        return ['status' => true, 'modules' => $modules];
+        return ['status' => true, 'jsFiles' => $jsFiles];
     }     
 
 

@@ -51,15 +51,23 @@ class FUN {
     async closeWinLogout() {
         await this.parent.view.close({ id: 'win-logout' });
     }
-
-
-
-
-
-
-    async showIconsPulpit() {
-        await this.parent.view.addIcon(await this.parent.con.getIconsPulpit());
+    
+    // pobranie nazw modulow i dodanie do skryptu 
+    async showModules() {
+        const modules = await this.parent.api.crud({ function: 'getInfoModules' });
+        if (modules && modules.status && Array.isArray(modules.jsFiles)) {
+            modules.jsFiles.forEach(jsFile => {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = jsFile;
+                document.body.appendChild(script);
+            });
+        }
     }
+
+
+
+
 
 }
 export default FUN;

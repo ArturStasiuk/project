@@ -44,20 +44,7 @@ class CONFIG {
  
     }
 
-    // Ikony na pulpicie - dynamiczne w zależności od stanu połączenia i logowania
-    async getIconsPulpit() {
-        return [{
-            id: 'di-folder',
-            icon: '📁', label: 'Moje pliki',
-            menuItems: [
-                { icon: '📄', label: 'Dokument.txt', onClick: () => alert('Otwórz plik') },
-                { icon: '📊', label: 'Arkusz.xlsx', onClick: () => alert('Otwórz arkusz') },
-                'separator',
-                { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Otwórz folder') }
-            ]
-        }];
-    }
-    
+
     // Okno logowania - dynamiczne w zależności od stanu połączenia i logowania
     async getWinLogin() {
         return { id: 'win-login', title: 'Logowanie', icon: '🔐', statusText: 'Podaj login i hasło', controls: { minimize: true, maximize: false, close: true }, size: { width: 400, height: 440 } };
