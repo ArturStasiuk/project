@@ -13,17 +13,18 @@ class TEST {
     async init() {
         console.log(`Inicjalizacja modułu ${this.nameModule}...`);
         // Dodanie pozycji do menu startowego
-  
+
         await this.view.addStartMenuItem({
-            items : [ {
+            
             id: 'sm-off',
             icon: '⏻',
             label: 'Wyłącz',
-            disabled: true
-        }]});
+            disabled: false
+        });
      
     }
-
+    
+    
 
 
 
