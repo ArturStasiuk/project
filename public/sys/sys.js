@@ -21,7 +21,7 @@ class SYS {
        
 
         await this.fun.showMenuStart();
-       // await this.fun.getModules();
+
 
 
     }
@@ -32,7 +32,7 @@ class SYS {
         await this.api.crud({ function: 'loginUsers', data: { email: email, password: password } });
         
         await this.init(); // Odświeżenie systemu po zalogowaniu
-        await this.fun.getModules();
+        await this.fun.getModules();// Pobranie i aktywacja modułów po zalogowaniu
 
     }
     // wylogowanie użytkownika
@@ -40,11 +40,12 @@ class SYS {
         await this.fun.closeWinLogout();
         await this.api.crud({ function: 'logoutUsers' });
         await this.init(); // Odświeżenie systemu po wylogowaniu
+        await this.fun.deinitModules(); // Dezaktywacja modułów po wylogowaniu
     }
 
 
 
 }
 const sys = new SYS();
-window.sys = sys; // Umożliwia dostęp do obiektu SYS z konsoli przeglądarki
+//window.sys = sys; // Umożliwia dostęp do obiektu SYS z konsoli przeglądarki
 export default sys;

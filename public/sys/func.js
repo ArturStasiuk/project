@@ -6,7 +6,7 @@ class FUN {
         this.init();
     }
     init() {
-        console.log('Inicjalizacja funkcji...');
+      //  console.log('Inicjalizacja funkcji...');
     }
 
     async showMenuStart() {
@@ -72,7 +72,23 @@ class FUN {
             });
         }
     }
-
+    // wywolanie funkcji deinit (czyszczenie) dla wszystkich modulow
+    async deinitModules() {
+        const modules = await this.parent.api.crud({ function: 'getInfoModules' });
+        if (modules && modules.status && Array.isArray(modules.jsFiles)) {
+            for (const jsFile of modules.jsFiles) {
+                try {
+                    const moduleName = jsFile.split('/').pop().replace('.js', '');
+                    if (window[moduleName] && typeof window[moduleName].deinit === 'function') {
+                        await window[moduleName].deinit();
+                        console.log(`Moduł ${moduleName} został zdezaktywowany.`);
+                    }
+                } catch (e) {
+                    console.error(`Błąd podczas dezaktywacji modułu z pliku ${jsFile}:`, e);
+                }
+            }
+        }
+    }
 
 
 
