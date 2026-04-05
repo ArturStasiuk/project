@@ -3,6 +3,9 @@ class FUN {
     constructor(parent) {
         this.parent = parent;
 
+        // Zbiór nazw modułów, których skrypty zostały już wstrzyknięte do DOM
+        this._loadedModules = new Set();
+
         this.init();
     }
     init() {
@@ -55,39 +58,62 @@ class FUN {
         await this.parent.view.close({ id: 'win-logout' });
     }
     
-    // pobranie nazw modulow i dodanie do skryptu 
+    // Wczytuje moduły z serwera i aktywuje je.
+    // Przy pierwszym logowaniu wstrzykuje skrypt modułu do DOM.
+    // Przy ponownym logowaniu (moduł już w rejestrze) wywołuje bezpośrednio init(),
+    // ponieważ przeglądarka cachuje moduły ES i nie wykonałaby skryptu ponownie.
     async getModules() {
-
-        const modules = await this.parent.api.crud({ function: 'getInfoModules' });
-        if (modules && modules.status && Array.isArray(modules.jsFiles)) {
-            modules.jsFiles.forEach(jsFile => {
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = jsFile;
-                document.body.appendChild(script);
-       
-
-
-
-            });
-        }
-    }
-    // wywolanie funkcji deinit (czyszczenie) dla wszystkich modulow
-    async deinitModules() {
         const modules = await this.parent.api.crud({ function: 'getInfoModules' });
         if (modules && modules.status && Array.isArray(modules.jsFiles)) {
             for (const jsFile of modules.jsFiles) {
-                try {
-                    const moduleName = jsFile.split('/').pop().replace('.js', '');
-                    if (window[moduleName] && typeof window[moduleName].deinit === 'function') {
-                        await window[moduleName].deinit();
-                        console.log(`Moduł ${moduleName} został zdezaktywowany.`);
+                const moduleName = jsFile.split('/').pop().replace('.js', '');
+
+                if (this._loadedModules.has(moduleName)) {
+                    // Moduł był już załadowany – wywołaj init() bezpośrednio przez rejestr
+                    const mod = window._moduleRegistry?.[moduleName];
+                    if (mod && typeof mod.init === 'function') {
+                        await mod.init();
+                        console.log(`Moduł ${moduleName}: ponowna inicjalizacja (init).`);
                     }
-                } catch (e) {
-                    console.error(`Błąd podczas dezaktywacji modułu z pliku ${jsFile}:`, e);
+                } else {
+                    // Pierwsze ładowanie – wstrzyknij skrypt modułu do DOM
+                    const script = document.createElement('script');
+                    script.type = 'module';
+                    script.src = jsFile;
+                    // Atrybut data-module-name umożliwia późniejsze odnalezienie i usunięcie skryptu
+                    script.dataset.moduleName = moduleName;
+                    document.body.appendChild(script);
+                    this._loadedModules.add(moduleName);
+                    console.log(`Moduł ${moduleName}: skrypt załadowany.`);
                 }
             }
         }
+    }
+
+    // Dezaktywuje wszystkie aktywne moduły:
+    // 1. Wywołuje deinit() każdego modułu zarejestrowanego w window._moduleRegistry.
+    // 2. Usuwa tagi <script> modułów z DOM (porządek; faktyczne wyładowanie
+    //    modułów ES zależy od przeglądarki – init() będzie wywoływane przez rejestr).
+    // 3. Czyści rejestr modułów.
+    async deinitModules() {
+        const registry = window._moduleRegistry || {};
+
+        for (const [moduleName, mod] of Object.entries(registry)) {
+            try {
+                if (typeof mod.deinit === 'function') {
+                    await mod.deinit();
+                    console.log(`Moduł ${moduleName} został zdezaktywowany.`);
+                }
+            } catch (e) {
+                console.error(`Błąd podczas dezaktywacji modułu ${moduleName}:`, e);
+            }
+        }
+
+        // Usuń tagi <script> wstrzyknięte przez getModules()
+        document.querySelectorAll('script[data-module-name]').forEach(s => s.remove());
+
+        // Wyczyść rejestr – moduły zostaną ponownie zarejestrowane przy następnym logowaniu
+        window._moduleRegistry = {};
     }
 
 

@@ -38,9 +38,9 @@ class SYS {
     // wylogowanie użytkownika
     async logOut() {
         await this.fun.closeWinLogout();
+        await this.fun.deinitModules(); // Dezaktywacja modułów (usuwa ikony i skrypty) przed odświeżeniem menu
         await this.api.crud({ function: 'logoutUsers' });
-        await this.init(); // Odświeżenie systemu po wylogowaniu
-        await this.fun.deinitModules(); // Dezaktywacja modułów po wylogowaniu
+        await this.init(); // Odświeżenie systemu i menu po wylogowaniu
     }
 
 
