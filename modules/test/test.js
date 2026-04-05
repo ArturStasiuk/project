@@ -14,12 +14,13 @@ class TEST {
         console.log(`Inicjalizacja modułu ${this.nameModule}...`);
         // Dodanie pozycji do menu startowego
   
-        await taskbar.addStartMenuItem({
+        await this.view.addStartMenuItem({
+            items : [ {
             id: 'sm-off',
             icon: '⏻',
             label: 'Wyłącz',
             disabled: true
-        });
+        }]});
      
     }
 

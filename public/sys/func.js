@@ -10,8 +10,10 @@ class FUN {
     }
 
     async showMenuStart() {
+        
+        
         await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart() );
-    
+        await this.getModules();
     }
 
    async showWinLogin() {
@@ -53,7 +55,7 @@ class FUN {
     }
     
     // pobranie nazw modulow i dodanie do skryptu 
-    async addModules() {
+    async getModules() {
         const modules = await this.parent.api.crud({ function: 'getInfoModules' });
         if (modules && modules.status && Array.isArray(modules.jsFiles)) {
             modules.jsFiles.forEach(jsFile => {
