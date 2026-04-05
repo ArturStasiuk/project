@@ -39,8 +39,11 @@ class SYS {
     async logOut() {
         await this.fun.closeWinLogout();
         await this.fun.deinitModules(); // Dezaktywacja modułów (usuwa ikony i skrypty) przed odświeżeniem menu
+        //
         await this.api.crud({ function: 'logoutUsers' });
-        await this.init(); // Odświeżenie systemu i menu po wylogowaniu
+        //  await this.init(); // Odświeżenie systemu i menu po wylogowaniu
+        // zaladowanie index.html ponownie, aby wyczyścić wszystkie dane i skrypty związane z zalogowanym użytkownikiem
+        window.location.href = 'index.php';
     }
 
 

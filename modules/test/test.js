@@ -1,5 +1,5 @@
 
-//import api from '../../api/api.js';
+
 class TEST {
         // Dekonstruktor: usuwa instancję i powiązane elementy/skrypty
     async deinit() {
@@ -23,7 +23,7 @@ class TEST {
 
     constructor() {
         this.nameModule = 'TEST';
-        console.log(`Inicjalizacja modułu ${this.nameModule}...`);
+
         this.init(); 
     }
     // tu nalezy dodac np ikone i nazwe do menu startowego, a po kliknieciu w ikone ma sie otwierac okno z zawartoscia tego modulu
