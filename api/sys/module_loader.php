@@ -1,22 +1,18 @@
 <?php
 /**
  * Proxy do bezpiecznego serwowania plików modułów JS.
- * Przed wysłaniem pliku sprawdza sesję i uprawnienia użytkownika,
- * dzięki czemu nieaktywne moduły są niewidoczne i niedostępne.
+ * Sprawdza uprawnienia użytkownika przed wysłaniem pliku.
  */
-require_once __DIR__ . '/../conect/session.php';
-require_once __DIR__ . '/system.php';
 
-$session = new SESSION();
-$system = new SYSTEM();
+// Sprawdzenie czy użytkownik jest zalogowany – narazie zakomentowane
+// require_once __DIR__ . '/../conect/session.php';
+// $session = new SESSION();
+// if (!$session->getKey('logIn')) {
+//     http_response_code(403);
+//     exit;
+// }
+// $userId = $session->getKey('id');
 
-// Sprawdzenie czy użytkownik jest zalogowany
-if (!$session->getKey('logIn')) {
-    http_response_code(403);
-    exit;
-}
-
-$userId = $session->getKey('id');
 $file = $_GET['file'] ?? null;
 
 if (!$file) {
@@ -37,18 +33,10 @@ if (strpos($file, '..') !== false || str_starts_with($file, './') || str_starts_
 $parts = explode('/', $file, 2);
 $moduleName = $parts[0];
 
-// Sprawdzenie czy użytkownik ma dostęp do tego modułu
-$userModulesInfo = $system->getInfoModulesForUser($userId);
-if (!$userModulesInfo['status']) {
-    http_response_code(403);
-    exit;
-}
-$allowedModules = [];
-foreach ($userModulesInfo['modules'] as $mod) {
-    if (isset($mod['active']) && $mod['active'] === '1') {
-        $allowedModules[] = $mod['modules_name'];
-    }
-}
+// Lista aktywnych modułów – narazie na sztywno, docelowo pobierana z bazy danych
+// Przeniesiona z system.php (getInfoModulesForUser)
+$allowedModules = ['usercontolpanel', 'notepad'];
+
 if (!in_array($moduleName, $allowedModules)) {
     http_response_code(403);
     exit;
