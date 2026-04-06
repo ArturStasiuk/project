@@ -4,8 +4,8 @@
  * Przed wysłaniem pliku sprawdza sesję i uprawnienia użytkownika,
  * dzięki czemu nieaktywne moduły są niewidoczne i niedostępne.
  */
-require_once __DIR__ . '/conect/session.php';
-require_once __DIR__ . '/sys/system.php';
+require_once __DIR__ . '/../conect/session.php';
+require_once __DIR__ . '/system.php';
 
 $session = new SESSION();
 $system = new SYSTEM();
@@ -24,7 +24,9 @@ if (!$file) {
     exit;
 }
 
-// Normalizacja ścieżki i zabezpieczenie przed path traversal
+// Wczesny fast-fail przed path traversal (PHP dekoduje wartości GET przed tym sprawdzeniem,
+// więc %2e%2e zostanie odczytane jako '..').
+// Ostateczną barierą bezpieczeństwa jest sprawdzenie realpath() poniżej.
 $file = str_replace('\\', '/', $file);
 if (strpos($file, '..') !== false || str_starts_with($file, './') || str_starts_with($file, '/')) {
     http_response_code(403);
@@ -53,7 +55,7 @@ if (!in_array($moduleName, $allowedModules)) {
 }
 
 // Budowanie bezpiecznej ścieżki do pliku
-$modulesDir = realpath(__DIR__ . '/../modules');
+$modulesDir = realpath(__DIR__ . '/../../modules');
 $fullPath = realpath($modulesDir . '/' . $file);
 
 // Zabezpieczenie: upewnij się że plik jest wewnątrz katalogu modules
@@ -77,7 +79,7 @@ $content = file_get_contents($fullPath);
 
 // Przepisanie względnych importów ES-modułów tak, aby przechodziły przez ten proxy.
 // Obsługuje wzorce: import X from './file.js' oraz import './file.js'
-$proxyBase = '/api/module_loader.php?file=';
+$proxyBase = '/api/sys/module_loader.php?file=';
 $content = preg_replace_callback(
     '/\bfrom\s+([\'"])\.\/([^\'"]+)\1/i',
     function ($matches) use ($moduleName, $proxyBase) {
