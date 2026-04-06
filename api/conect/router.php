@@ -5,7 +5,8 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/conect.php';
 require_once __DIR__ . '/../dataBase/users.php';
-require_once __DIR__ . '/../sys/system.php';
+define('MODULE_LOADER_INCLUDED', true);
+require_once __DIR__ . '/../sys/module_loader.php';
 class ROUTER {
     private $session;
     private $inputData=null;
@@ -13,12 +14,9 @@ class ROUTER {
     private $conect;
     private $db;
     private $users;
-    private $system;
     private $data;
    public function __construct()
     {
-        $this->system = new SYSTEM();
-
      $this->session = new SESSION();
 
        $this->db = new CONECT();
@@ -100,11 +98,13 @@ class ROUTER {
     }
     // pobranie informacji o dostępnych modułach (tylko dla zalogowanego użytkownika)
     private function getInfoModules(){
-        if (!$this->session->getKey('logIn')) {
-            return ['status' => false, 'error' => 'Unauthorized'];
-        }
-        $userId = $this->session->getKey('id');
-        return $this->system->getInfoModules($userId);
+        // Sprawdzenie czy użytkownik jest zalogowany – narazie zakomentowane
+        // if (!$this->session->getKey('logIn')) {
+        //     return ['status' => false, 'error' => 'Unauthorized'];
+        // }
+        // $userId = $this->session->getKey('id');
+        // return getInfoModules($userId);
+        return getInfoModules();
     }
 
 
