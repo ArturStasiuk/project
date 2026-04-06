@@ -24,7 +24,9 @@ if (!$file) {
     exit;
 }
 
-// Normalizacja ścieżki i zabezpieczenie przed path traversal
+// Wczesny fast-fail przed path traversal (PHP dekoduje wartości GET przed tym sprawdzeniem,
+// więc %2e%2e zostanie odczytane jako '..').
+// Ostateczną barierą bezpieczeństwa jest sprawdzenie realpath() poniżej.
 $file = str_replace('\\', '/', $file);
 if (strpos($file, '..') !== false || str_starts_with($file, './') || str_starts_with($file, '/')) {
     http_response_code(403);
