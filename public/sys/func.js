@@ -66,7 +66,20 @@ class FUN {
         const modules = await this.parent.api.crud({ function: 'getInfoModules' });
         if (modules && modules.status && Array.isArray(modules.jsFiles)) {
             for (const jsFile of modules.jsFiles) {
-                const moduleName = jsFile.split('/').pop().replace('.js', '');
+                // Wyciągnij nazwę modułu: obsługuje zarówno ścieżki proxy (?file=name/name.js)
+                // jak i bezpośrednie ścieżki (../modules/name/name.js)
+                let moduleName;
+                try {
+                    const url = new URL(jsFile, window.location.href);
+                    const fileParam = url.searchParams.get('file');
+                    if (fileParam) {
+                        moduleName = fileParam.split('/')[0];
+                    } else {
+                        moduleName = jsFile.split('/').pop().replace('.js', '');
+                    }
+                } catch (e) {
+                    moduleName = jsFile.split('/').pop().replace('.js', '');
+                }
 
                 if (this._loadedModules.has(moduleName)) {
                     // Moduł był już załadowany – wywołaj init() bezpośrednio przez rejestr

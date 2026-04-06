@@ -7,20 +7,39 @@ class SYSTEM {
  
          }
      
-    // odczyt jakie katalogi i pliki sa dostempne w katalogu modules     
-    public function getInfoModules(){
+    // odczyt jakie katalogi i pliki sa dostempne w katalogu modules,
+    // filtrowane do aktywnych modułów danego użytkownika
+    public function getInfoModules($userId = null){
         $modulesDir = __DIR__ . '/../../modules';
         $jsFiles = [];
+
+        // Pobierz listę aktywnych modułów dla użytkownika
+        $allowedModules = null;
+        if ($userId !== null) {
+            $userModulesInfo = $this->getInfoModulesForUser($userId);
+            if ($userModulesInfo['status']) {
+                $allowedModules = [];
+                foreach ($userModulesInfo['modules'] as $mod) {
+                    if (isset($mod['active']) && $mod['active'] === '1') {
+                        $allowedModules[] = $mod['modules_name'];
+                    }
+                }
+            }
+        }
+
         if (is_dir($modulesDir)) {
             $dirHandle = opendir($modulesDir);
             if ($dirHandle) {
                 while (($entry = readdir($dirHandle)) !== false) {
                     if ($entry !== '.' && $entry !== '..' && is_dir($modulesDir . '/' . $entry)) {
+                        // Pomiń moduły, do których użytkownik nie ma dostępu
+                        if ($allowedModules !== null && !in_array($entry, $allowedModules)) {
+                            continue;
+                        }
                         $jsFile = $modulesDir . '/' . $entry . '/' . $entry . '.js';
                         if (file_exists($jsFile)) {
-                            // Ścieżka względem katalogu public
-                            $relativePath = '../modules/' . $entry . '/' . $entry . '.js';
-                            $jsFiles[] = $relativePath;
+                            // Ścieżka przez proxy PHP (zamiast bezpośrednio do pliku statycznego)
+                            $jsFiles[] = '/api/module_loader.php?file=' . rawurlencode($entry . '/' . $entry . '.js');
                         }
                     }
                 }
@@ -28,9 +47,9 @@ class SYSTEM {
             }
         }
         return ['status' => true, 'jsFiles' => $jsFiles];
-    }     
+    }
     // odczyt z bazy danych jakie moduly sa dostempne dla danego uzytkowika narazie dane na sztywno ustawione
-    private function getInfoModulesForUser($userId){
+    public function getInfoModulesForUser($userId){
         $modules = [];
         $modules[] = [
            'modules_name' => 'usercontolpanel',

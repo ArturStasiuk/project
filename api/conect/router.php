@@ -98,9 +98,13 @@ class ROUTER {
             'message' => 'Logout successful'
         ];
     }
-    // pobranie informacji o dostępnych modułach
+    // pobranie informacji o dostępnych modułach (tylko dla zalogowanego użytkownika)
     private function getInfoModules(){
-        return $this->system->getInfoModules();
+        if (!$this->session->getKey('logIn')) {
+            return ['status' => false, 'error' => 'Unauthorized'];
+        }
+        $userId = $this->session->getKey('id');
+        return $this->system->getInfoModules($userId);
     }
 
 
