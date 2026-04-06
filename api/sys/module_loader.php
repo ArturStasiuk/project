@@ -18,7 +18,7 @@ function getInfoModulesForUser($userId = null) {
     ];
     $modules[] = [
         'modules_name' => 'notepad',
-        'active' => '1',
+        'active' => '0',
         'read' => '1',
         'append' => '1',
         'clear' => '1',
@@ -85,9 +85,12 @@ if (defined('MODULE_LOADER_INCLUDED')) {
 // }
 // $userId = $session->getKey('id');
 
+
 $file = $_GET['file'] ?? null;
+error_log("[module_loader] file param: " . var_export($file, true));
 
 if (!$file) {
+    error_log("[module_loader] Brak parametru file");
     http_response_code(400);
     exit;
 }
@@ -97,6 +100,7 @@ if (!$file) {
 // Ostateczną barierą bezpieczeństwa jest sprawdzenie realpath() poniżej.
 $file = str_replace('\\', '/', $file);
 if (strpos($file, '..') !== false || str_starts_with($file, './') || str_starts_with($file, '/')) {
+    error_log("[module_loader] Niedozwolona ścieżka: $file");
     http_response_code(403);
     exit;
 }
@@ -115,27 +119,33 @@ foreach ($userModulesInfo['modules'] as $mod) {
 }
 
 if (!in_array($moduleName, $allowedModules)) {
+    error_log("[module_loader] Moduł niedozwolony: $moduleName");
     http_response_code(403);
     exit;
 }
 
 // Budowanie bezpiecznej ścieżki do pliku
+
 $modulesDir = realpath(__DIR__ . '/../../modules');
 $fullPath = realpath($modulesDir . '/' . $file);
+error_log("[module_loader] modulesDir: $modulesDir, fullPath: $fullPath");
 
 // Zabezpieczenie: upewnij się że plik jest wewnątrz katalogu modules
 if ($fullPath === false || !str_starts_with($fullPath, $modulesDir . DIRECTORY_SEPARATOR)) {
+    error_log("[module_loader] Plik poza katalogiem modules lub nie istnieje: $fullPath");
     http_response_code(403);
     exit;
 }
 
 // Sprawdzenie rozszerzenia – serwujemy tylko pliki .js
 if (pathinfo($fullPath, PATHINFO_EXTENSION) !== 'js') {
+    error_log("[module_loader] Niedozwolone rozszerzenie: $fullPath");
     http_response_code(403);
     exit;
 }
 
 if (!file_exists($fullPath)) {
+    error_log("[module_loader] Plik nie istnieje: $fullPath");
     http_response_code(404);
     exit;
 }

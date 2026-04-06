@@ -1,5 +1,5 @@
-import CONFIG from './config.js';
-import FUNCTION from './function.js';
+//import CONFIG from './config.js';
+//import FUNCTION from './function.js';
 
 class NOTEPAD {
         // Dekonstruktor: usuwa instancję i powiązane elementy/skrypty
@@ -23,8 +23,8 @@ class NOTEPAD {
     nameModule;
 
     constructor() {
-        this.conf = new CONFIG(this); 
-        this.func = new FUNCTION(this);
+     //   this.conf = new CONFIG(this); 
+     //   this.func = new FUNCTION(this);
 
         this.init(); 
     }
@@ -32,7 +32,7 @@ class NOTEPAD {
     async init() {
         console.log(`Inicjalizacja modułu ${this.nameModule}...`);
         // Dodanie pozycji do menu startowego
-        await this.func.addStartMenuItem();
+      //  await this.func.addStartMenuItem();
      
     }
     
