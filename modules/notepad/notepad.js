@@ -1,20 +1,20 @@
 
 
-class TEST {
+class NOTEPAD {
         // Dekonstruktor: usuwa instancję i powiązane elementy/skrypty
     async deinit() {
         console.log('Moduł TEST został zdezaktywowany i wyczyszczony.');
             // Usuń pozycję z menu startowego
-            await window._view.removeStartMenuItem({ id: 'sm-off' });
+            await window._view.removeStartMenuItem({ id: 'sm-notepad' });
 
             // Zamknij okno modułu, jeśli istnieje
             try {
-                await window._view.close({ id: 'win-test' });
+                await window._view.close({ id: 'win-notepad' });
             } catch (e) { console.warn('Nie można zamknąć okna modułu TEST:', e); }
 
             // Usuń ikonę pulpitu, jeśli była dodana
             try {
-                await window._view.removeIcon({ id: 'di-test' });
+                await window._view.removeIcon({ id: 'di-notepad' });
             } catch (e) { console.warn('Nie można usunąć ikony modułu TEST:', e); }
 
             console.log('Moduł TEST został zdezaktywowany i wyczyszczony.');
@@ -22,7 +22,7 @@ class TEST {
     nameModule;
 
     constructor() {
-        this.nameModule = 'TEST';
+        this.nameModule = 'NOTEPAD';
 
         this.init(); 
     }
@@ -31,10 +31,18 @@ class TEST {
         console.log(`Inicjalizacja modułu ${this.nameModule}...`);
         // Dodanie pozycji do menu startowego
         await window._view.addStartMenuItem({
-            id: 'sm-off',
-            icon: '⏻',
-            label: 'Wyłącz',
-            disabled: false
+            id: 'sm-notepad',
+            icon: '📝',
+            label: 'Notatnik',
+            disabled: false,
+            onClick: async () => {
+                await window._view.create({
+                    id: 'win-notepad',
+                    title: 'Notatnik',
+                    icon: '📝',
+                    statusText: 'Nowy dokument',
+                });
+            }
         });
      
     }
@@ -43,8 +51,8 @@ class TEST {
 
 
 }
-const test = new TEST();
+const notepad = new NOTEPAD();
 // Zarejestruj instancję modułu w globalnym rejestrze, aby sys mógł wywołać init()/deinit()
 window._moduleRegistry = window._moduleRegistry || {};
-window._moduleRegistry['test'] = test;
-export default test;
+window._moduleRegistry['notepad'] = notepad;
+export default notepad;

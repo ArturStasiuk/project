@@ -37,6 +37,7 @@ class SYS {
     }
     // wylogowanie użytkownika
     async logOut() {
+       // window.location.href = 'index.php';
         await this.fun.closeWinLogout();
         await this.fun.deinitModules(); // Dezaktywacja modułów (usuwa ikony i skrypty) przed odświeżeniem menu
         //

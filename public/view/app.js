@@ -646,8 +646,15 @@ class View {
                         return;
                     }
                 }
-                _startMenuItems.push(item);
-                if (_startMenuEl) _startMenuEl.appendChild(_makeStartMenuItem(item));
+                _startMenuItems.unshift(item);
+                if (_startMenuEl) {
+                    const newEl = _makeStartMenuItem(item);
+                    if (_startMenuEl.firstChild) {
+                        _startMenuEl.insertBefore(newEl, _startMenuEl.firstChild);
+                    } else {
+                        _startMenuEl.appendChild(newEl);
+                    }
+                }
             },
 
             /**
