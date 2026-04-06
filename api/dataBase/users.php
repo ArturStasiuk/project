@@ -43,5 +43,46 @@ class USERS
             ];
         }
     }
+    // funkcja do hashowania hasla przy rejestracji/logowania
+    private function hashPassword($password) {
+        return password_hash($password, PASSWORD_BCRYPT);
+    }   
+    
+    public function registerUsers($conection, $email, $password, $name){
+        if (empty($email) || empty($password) || empty($name)) {
+            return [
+                'status' => false,
+                'message' => 'Email, password and name are required'
+            ];
+        }
+        // sprawdzenie czy email jest juz zarejestrowany
+        $sql = "SELECT * FROM users WHERE email = '$email'";
+        $result = $conection->query($sql);
+        if ($result && $result->num_rows > 0) {
+            return [
+                'status' => false,
+                'message' => 'Email is already registered'
+            ];
+        }
+        // hashowanie hasla przed zapisaniem do bazy
+        $hashedPassword = $this->hashPassword($password);
+        // zapisanie uzytkownika do bazy
+        $sql = "INSERT INTO users (email, password, name) VALUES ('$email', '$hashedPassword', '$name')";
+        if ($conection->query($sql) === TRUE) {
+            return [
+                'status' => true,
+                'message' => 'Registration successful'
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => 'Error during registration: ' . $conection->error
+            ];
+        }
+    }
+
+
+
+
 
 }

@@ -1,4 +1,5 @@
-
+import CONFIG from './config.js';
+import FUNCTION from './function.js';
 
 class NOTEPAD {
         // Dekonstruktor: usuwa instancję i powiązane elementy/skrypty
@@ -10,42 +11,31 @@ class NOTEPAD {
             // Zamknij okno modułu, jeśli istnieje
             try {
                 await window._view.close({ id: 'win-notepad' });
-            } catch (e) { console.warn('Nie można zamknąć okna modułu TEST:', e); }
+            } catch (e) { console.warn('Nie można zamknąć okna modułu NOTEPAD:', e); }
 
             // Usuń ikonę pulpitu, jeśli była dodana
             try {
                 await window._view.removeIcon({ id: 'di-notepad' });
-            } catch (e) { console.warn('Nie można usunąć ikony modułu TEST:', e); }
+            } catch (e) { console.warn('Nie można usunąć ikony modułu NOTEPAD:', e); }
 
-            console.log('Moduł TEST został zdezaktywowany i wyczyszczony.');
+            console.log('Moduł NOTEPAD został zdezaktywowany i wyczyszczony.');
         }
     nameModule;
 
     constructor() {
-        this.nameModule = 'NOTEPAD';
+        this.conf = new CONFIG(this); 
+        this.func = new FUNCTION(this);
 
         this.init(); 
     }
-    // tu nalezy dodac np ikone i nazwe do menu startowego, a po kliknieciu w ikone ma sie otwierac okno z zawartoscia tego modulu
+    // tu nalezy dodcac np ikone i nazwe do menu startowego, a po kliknieciu w ikone ma sie otwierac okno z zawartoscia tego modulu
     async init() {
         console.log(`Inicjalizacja modułu ${this.nameModule}...`);
         // Dodanie pozycji do menu startowego
-        await window._view.addStartMenuItem({
-            id: 'sm-notepad',
-            icon: '📝',
-            label: 'Notatnik',
-            disabled: false,
-            onClick: async () => {
-                await window._view.create({
-                    id: 'win-notepad',
-                    title: 'Notatnik',
-                    icon: '📝',
-                    statusText: 'Nowy dokument',
-                });
-            }
-        });
+        await this.func.addStartMenuItem();
      
     }
+    
     
     
 
