@@ -1,8 +1,79 @@
 <?php
 /**
- * Proxy do bezpiecznego serwowania plików modułów JS.
- * Sprawdza uprawnienia użytkownika przed wysłaniem pliku.
+ * Moduł ładowania plików JS.
+ * Zawiera funkcje do pobierania listy modułów oraz proxy do serwowania plików JS modułów.
  */
+
+// Zwraca listę modułów dostępnych dla użytkownika – narazie dane na sztywno, docelowo z bazy danych
+function getInfoModulesForUser($userId = null) {
+    $modules = [];
+    $modules[] = [
+        'modules_name' => 'usercontolpanel',
+        'active' => '1',
+        'read' => '1',
+        'append' => '1',
+        'clear' => '1',
+        'modify' => '1',
+    ];
+    $modules[] = [
+        'modules_name' => 'notepad',
+        'active' => '1',
+        'read' => '1',
+        'append' => '1',
+        'clear' => '1',
+        'modify' => '1',
+    ];
+    return ['status' => true, 'modules' => $modules];
+}
+
+// Zwraca listę URL-i plików JS aktywnych modułów dostępnych dla użytkownika
+function getInfoModules($userId = null) {
+    $modulesDir = __DIR__ . '/../../modules';
+    $jsFiles = [];
+
+    // Pobierz listę aktywnych modułów dla użytkownika
+    // Sprawdzenie czy użytkownik jest zalogowany – narazie zakomentowane
+    // if ($userId !== null) { ... }
+
+    // Narazie aktywne moduły na sztywno
+    $allowedModules = null;
+    $userModulesInfo = getInfoModulesForUser($userId);
+    if ($userModulesInfo['status']) {
+        $allowedModules = [];
+        foreach ($userModulesInfo['modules'] as $mod) {
+            if (isset($mod['active']) && $mod['active'] === '1') {
+                $allowedModules[] = $mod['modules_name'];
+            }
+        }
+    }
+
+    $resolvedDir = realpath($modulesDir);
+    if ($resolvedDir && is_dir($resolvedDir)) {
+        $dirHandle = opendir($resolvedDir);
+        if ($dirHandle) {
+            while (($entry = readdir($dirHandle)) !== false) {
+                if ($entry !== '.' && $entry !== '..' && is_dir($resolvedDir . '/' . $entry)) {
+                    if ($allowedModules !== null && !in_array($entry, $allowedModules)) {
+                        continue;
+                    }
+                    $jsFile = $resolvedDir . '/' . $entry . '/' . $entry . '.js';
+                    if (file_exists($jsFile)) {
+                        $jsFiles[] = '/api/sys/module_loader.php?file=' . rawurlencode($entry . '/' . $entry . '.js');
+                    }
+                }
+            }
+            closedir($dirHandle);
+        }
+    }
+    return ['status' => true, 'jsFiles' => $jsFiles];
+}
+
+// Jeśli plik jest dołączony (included) przez inny skrypt, nie wykonujemy kodu serwowania pliku
+if (defined('MODULE_LOADER_INCLUDED')) {
+    return;
+}
+
+// --- Proxy do bezpiecznego serwowania plików modułów JS ---
 
 // Sprawdzenie czy użytkownik jest zalogowany – narazie zakomentowane
 // require_once __DIR__ . '/../conect/session.php';
@@ -33,9 +104,14 @@ if (strpos($file, '..') !== false || str_starts_with($file, './') || str_starts_
 $parts = explode('/', $file, 2);
 $moduleName = $parts[0];
 
-// Lista aktywnych modułów – narazie na sztywno, docelowo pobierana z bazy danych
-// Przeniesiona z system.php (getInfoModulesForUser)
-$allowedModules = ['usercontolpanel', 'notepad'];
+// Pobierz listę aktywnych modułów z funkcji przeniesionej z system.php
+$userModulesInfo = getInfoModulesForUser();
+$allowedModules = [];
+foreach ($userModulesInfo['modules'] as $mod) {
+    if (isset($mod['active']) && $mod['active'] === '1') {
+        $allowedModules[] = $mod['modules_name'];
+    }
+}
 
 if (!in_array($moduleName, $allowedModules)) {
     http_response_code(403);
