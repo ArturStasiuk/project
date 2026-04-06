@@ -1,23 +1,4 @@
-<?php
- $modules = [];
- $modules[] = [
-    'modules_name' => 'usercontolpanel',
-    'active' => '1',
-    'read'=>'1',
-    'append'=>'1',
-    'clear'=>'1',
-    'modify'=>'1',
- ];
-$modules[] = [
-    'modules_name' => 'notepad',
-    'active' => '1',
-    'read' => '1',
-    'append' => '1',
-    'clear' => '1',
-    'modify' => '1',
-];
 
-?>
 
 <!DOCTYPE html>
 
