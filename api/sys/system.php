@@ -29,6 +29,28 @@ class SYSTEM {
         }
         return ['status' => true, 'jsFiles' => $jsFiles];
     }     
-    //
+    // odczyt z bazy danych jakie moduly sa dostempne dla danego uzytkowika narazie dane na sztywno ustawione
+    private function getInfoModulesForUser($userId){
+        $modules = [];
+        $modules[] = [
+           'modules_name' => 'usercontolpanel',
+           'active' => '1',
+           'read'=>'1',
+           'append'=>'1',
+           'clear'=>'1',
+           'modify'=>'1',
+        ];
+       $modules[] = [
+           'modules_name' => 'notepad',
+           'active' => '1',
+           'read' => '1',
+           'append' => '1',
+           'clear' => '1',
+           'modify' => '1',
+       ];
+       return ['status' => true, 'modules' => $modules];
+    }
+
+
 
 }
