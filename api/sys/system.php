@@ -39,7 +39,7 @@ class SYSTEM {
                         $jsFile = $modulesDir . '/' . $entry . '/' . $entry . '.js';
                         if (file_exists($jsFile)) {
                             // Ścieżka przez proxy PHP (zamiast bezpośrednio do pliku statycznego)
-                            $jsFiles[] = '/api/module_loader.php?file=' . rawurlencode($entry . '/' . $entry . '.js');
+                            $jsFiles[] = '/api/sys/module_loader.php?file=' . rawurlencode($entry . '/' . $entry . '.js');
                         }
                     }
                 }
