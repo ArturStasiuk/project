@@ -103,6 +103,7 @@ class ROUTER {
         //     return ['status' => false, 'error' => 'Unauthorized'];
         // }
         // $userId = $this->session->getKey('id');
+        // return getInfoModules($userId);
         return getInfoModules();
     }
 

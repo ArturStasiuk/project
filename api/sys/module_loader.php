@@ -5,6 +5,7 @@
  */
 
 // Zwraca listę modułów dostępnych dla użytkownika – narazie dane na sztywno, docelowo z bazy danych
+// $userId – narazie nieużywany, docelowo będzie filtrować moduły z bazy danych dla konkretnego użytkownika
 function getInfoModulesForUser($userId = null) {
     $modules = [];
     $modules[] = [
