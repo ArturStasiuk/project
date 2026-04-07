@@ -30,7 +30,7 @@ class NOTEPAD {
     }
     // tu nalezy dodcac np ikone i nazwe do menu startowego, a po kliknieciu w ikone ma sie otwierac okno z zawartoscia tego modulu
     async init() {
-        console.log(`bla bla`);
+        console.log(`NOTEPAD: init() called`);
         // Dodanie pozycji do menu startowego
       await this.func.addStartMenuItem();
      

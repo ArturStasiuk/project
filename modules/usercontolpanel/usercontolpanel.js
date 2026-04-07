@@ -1,15 +1,16 @@
-//import CONFIG from './config.js';
-//import FUNCTION from './function.js';
+import CONFIG from './config.js';
+import FUNCTION from './function.js';
 class USERCONTROLPANEL {
     constructor() {
 
-       // this.config = new CONFIG(this);
-       // this.function = new FUNCTION(this);
+        this.config = new CONFIG(this);
+        this.function = new FUNCTION(this);
         this.init();
     }
 
     async init() {
-   //     await this.function.addStartMenuItem();
+        console.log(`USERCONTROLPANEL: init() called`);
+        await this.function.addStartMenuItem();
     }
 
     async deinit() {
