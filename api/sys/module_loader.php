@@ -18,7 +18,7 @@ function getInfoModulesForUser($userId = null) {
     ];
     $modules[] = [
         'modules_name' => 'notepad',
-        'active' => '0',
+        'active' => '1',
         'read' => '1',
         'append' => '1',
         'clear' => '1',
