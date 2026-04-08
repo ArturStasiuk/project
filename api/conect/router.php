@@ -64,29 +64,10 @@ class ROUTER {
 
     // logowanie użytkownika
     private function loginUsers(){
-          $email = $this->data['email'] ?? null;
-          $password = $this->data['password'] ?? null;
-           $this->session->setKey('logIn', false);
-          $odp =$this->users->loginUsers($this->conect, $email, $password);
-          if($odp['status']!== true){
-              $this->session->destroy();
-              return [
-                  'status' => false,
-                  'message' => 'Login failed: '
-              ];
-          }
-           else {
-            $this->session->setKey('logIn', true);
-            $this->session->setKey('id', $odp['data']['id']);
-            $this->session->setKey('email', $odp['data']['email']);
-            $this->session->setKey('name', $odp['data']['name']);
-            $this->session->setKey('last_name', $odp['data']['last_name']);
-
-              return [
-                  'status' => true,
-                  'message' => 'Login successful'
-              ];
-           }
+        $email = $this->data['email'] ?? null;
+        $password = $this->data['password'] ?? null;
+        // Cała logika logowania przeniesiona do USERS::loginUsers
+        return $this->users->loginUsers($this->conect, $email, $password, $this->session);
          
 
 

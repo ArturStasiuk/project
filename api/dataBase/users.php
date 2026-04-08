@@ -10,39 +10,41 @@ class USERS
 
      
 
-    public function loginUsers($conection, $email, $password){
+    public function loginUsers($conection, $email, $password, $session ) {
         if (empty($email) || empty($password)) {
+            if ($session) $session->destroy();
             return [
                 'status' => false,
                 'message' => 'Email and password are required'
             ];
         }
-        $sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password' AND active = 1";
+        $sql = "SELECT * FROM users WHERE email = '$email' AND active = 1";
         $result = $conection->query($sql);
-        if ($result) {
-             
-            if ($result->num_rows > 0) {
-                // pobranie danych uzytkownika 
-                $user = $result->fetch_assoc();
-                unset($user['password']); // usunięcie hasła przed zapisaniem sesji
+        if ($result && $result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            if (isset($user['password']) && $user['password'] === $password) {
+                unset($user['password']);
+                if ($session) {
+                    $session->setKey('logIn', true);
+                    $session->setKey('id', $user['id']);
+                    $session->setKey('email', $user['email']);
+                    $session->setKey('name', $user['name']);
+                    $session->setKey('last_name', $user['last_name'] ?? '');
+                }
                 return [
                     'status' => true,
                     'message' => 'Login successful',
-                    'data' => $user 
-                ];
-            } else {
-                return [
-                    'status' => false,
-                    'message' => 'Invalid email or password'
+                    'data' => $user
                 ];
             }
-        } else {
-            return [
-                'status' => false,
-                'error' => 'Error during login: ' . $conection->error
-            ];
         }
+        if ($session) $session->destroy();
+        return [
+            'status' => false,
+            'message' => 'Invalid email or password'
+        ];
     }
+    
     // funkcja do hashowania hasla przy rejestracji/logowania
     private function hashPassword($password) {
         return password_hash($password, PASSWORD_BCRYPT);
