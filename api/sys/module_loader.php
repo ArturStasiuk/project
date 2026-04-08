@@ -4,59 +4,26 @@
  * Zawiera funkcje do pobierania listy modułów oraz proxy do serwowania plików JS modułów.
  */
 
-// Zwraca listę modułów dostępnych dla użytkownika – narazie dane na sztywno, docelowo z bazy danych
-// $userId – narazie nieużywany, docelowo będzie filtrować moduły z bazy danych dla konkretnego użytkownika
-function getInfoModulesForUser($userId = null) {
-    // nalezy pobrac z seesion id uzytkownika 
-    
-    $modules = [];
-    $modules[] = [
-        'modules_name' => 'usercontolpanel',
-        'active' => '0',
-        'read' => '1',
-        'append' => '1',
-        'clear' => '1',
-        'modify' => '1',
-    ];
-    $modules[] = [
-        'modules_name' => 'notepad',
-        'active' => '1',
-        'read' => '1',
-        'append' => '1',
-        'clear' => '1',
-        'modify' => '1',
-    ];
-    return ['status' => true, 'modules' => $modules];
-}
+
 
 // Zwraca listę URL-i plików JS aktywnych modułów dostępnych dla użytkownika
-function getInfoModules($userId = null) {
+function getInfoModules($modules) {
     $modulesDir = __DIR__ . '/../../modules';
     $jsFiles = [];
-
-    // Pobierz listę aktywnych modułów dla użytkownika
-    // Sprawdzenie czy użytkownik jest zalogowany – narazie zakomentowane
-    // if ($userId !== null) { ... }
-
-    // Narazie aktywne moduły na sztywno
-    $allowedModules = null;
-    $userModulesInfo = getInfoModulesForUser($userId);
-    if ($userModulesInfo['status']) {
-        $allowedModules = [];
-        foreach ($userModulesInfo['modules'] as $mod) {
-            if (isset($mod['active']) && $mod['active'] === '1') {
-                $allowedModules[] = $mod['modules_name'];
-            }
+    $allowedModules = [];
+    // Oczekujemy tablicy modułów w formacie [['modules_name' => ..., 'active' => ...], ...]
+    foreach ($modules as $mod) {
+        if (isset($mod['active']) && $mod['active'] === '1') {
+            $allowedModules[] = $mod['modules_name'];
         }
     }
-
     $resolvedDir = realpath($modulesDir);
     if ($resolvedDir && is_dir($resolvedDir)) {
         $dirHandle = opendir($resolvedDir);
         if ($dirHandle) {
             while (($entry = readdir($dirHandle)) !== false) {
                 if ($entry !== '.' && $entry !== '..' && is_dir($resolvedDir . '/' . $entry)) {
-                    if ($allowedModules !== null && !in_array($entry, $allowedModules)) {
+                    if (!in_array($entry, $allowedModules)) {
                         continue;
                     }
                     $jsFile = $resolvedDir . '/' . $entry . '/' . $entry . '.js';
@@ -111,20 +78,7 @@ if (strpos($file, '..') !== false || str_starts_with($file, './') || str_starts_
 $parts = explode('/', $file, 2);
 $moduleName = $parts[0];
 
-// Pobierz listę aktywnych modułów z funkcji przeniesionej z system.php
-$userModulesInfo = getInfoModulesForUser();
-$allowedModules = [];
-foreach ($userModulesInfo['modules'] as $mod) {
-    if (isset($mod['active']) && $mod['active'] === '1') {
-        $allowedModules[] = $mod['modules_name'];
-    }
-}
-
-if (!in_array($moduleName, $allowedModules)) {
-    error_log("[module_loader] Moduł niedozwolony: $moduleName");
-    http_response_code(403);
-    exit;
-}
+// Usunięto sprawdzanie allowedModules – lista aktywnych modułów jest już przekazywana wyżej
 
 // Budowanie bezpiecznej ścieżki do pliku
 
