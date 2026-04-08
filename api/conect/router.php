@@ -7,6 +7,7 @@ require_once __DIR__ . '/conect.php';
 require_once __DIR__ . '/../dataBase/users.php';
 define('MODULE_LOADER_INCLUDED', true);
 require_once __DIR__ . '/../sys/module_loader.php';
+require_once __DIR__ . '/../dataBase/acess.php';
 class ROUTER {
     private $session;
     private $inputData=null;
@@ -15,6 +16,7 @@ class ROUTER {
     private $db;
     private $users;
     private $data;
+    private $acess;
    public function __construct()
     {
      $this->session = new SESSION();
@@ -22,6 +24,7 @@ class ROUTER {
        $this->db = new CONECT();
        $this->users = new USERS();
         $this->conect = $this->db->connect();
+            $this->acess = new ACESS();
          if (!$this->conect) {
             echo json_encode(['status' => false, 'error' => 'Nie nawiązano połączenia z bazą danych']);
             exit;
@@ -98,13 +101,16 @@ class ROUTER {
     }
     // pobranie informacji o dostępnych modułach (tylko dla zalogowanego użytkownika)
     private function getInfoModules(){
-        // Sprawdzenie czy użytkownik jest zalogowany – narazie zakomentowane
-        // if (!$this->session->getKey('logIn')) {
-        //     return ['status' => false, 'error' => 'Unauthorized'];
-        // }
-        // $userId = $this->session->getKey('id');
-        // return getInfoModules($userId);
-        return getInfoModules();
+        // Sprawdzenie czy użytkownik jest zalogowany – jeśli nie, zwróć błąd 401 Unauthorized
+         if (!$this->session->getKey('logIn')) {
+             return ['status' => false, 'error' => 'Unauthorized'];
+         }
+         // pobranie id użytkownika z sesji
+         $userId = $this->session->getKey('id');
+            // pobranie informacji o modułach z bazy danych dla zalogowanego użytkownika
+            $modules = $this->acess->getActiveModulesForUser($this->conect, $userId);
+            // zaladowanie modułów z katalogu i zwrócenie listy URL-i plików JS aktywnych modułów dostępnych dla użytkownika
+        return getInfoModules($modules['modules']);
     }
 
 
