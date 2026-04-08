@@ -20,7 +20,7 @@ class Router
 {
     private Session    $session;
     private Connection $db;
-    private \mysqli|false $conn;
+    private \mysqli    $conn;
     private Users      $users;
     private Access     $access;
     private ?array     $data;
@@ -30,12 +30,14 @@ class Router
     {
         $this->session = new Session();
         $this->db      = new Connection();
-        $this->conn    = $this->db->connect();
+        $conn          = $this->db->connect();
 
-        if (!$this->conn) {
+        if (!$conn) {
             echo json_encode(['status' => false, 'error' => 'Nie nawiązano połączenia z bazą danych']);
             exit;
         }
+
+        $this->conn = $conn;
 
         $this->users  = new Users();
         $this->access = new Access();
@@ -51,13 +53,19 @@ class Router
     // Routing
     // -------------------------------------------------------------------------
 
+    /** Internal methods not accessible as endpoints. */
+    private const INTERNAL_METHODS = ['__construct', 'dispatch', 'respond'];
+
     private function dispatch(): void
     {
         if (!$this->function) {
             $this->respond(['status' => true, 'message' => 'No function specified']);
         }
 
-        if (!method_exists($this, $this->function)) {
+        if (
+            in_array($this->function, self::INTERNAL_METHODS, true)
+            || !method_exists($this, $this->function)
+        ) {
             $this->respond(['status' => false, 'error' => 'Function not found']);
         }
 
