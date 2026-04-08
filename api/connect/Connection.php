@@ -14,7 +14,7 @@ class Connection
 
     public function __construct()
     {
-        $config         = require __DIR__ . '/../../config.php';
+        $config         = require __DIR__ . '/../config.php';
         $db             = $config['database'];
         $this->host     = $db['host'];
         $this->user     = $db['user'];

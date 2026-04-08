@@ -20,7 +20,7 @@ class Router
 {
     private Session    $session;
     private Connection $db;
-    private \mysqli    $conn;
+    private \mysqli|false $conn;
     private Users      $users;
     private Access     $access;
     private ?array     $data;
