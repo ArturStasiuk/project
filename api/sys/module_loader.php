@@ -7,10 +7,12 @@
 // Zwraca listę modułów dostępnych dla użytkownika – narazie dane na sztywno, docelowo z bazy danych
 // $userId – narazie nieużywany, docelowo będzie filtrować moduły z bazy danych dla konkretnego użytkownika
 function getInfoModulesForUser($userId = null) {
+    // nalezy pobrac z seesion id uzytkownika 
+    
     $modules = [];
     $modules[] = [
         'modules_name' => 'usercontolpanel',
-        'active' => '1',
+        'active' => '0',
         'read' => '1',
         'append' => '1',
         'clear' => '1',
