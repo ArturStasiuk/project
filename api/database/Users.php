@@ -48,7 +48,6 @@ class Users
 
                 return ['status' => true, 'message' => 'Login successful', 'data' => $user];
             }
-            $stmt->close();
         }
 
         $session->destroy();
