@@ -4,7 +4,7 @@ class API {
         this.infoModules = { name: 'API', version: '0.1', author: 'Artur', description: 'API for data base connection' };
         // 
         this.response = null;
-        this.dataRouter = '../api/conect/router'; // poprawiona ścieżka względem public/
+        this.dataRouter = '../api/index';
 
         
 
