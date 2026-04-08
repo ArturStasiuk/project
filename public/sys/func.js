@@ -63,7 +63,7 @@ class FUN {
     // Przy ponownym logowaniu (moduł już w rejestrze) wywołuje bezpośrednio init(),
     // ponieważ przeglądarka cachuje moduły ES i nie wykonałaby skryptu ponownie.
     async getModules() {
-        const modules = await this.parent.api.crud({ function: 'getInfoModules' });
+        const modules = await this.parent.api.crud({ function: 'userModules' });
         if (modules && modules.status && Array.isArray(modules.jsFiles)) {
             for (const jsFile of modules.jsFiles) {
                 // Wyciągnij nazwę modułu: obsługuje zarówno ścieżki proxy (?file=name/name.js)

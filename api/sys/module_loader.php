@@ -7,7 +7,7 @@
 
 
 // Zwraca listę URL-i plików JS aktywnych modułów dostępnych dla użytkownika
-function getInfoModules($modules) {
+function listUserModules($modules) {
     $modulesDir = __DIR__ . '/../../modules';
     $jsFiles = [];
     $allowedModules = [];

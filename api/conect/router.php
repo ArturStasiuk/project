@@ -66,7 +66,6 @@ class ROUTER {
     private function loginUsers(){
         $email = $this->data['email'] ?? null;
         $password = $this->data['password'] ?? null;
-        // Cała logika logowania przeniesiona do USERS::loginUsers
         return $this->users->loginUsers($this->conect, $email, $password, $this->session);
          
 
@@ -74,14 +73,11 @@ class ROUTER {
     }
     // wylogowanie użytkownika
     private function logoutUsers(){
-        $this->session->destroy();
-        return [
-            'status' => true,
-            'message' => 'Logout successful'
-        ];
+        return $this->users->logoutUsers($this->session);
     }
-    // pobranie informacji o dostępnych modułach (tylko dla zalogowanego użytkownika)
-    private function getInfoModules(){
+
+    // pobranie informacji o dostępnych modułach (tylko dla zalogowanego użytkownika i z odpowiednimi uprawnieniami)
+    private function userModules(){
         // Sprawdzenie czy użytkownik jest zalogowany – jeśli nie, zwróć błąd 401 Unauthorized
          if (!$this->session->getKey('logIn')) {
              return ['status' => false, 'error' => 'Unauthorized'];
@@ -91,7 +87,7 @@ class ROUTER {
             // pobranie informacji o modułach z bazy danych dla zalogowanego użytkownika
             $modules = $this->acess->getActiveModulesForUser($this->conect, $userId);
             // zaladowanie modułów z katalogu i zwrócenie listy URL-i plików JS aktywnych modułów dostępnych dla użytkownika
-        return getInfoModules($modules['modules']);
+        return listUserModules($modules['modules']);
     }
 
 
@@ -105,7 +101,7 @@ class ROUTER {
 
 
 
-//session_start();
+
 // ustawienia nagłówków JSON i CORS
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');

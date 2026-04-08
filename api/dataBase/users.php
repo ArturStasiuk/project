@@ -9,7 +9,7 @@ class USERS
     }
 
      
-
+    // logowanie użytkownika
     public function loginUsers($conection, $email, $password, $session ) {
         if (empty($email) || empty($password)) {
             if ($session) $session->destroy();
@@ -45,6 +45,15 @@ class USERS
         ];
     }
     
+    // wylogowanie użytkownika
+    public function logoutUsers($session){
+        if ($session) $session->destroy();
+        return [
+            'status' => true,
+            'message' => 'Logout successful'
+        ];
+    }
+
     // funkcja do hashowania hasla przy rejestracji/logowania
     private function hashPassword($password) {
         return password_hash($password, PASSWORD_BCRYPT);
