@@ -9,7 +9,7 @@ class API {
         
 
     }
-    // uniwersalna funkcja POST do wysyłania danych do dowolnego endpointa w katalogu data
+    // uniwersalna funkcja POST do wysyłania danych do routera
     async crud( data) {
       
         this.response = await this.sendRequest(this.dataRouter, data);
