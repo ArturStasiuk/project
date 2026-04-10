@@ -8,6 +8,7 @@ require_once __DIR__ . '/../dataBase/users.php';
 define('MODULE_LOADER_INCLUDED', true);
 require_once __DIR__ . '/../sys/module_loader.php';
 require_once __DIR__ . '/../dataBase/acess.php';
+require_once __DIR__ . '/../dataBase/company_users.php';
 class ROUTER {
     private $session;
     private $inputData=null;
@@ -17,12 +18,14 @@ class ROUTER {
     private $users;
     private $data;
     private $acess;
+    private $companyUsers;
    public function __construct()
     {
      $this->session = new SESSION();
 
        $this->db = new CONECT();
        $this->users = new USERS();
+       $this->companyUsers = new COMPANY_USERS();
         $this->conect = $this->db->connect();
             $this->acess = new ACESS();
          if (!$this->conect) {
@@ -66,11 +69,27 @@ class ROUTER {
     private function loginUsers(){
         $email = $this->data['email'] ?? null;
         $password = $this->data['password'] ?? null;
-        return $this->users->loginUsers($this->conect, $email, $password, $this->session);
-         
+        $user = $this->users->loginUsers($this->conect, $email, $password, $this->session);
+       if($user['status']!== true){
+           $this->db->disconnect($this->conect);
+           return [
+               'status' => false,
+                'error' => $user['message']
+               
+           ];
+       }
+       $idCompany = $this->companyUsers->getCompanyUsers($this->conect, $user
+       ['data']['id']);
+       $this->session->setKey('id_company', $idCompany['data'] ?? []);
+ 
+       return [
+           'status' => true,
+       ];
+
 
 
     }
+
     // wylogowanie użytkownika
     private function logoutUsers(){
         return $this->users->logoutUsers($this->session);
