@@ -1,12 +1,10 @@
 class CONFIG {
     constructor(parent) {
           this.parent = parent;
-
-
-        this.init();
+          this.init();
     }
     init() {
-        console.log('Inicjalizacja konfiguracji...');
+       // await this.getMeniuStart();
     }
    
     // Menu startowe - dynamiczne w zależności od stanu połączenia i logowania

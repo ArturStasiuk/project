@@ -16,23 +16,22 @@ class SYS {
     //================================================
     async init() {
         console.log('Inicjalizacja systemu...');
-       
-
-       
-
         await this.fun.showMenuStart();
-
-
-
     }
     
 
-    // wylogowanie użytkownika
+    // restart striny 
     async restart() {
-
-        window.location.href = 'index.php';
+    window.location.href = 'index.php';
     }
-
+    // ladowanie modulow publicznych 
+    async loadaPublicModules() {
+        
+    }
+    // ladowanie modolow prywatnych
+    async loadaPrivateModules() {
+        
+    }
 
 
 }
