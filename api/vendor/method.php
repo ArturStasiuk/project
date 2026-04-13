@@ -27,9 +27,9 @@ class METHOD
     public function getPublicTools(mixed $param = null): array
     {
         include_once __DIR__ . '/../service/tools.php';
-        $modules = new TOOLS();
+        $tools = new TOOLS();
         // tutaj możesz dodać logikę do pobierania ścieżek modułów
-        return $modules->getPublicModules();
+        return $tools->getPublicTools();
     }
 
 

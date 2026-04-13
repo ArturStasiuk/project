@@ -2,15 +2,28 @@
 class TOOLS{
     public function __construct(){}
 
-    public function getPublicModules(): array
+    public function getPublicTools(): array
     {
-        // tutaj możesz dodać logikę do pobierania ścieżek modułów
-        // na przykład, możesz zwrócić tablicę z nazwami modułów i ich ścieżkami
-        return [
-            'module1' => '/path/to/module1',
-            'module2' => '/path/to/module2',
-            'module3' => '/path/to/module3',
-        ];
+        $toolsPaths = [];
+        // Szukaj w katalogu 'public/tools' względem katalogu projektu
+        $toolsDir = __DIR__ . '/../../public/tools';
+        if (is_dir($toolsDir)) {
+            $dirs = scandir($toolsDir);
+            foreach ($dirs as $dir) {
+                if ($dir !== '.' && $dir !== '..') {
+                    $subDirPath = $toolsDir . '/' . $dir;
+                    if (is_dir($subDirPath)) {
+                        $jsFile = $subDirPath . '/' . $dir . '.js';
+                        if (file_exists($jsFile)) {
+                            // Zwróć ścieżkę względną względem katalogu 'public', czyli 'tools/nazwa/nazwa.js'
+                            $relativePath = 'tools/' . $dir . '/' . $dir . '.js';
+                            $toolsPaths[] = $relativePath;
+                        }
+                    }
+                }
+            }
+        }
+        return $toolsPaths;
     }
 
 

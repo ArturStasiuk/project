@@ -27,7 +27,17 @@ class SYS {
     }
     // ladowanie modulow publicznych 
     async loadaPublicTools() {
-        await this.api.send({ method: 'getPublicTools' }); 
+        const tools = await this.api.send({ method: 'getPublicTools' });
+        if (Array.isArray(tools)) {
+            for (const path of tools) {
+                try {
+                    await import(`../${path}`);
+                    console.log(`Załadowano moduł: ${path}`);
+                } catch (e) {
+                    console.error(`Błąd ładowania modułu: ${path}`, e);
+                }
+            }
+        }
     }
     // ladowanie modolow prywatnych
     async loadaPrivateTools() {
