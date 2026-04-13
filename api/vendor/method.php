@@ -1,5 +1,5 @@
 <?php
-
+// Ten plik jest odpowiedzialny za dostarczanie klas METHOD do głównego vendor.php
 class METHOD
 {
     public function call(string $methodName, mixed $param = null): void
@@ -9,7 +9,7 @@ class METHOD
             return;
         }
 
-        // jeśli niektóre metody potrzebują param, możesz go przekazywa��:
+        // jeśli niektóre metody potrzebują param, możesz go przekazywać:
         $this->$methodName($param);
     }
 
@@ -21,7 +21,6 @@ class METHOD
         include_once __DIR__ . '/../service/session.php';
         $session = new SESSION();
         $loggedIn = $session->getKey('id_users') !== null;
-
         echo json_encode(['loggedIn' => $loggedIn]);
     }
 }

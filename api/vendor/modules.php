@@ -1,5 +1,6 @@
 <?php
-
+// Ten plik jest odpowiedzialny za dostarczanie klas MODULES i METHOD do głównego vendor.php
+// Dzięki temu możemy trzymać te klasy w osobnych plikach, co poprawiaczytelność i organizację kodu.
 class MODULES
 {
     /**
@@ -40,5 +41,5 @@ class MODULES
             'company' => new COMPANY(),
         ];
     }
-    
+
 }
