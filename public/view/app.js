@@ -1196,6 +1196,21 @@ class View {
                     const hb = mb.querySelector('.menubar-hamburger');
                     hb ? mb.insertBefore(el, hb) : mb.appendChild(el);
                 } else mb.insertBefore(el, existing[position]);
+
+                /* ensure hamburger button exists for mobile screens */
+                if (!mb.querySelector('.menubar-hamburger')) {
+                    const hamburger = document.createElement('button');
+                    hamburger.className = 'menubar-hamburger';
+                    hamburger.title = 'Menu';
+                    hamburger.innerHTML = '&#9776;';
+                    hamburger.addEventListener('click', e => {
+                        e.stopPropagation();
+                        _closeMenus();
+                        const overlay = _buildMobileOverlay();
+                        if (overlay) overlay.classList.add('open');
+                    });
+                    mb.appendChild(hamburger);
+                }
             },
 
             /** Usuwa menu po data-menu-id */
