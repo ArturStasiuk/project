@@ -71,7 +71,7 @@ echo json_encode(['status' => true, 'message' => 'no module specified']);
 //==========includowanie plikow w zaleznosci jakie modules jest wywolywany ===========================================================
 
 
-// modules users - wszystko co zwiazane z uzytkownikami - logowanie, rejestracja, dane uzytkownika itd
+// modules user - wszystko co zwiazane z uzytkownikami - logowanie, rejestracja, dane uzytkownika itd
 function user(){
     include_once __DIR__ . '/../config/config_db.php';
     include_once __DIR__ . '/../connect/connect_db.php';
