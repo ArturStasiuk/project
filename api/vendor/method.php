@@ -22,4 +22,16 @@ class METHOD
         $loggedIn = $session->getKey('id_users') !== null;
         return ['loggedIn' => $loggedIn];
     }
+
+    // pobranie sciezek do modolow public function getModulesPaths(mixed $param = null): array
+    public function getPublicModules(mixed $param = null): array
+    {
+        include_once __DIR__ . '/../service/tools.php';
+        $modules = new TOOLS();
+        // tutaj możesz dodać logikę do pobierania ścieżek modułów
+        return $modules->getPublicModules();
+    }
+
+
+
 }
