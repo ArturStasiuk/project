@@ -2,25 +2,24 @@
 // Ten plik jest odpowiedzialny za dostarczanie klas METHOD do głównego vendor.php
 class METHOD
 {
-    public function call(string $methodName, mixed $param = null): void
+    public function call(string $methodName, mixed $param = null): array
     {
         if (!method_exists($this, $methodName)) {
-            echo json_encode(['status' => 'false', 'message' => 'Method not found']);
-            return;
+            return ['status' => false, 'message' => 'Method not found'];
         }
 
         // jeśli niektóre metody potrzebują param, możesz go przekazywać:
-        $this->$methodName($param);
+        return $this->$methodName($param);
     }
 
     /**
      * sprawdza czy uzytkownik jest zalogowany
      */
-    private function checkLoggedIn(mixed $param = null): void
+    private function checkLoggedIn(mixed $param = null): array
     {
         include_once __DIR__ . '/../service/session.php';
         $session = new SESSION();
         $loggedIn = $session->getKey('id_users') !== null;
-        echo json_encode(['loggedIn' => $loggedIn]);
+        return ['loggedIn' => $loggedIn];
     }
 }

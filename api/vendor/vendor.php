@@ -39,9 +39,11 @@ class VENDOR
             return;
         }
 
+
         // 2) Jeżeli nie ma modules, ale jest method -> wywołaj metodę lokalną (METHOD)
         if ($modulesName === null && $methodName !== null) {
-            $this->method->call($methodName, $param);
+            $result = $this->method->call($methodName, $param);
+            echo json_encode($result);
             return;
         }
 
