@@ -2,10 +2,22 @@
 
 class VENDOR
 {
+    private MODULES $modules;
+    private METHOD $method;
+
     public function __construct()
     {
         $this->enableErrors();
         $this->setJsonHeader();
+
+        // Podpinamy klasy odpowiedzialne za:
+        // - dostarczanie zależności do modułów
+        // - metody lokalne (bez modules)
+        include_once __DIR__ . '/modules.php';
+        include_once __DIR__ . '/method.php';
+
+        $this->modules = new MODULES();
+        $this->method  = new METHOD();
     }
 
     public function handleRequest(): void
@@ -22,14 +34,14 @@ class VENDOR
         $param       = $data['param'] ?? null;
 
         // 1) Jeżeli przekazano modules -> ładuj moduł, twórz klasę, wywołaj metodę
-        if ($modulesName) {
+        if (!empty($modulesName)) {
             $this->handleModuleCall($modulesName, $methodName, $param);
             return;
         }
 
-        // 2) Jeżeli nie ma modules, ale jest method -> wywołaj metodę lokalną (np. checkLoggedIn)
+        // 2) Jeżeli nie ma modules, ale jest method -> wywołaj metodę lokalną (METHOD)
         if ($modulesName === null && $methodName !== null) {
-            $this->handleLocalMethod($methodName, $param);
+            $this->method->call($methodName, $param);
             return;
         }
 
@@ -39,14 +51,8 @@ class VENDOR
     // =============================================================================
     // Module handling
     // =============================================================================
-
-    private function handleModuleCall(?string $modulesName, ?string $methodName, mixed $param): void
+    private function handleModuleCall(string $modulesName, ?string $methodName, mixed $param): void
     {
-        if (!$modulesName) {
-            echo json_encode(['status' => 'false', 'message' => 'Module not specified']);
-            return;
-        }
-
         $moduleFile = __DIR__ . '/../modules/' . $modulesName . '.php';
 
         if (!file_exists($moduleFile)) {
@@ -61,15 +67,15 @@ class VENDOR
             return;
         }
 
-        $instances = $this->buildModuleInstances($modulesName);
+        // Zaleznosci dla modułu bierzemy z klasy MODULES
+        $instances = $this->modules->build($modulesName);
 
         // Tworzenie instancji modułu:
         if (!empty($instances)) {
-            // przekazujemy instancje + param na końcu
             $args = array_merge(array_values($instances), [$param]);
             $moduleInstance = new $modulesName(...$args);
         } else {
-            // fallback kompatybilny z Twoim kodem
+            // fallback kompatybilny z Twoim kodem (gdy brak provider'a)
             $moduleInstance = new $modulesName(null, $param);
         }
 
@@ -83,40 +89,14 @@ class VENDOR
             return;
         }
 
+        // Jeśli metody modułów zawsze zwracają dane (array/bool/string),
+        // to możesz tak jak miałeś:
         echo json_encode($moduleInstance->$methodName());
-    }
-
-    /**
-     * Jeśli istnieje metoda o nazwie modułu (np. user()) to zwróci tablicę instancji zależności.
-     */
-    private function buildModuleInstances(string $modulesName): array
-    {
-        // zamiast function_exists($modulesName) mamy method_exists($this, $modulesName)
-        if (method_exists($this, $modulesName)) {
-            return $this->$modulesName(); // np. ['pdo'=>..., 'session'=>...]
-        }
-        return [];
-    }
-
-    // =============================================================================
-    // Local methods handling (no modules)
-    // =============================================================================
-
-    private function handleLocalMethod(string $methodName, mixed $param): void
-    {
-        if (!method_exists($this, $methodName)) {
-            echo json_encode(['status' => 'false', 'message' => 'Method not found']);
-            return;
-        }
-
-        // Jeżeli chcesz przekazywać $param do metod lokalnych, to tu jest miejsce:
-        $this->$methodName($param);
     }
 
     // =============================================================================
     // Helpers
     // =============================================================================
-
     private function enableErrors(): void
     {
         ini_set('display_errors', '1');
@@ -136,56 +116,11 @@ class VENDOR
 
     private function readJsonInput(): array
     {
-        $raw = file_get_contents('php://input');
+        $raw  = file_get_contents('php://input');
         $data = json_decode($raw, true);
         return is_array($data) ? $data : [];
     }
-
-    // ============================================================================= 
-    // "Modules" dependency providers (dawne funkcje user() itd.)
-    // =============================================================================
-
-    /**
-     * modules user - wszystko co zwiazane z uzytkownikami
-     */
-    private function user(): array
-    {
-        include_once __DIR__ . '/../config/config_db.php';
-        include_once __DIR__ . '/../connect/connect_db.php';
-        $config_db = new CONFIG_DB();
-        $connect_db = new CONNECT();
-
-        include_once __DIR__ . '/../service/session.php';
-        include_once __DIR__ . '/../data_base/users.php';
-        include_once __DIR__ . '/../data_base/access_tables.php';
-        include_once __DIR__ . '/../data_base/company_users.php';
-        include_once __DIR__ . '/../data_base/company.php';
-
-        return [
-            'pdo' => $connect_db->connect($config_db->getConfig()),
-            'session' => new SESSION(),
-            'users' => new USERS(),
-            'access_tables' => new ACCESS_TABLES(),
-            'company_users' => new COMPANY_USERS(),
-            'company' => new COMPANY(),
-        ];
-    }
-
-    // =============================================================================
-    // Metody bez modules (dawne funkcje globalne)
-    // =============================================================================
-
-    /**
-     * sprawdza czy uzytkownik jest zalogowany
-     */
-    private function checkLoggedIn(): void
-    {
-        include_once __DIR__ . '/../service/session.php';
-        $session = new SESSION();
-        $loggedIn = $session->getKey('id_users') !== null;
-        echo json_encode(['loggedIn' => $loggedIn]);
-    }
 }
 
-// Uruchomienie (zastępuje kod proceduralny z pliku)
+// Uruchomienie
 (new VENDOR())->handleRequest();
