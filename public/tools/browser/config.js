@@ -70,7 +70,7 @@ class CONFIG {
     <div style="flex:1;position:relative;min-height:0;overflow:hidden;">
         <iframe id="browser-iframe"
             style="width:100%;height:100%;border:none;background:#fff;display:block;"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+            sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
             src="about:blank">
         </iframe>
         <div id="browser-blocked" style="display:none;position:absolute;inset:0;background:#f8f8f8;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:sans-serif;color:#555;">
@@ -145,7 +145,7 @@ setTimeout(function() {
 
     iframe.addEventListener('load', function() {
         var loc;
-        try { loc = iframe.contentWindow.location.href; } catch(e) { loc = null; }
+        try { loc = iframe.contentWindow.location.href; } catch(e) { /* cross-origin: cannot read location */ loc = null; }
         var statusEl = document.querySelector('#' + winId + ' .status-bar span');
         if (loc && loc !== 'about:blank') {
             urlInput.value = loc;
