@@ -4,7 +4,7 @@ class API {
         this.infoModules = { name: 'API', version: '0.1', author: 'Artur', description: 'API for data base connection' };
         // 
         this.response = null;
-        this.vendorPath = '../api/vendor/init'; // katalog z modułami do obsługi danych, np. users.php, products.php itp.
+        this.vendorPath = '../api/vendor/vendor'; // katalog z modułami do obsługi danych, np. users.php, products.php itp.
 
 
 
