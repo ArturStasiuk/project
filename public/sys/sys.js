@@ -29,10 +29,10 @@ class SYS {
     // logowanie uzytkownika
     async logIn(email, password) {
         await this.fun.closeWinLogin();
-        await this.api.crud({ function: 'loginUsers', data: { email: email, password: password } });
+
         
         await this.init(); // Odświeżenie systemu po zalogowaniu
-        await this.fun.getModules();// Pobranie i aktywacja modułów po zalogowaniu
+
 
     }
     // wylogowanie użytkownika

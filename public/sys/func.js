@@ -16,7 +16,7 @@ class FUN {
         
         
         await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart());
-       // await this.getModules();
+
         
     }
 
@@ -29,7 +29,7 @@ class FUN {
                   const emailInput = document.getElementById('login-email');
                   const passwordInput = document.getElementById('login-password');
                   btn.onclick = null;
-                  btn.onclick = async () => { await this.parent.logIn(emailInput.value, passwordInput.value); };
+                  btn.onclick = async () => { await window.api.send({ modules: 'login', function: 'loginUsers', param: { email: emailInput.value, password: passwordInput.value } }); await this.parent.logIn(emailInput.value, passwordInput.value); };
               }
        }, 10);
     }
@@ -58,76 +58,7 @@ class FUN {
         await this.parent.view.close({ id: 'win-logout' });
     }
     
-    // Wczytuje moduły z serwera i aktywuje je.
-    // Przy pierwszym logowaniu wstrzykuje skrypt modułu do DOM.
-    // Przy ponownym logowaniu (moduł już w rejestrze) wywołuje bezpośrednio init(),
-    // ponieważ przeglądarka cachuje moduły ES i nie wykonałaby skryptu ponownie.
-    async getModules() {
-        const modules = await this.parent.api.crud({ function: 'userModules' });
-        if (modules && modules.status && Array.isArray(modules.jsFiles)) {
-            for (const jsFile of modules.jsFiles) {
-                // Wyciągnij nazwę modułu: obsługuje zarówno ścieżki proxy (?file=name/name.js)
-                // jak i bezpośrednie ścieżki (../modules/name/name.js)
-                let moduleName;
-                try {
-                    const url = new URL(jsFile, window.location.href);
-                    const fileParam = url.searchParams.get('file');
-                    if (fileParam) {
-                        moduleName = fileParam.split('/')[0];
-                    } else {
-                        moduleName = jsFile.split('/').pop().replace('.js', '');
-                    }
-                } catch (e) {
-                    moduleName = jsFile.split('/').pop().replace('.js', '');
-                }
 
-                if (this._loadedModules.has(moduleName)) {
-                    // Moduł był już załadowany – wywołaj init() bezpośrednio przez rejestr
-                    const mod = window._moduleRegistry?.[moduleName];
-                    if (mod && typeof mod.init === 'function') {
-                        await mod.init();
-                        console.log(`Moduł ${moduleName}: ponowna inicjalizacja (init).`);
-                    }
-                } else {
-                    // Pierwsze ładowanie – wstrzyknij skrypt modułu do DOM
-                    const script = document.createElement('script');
-                    script.type = 'module';
-                    script.src = jsFile;
-                    // Atrybut data-module-name umożliwia późniejsze odnalezienie i usunięcie skryptu
-                    script.dataset.moduleName = moduleName;
-                    document.body.appendChild(script);
-                    this._loadedModules.add(moduleName);
-                    console.log(`Moduł ${moduleName}: skrypt załadowany.`);
-                }
-            }
-        }
-    }
-
-    // Dezaktywuje wszystkie aktywne moduły:
-    // 1. Wywołuje deinit() każdego modułu zarejestrowanego w window._moduleRegistry.
-    // 2. Usuwa tagi <script> modułów z DOM (porządek; faktyczne wyładowanie
-    //    modułów ES zależy od przeglądarki – init() będzie wywoływane przez rejestr).
-    // 3. Czyści rejestr modułów.
-    async deinitModules() {
-        const registry = window._moduleRegistry || {};
-
-        for (const [moduleName, mod] of Object.entries(registry)) {
-            try {
-                if (typeof mod.deinit === 'function') {
-                    await mod.deinit();
-                    console.log(`Moduł ${moduleName} został zdezaktywowany.`);
-                }
-            } catch (e) {
-                console.error(`Błąd podczas dezaktywacji modułu ${moduleName}:`, e);
-            }
-        }
-
-        // Usuń tagi <script> wstrzyknięte przez getModules()
-        document.querySelectorAll('script[data-module-name]').forEach(s => s.remove());
-
-        // Wyczyść rejestr – moduły zostaną ponownie zarejestrowane przy następnym logowaniu
-        window._moduleRegistry = {};
-    }
 
 
 

@@ -11,35 +11,20 @@ class CONFIG {
    
     // Menu startowe - dynamiczne w zależności od stanu połączenia i logowania
     async getMenuStart() {
-        const conect = await this.parent.api.crud({ function: 'getConectInfo' });
-        const isLoggedIn = await this.parent.api.crud({ function: 'isLoggedIn' });
+
        
 
-        if (conect.status === true) {
+    
             return {
                 items: [
-                    isLoggedIn.loggedIn ?
+                  
                         {
-                            id: 'sm-logout', icon: '🔓', label: 'Wyloguj', onClick: async () => await this.parent.fun.showWinLogout()
+                        id: 'sm-login', icon: '🔒', label: 'Zaloguj', onClick: async () => await this.parent.fun.showWinLogin()
                         }
-                        :
-                        {
-                            id: 'sm-login', icon: '🔐', label: 'Zaloguj', onClick: async () => await this.parent.fun.showWinLogin()
-                        }
+                       
                 ]
             };
-        } else {
-            return {
-                items: [
-                    {
-                        id: 'sm-nodb',
-                        icon: '❌',
-                        label: 'Brak połączenia z serwerem/bazą danych',
-                        onClick: () => alert('Brak połączenia z serwerem lub bazą danych!')
-                    }
-                ]
-            };
-        }
+
 
  
     }
