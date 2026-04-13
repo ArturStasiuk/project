@@ -1,25 +1,37 @@
-class API { 
+class API {
 
     constructor() {
         this.infoModules = { name: 'API', version: '0.1', author: 'Artur', description: 'API for data base connection' };
         // 
         this.response = null;
-        this.dataRouter = '../api/conect/router'; // poprawiona ścieżka względem public/
+        this.vendorPath = '/new/api/vendor/init'; // katalog z modułami do obsługi danych, np. users.php, products.php itp.
 
-        
+
 
     }
-    // uniwersalna funkcja POST do wysyłania danych do routera
-    async crud( data) {
-      
-        this.response = await this.sendRequest(this.dataRouter, data);
+
+    async send(data) {
+
+        this.response = await this.sendRequest(this.vendorPath, data);
         return this.response;
     }
-    
+
 
     //================================================
+    /**  uniwersalna funkcja POST do wysyłania danych do katalogu z modułami, np. users.php, products.php itp , sprawdza czy plik istnieje przed wysłaniem żądania, jeśli nie istnieje zwraca błąd, jeśli istnieje wysyła dane i zwraca odpowiedź z serwera*/
     async sendRequest(fileName, data) {
         const url = `${fileName}.php`;
+        // Sprawdzenie czy plik istnieje przed wysłaniem żądania
+        try {
+            const fileExists = await fetch(url, { method: 'HEAD' });
+            if (!fileExists.ok) {
+             //   console.error(`API error: Nie znaleziono modułu (${url})`);
+                return { status: 'error', error: `Nie znaleziono modułu: ${url}` };
+            }
+        } catch (err) {
+           // console.error(`API error: Błąd sprawdzania istnienia modułu (${url})`, err);
+            return { status: 'error', error: `Błąd sprawdzania istnienia modułu: ${url}` };
+        }
         try {
             console.log(`wyslano >> ${fileName}:`, data);
             this.response = await fetch(url, {

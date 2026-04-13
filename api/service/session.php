@@ -1,13 +1,20 @@
 <?php
 class SESSION {
    // public $logIn;
+   // id_users / id zalogowanego uzytkownika
 
     public function __construct()
     {
-        session_start();
+      session_start();
       // $this->logIn = null; 
     }
-
+    // uruchomienie sesji
+    public function start()
+     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
 
     // sprawdzenie czy sesja jest aktywna
     public function isActive()
@@ -30,7 +37,7 @@ class SESSION {
      {
         unset($_SESSION[$key]);
     }
-    // pobranie całej sesji
+    // pobranie danych całej sesji
     public function getSession()
      {
         return $_SESSION;
