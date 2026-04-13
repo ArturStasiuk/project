@@ -24,7 +24,7 @@ class METHOD
     }
 
     // pobranie sciezek do modolow public function getModulesPaths(mixed $param = null): array
-    public function getPublicModules(mixed $param = null): array
+    public function getPublicTools(mixed $param = null): array
     {
         include_once __DIR__ . '/../service/tools.php';
         $modules = new TOOLS();

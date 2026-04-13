@@ -17,7 +17,7 @@ class SYS {
     async init() {
         console.log('Inicjalizacja systemu...');
         await this.fun.showMenuStart();
-        await this.loadaPublicModules();
+        await this.loadaPublicTools();
     }
     
 
@@ -26,11 +26,11 @@ class SYS {
     window.location.href = 'index.php';
     }
     // ladowanie modulow publicznych 
-    async loadaPublicModules() {
-        await this.api.send({ method: 'getPublicModules' }); 
+    async loadaPublicTools() {
+        await this.api.send({ method: 'getPublicTools' }); 
     }
     // ladowanie modolow prywatnych
-    async loadaPrivateModules() {
+    async loadaPrivateTools() {
         
     }
 
