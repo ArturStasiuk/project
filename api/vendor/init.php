@@ -16,29 +16,30 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 // Odczytaj dane wejściowe
 $data = json_decode(file_get_contents('php://input'), true);
 // jaki modules ma byc zaladowany 
-$className= isset($data['modules']) ? $data['modules'] : null; 
+$modulesName= isset($data['modules']) ? $data['modules'] : null; 
 // jaka funkcja ma byc wywolana w modules
-$methodName = isset($data['function']) ? $data['function'] : null;
+$methodName = isset($data['method']) ? $data['method'] : null;
 // jakie parametry sa przekazane do funkcji
 $param = isset($data['param']) ? $data['param'] : null;
-// sprawdz czy modules jest przekazany
-if ($className) {
+//============================================================================
+// jezeli przekazano modules i method i param to sprawdz czy plik z modules istnieje i czy metoda istnieje w klasie i ja wywolaj
+if ($modulesName) {
         // sprawdz czy plik z modules istnieje
-        $moduleFile = __DIR__ . '/../modules/' . $className . '.php';
+        $moduleFile = __DIR__ . '/../modules/' . $modulesName . '.php';
         if (file_exists($moduleFile)) {
             include_once $moduleFile;
             // sprawdz czy klasa istnieje
-            if (class_exists($className)) {
+            if (class_exists($modulesName)) {
                 $instances = [];
-                if (function_exists($className)) {
-                    $instances = $className(); // np. ['conn'=>...]
+                if (function_exists($modulesName)) {
+                    $instances = $modulesName(); // np. ['conn'=>...]
                 }
                 // Jeśli konstruktor klasy modułu przyjmuje instancje, przekaż je wraz z $param
                 if (!empty($instances)) {
                     $args = array_merge(array_values($instances), [$param]);
-                    $moduleInstance = new $className(...$args);
+                    $moduleInstance = new $modulesName(...$args);
                 } else {
-                    $moduleInstance = new $className(null, $param); // zakładamy, że pierwszy argument to instancja, drugi to $param
+                    $moduleInstance = new $modulesName(null, $param); // zakładamy, że pierwszy argument to instancja, drugi to $param
                 }
                 // sprawdz czy metoda istnieje w klasie
                 if (method_exists($moduleInstance, $methodName)) {
@@ -46,7 +47,7 @@ if ($className) {
                     echo json_encode($moduleInstance->$methodName());
                     exit;
                 } else {
-                    echo json_encode(['status' => 'false', 'message' => 'Function not found']);
+                    echo json_encode(['status' => 'false', 'message' => 'Method not found']);
                     exit;
                 }
             } else {
@@ -62,15 +63,27 @@ if ($className) {
 
 
 }
-// jeśli modules nie jest przekazany, zwróć odpowiedź z informacją
+//============================================================================
+
+// jezeli przeazano tylko metode i parametry bez modules to sprawdz czy funkcja istnieje i ja wywolaj
+if ($modulesName === null && $methodName !== null && $param !== null) {
+    // sprawdz czy funkcja istnieje
+    if (function_exists($param['method'])) {
+        // wywolaj funkcje i przekaż parametry
+        echo json_encode($param['method']());
+        exit;
+    } else {
+        echo json_encode(['status' => false, 'message' => 'Method not found']);
+        exit;
+    }
+}
+//============================================================================
 
 
 
 echo json_encode(['status' => true, 'message' => 'no module specified']);
 
 //==========includowanie plikow w zaleznosci jakie modules jest wywolywany ===========================================================
-
-
 // modules user - wszystko co zwiazane z uzytkownikami - logowanie, rejestracja, dane uzytkownika itd
 function user(){
     include_once __DIR__ . '/../config/config_db.php';

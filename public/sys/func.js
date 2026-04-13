@@ -61,7 +61,7 @@ class FUN {
     // funkcja logujaca użytkownika, wysyła dane do API, a następnie odświeża system
     async logIn(email, password) {
         await this.closeWinLogin();
-        await this.parent.api.send({ modules: 'user', function: 'loginUsers', param: { email: email, password: password } });
+        await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email: email, password: password } });
         await this.parent.init(); // Odświeżenie systemu po zalogowaniu
     }
     // funkcja wylogowująca użytkownika, wysyła żądanie do API, a następnie odświeża system

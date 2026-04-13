@@ -23,7 +23,7 @@ class USER  //
     public function loginUsers(){
        // sprawdzenie czy uzytkownik nie jest juz zalogowany
          if($this->checkLoggedIn()){
-              return ['status' => false, 'message' => 'User is already logged in'];
+              return ['status' => true, 'message' => 'User is already logged in'];
          }
       // sprawdzenie czy email i haslo sa przekazane
       if(!$this->checkEmailParam() || !$this->checkPasswordParam()){
@@ -174,4 +174,6 @@ class USER  //
     }
     return true;
    }
+
+   //
 }
