@@ -14,7 +14,7 @@ class NOTEPAD {
     async init() {
         console.log(`NOTEPAD: init() called`);
         // Dodanie pozycji do menu startowego
-      await this.func.addStartMenuItem();
+      await this.func.addStartMenuItem({ id: 'sm-notepad' });
      
     }
     
