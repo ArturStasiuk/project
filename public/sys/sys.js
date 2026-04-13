@@ -16,7 +16,7 @@ class SYS {
     //================================================
     async init() {
         console.log('Inicjalizacja systemu...');
-
+        await api.send({ method: 'checkLoggedIn' });
 
        
 

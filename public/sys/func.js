@@ -8,8 +8,9 @@ class FUN {
 
         this.init();
     }
-    init() {
-      //  console.log('Inicjalizacja funkcji...');
+    async init() {
+        //  console.log('Inicjalizacja funkcji...');
+        
     }
 
     async showMenuStart() {

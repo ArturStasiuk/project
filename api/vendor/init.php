@@ -66,23 +66,19 @@ if ($modulesName) {
 //============================================================================
 
 // jezeli przeazano tylko metode i parametry bez modules to sprawdz czy funkcja istnieje i ja wywolaj
-if ($modulesName === null && $methodName !== null && $param !== null) {
+if ($modulesName === null && $methodName !== null ) {
     // sprawdz czy funkcja istnieje
-    if (function_exists($param['method'])) {
-        // wywolaj funkcje i przekaż parametry
-        echo json_encode($param['method']());
-        exit;
-    } else {
-        echo json_encode(['status' => false, 'message' => 'Method not found']);
-        exit;
-    }
+    if (function_exists($methodName)) {
+        // wywolaj funkcje
+        $methodName();
+    } 
 }
 //============================================================================
 
 
 
 echo json_encode(['status' => true, 'message' => 'no module specified']);
-
+//============================================================================
 //==========includowanie plikow w zaleznosci jakie modules jest wywolywany ===========================================================
 // modules user - wszystko co zwiazane z uzytkownikami - logowanie, rejestracja, dane uzytkownika itd
 function user(){
@@ -106,4 +102,17 @@ function user(){
     
 
   ];
+}
+
+// =========================================================
+// metody bez modules -
+// sprawdza czy uzytkownik jest zalogowany 
+function checkLoggedIn(){
+    include_once __DIR__ . '/../service/session.php';
+    $session = new SESSION();
+    $loggedIn = $session->getKey('id_users') !== null;
+    echo json_encode(['loggedIn' => $loggedIn]);
+    exit;
+
+
 }
