@@ -1,5 +1,5 @@
 <?php
-
+// Ten plik jest głównym entry pointem dla wszystkich zapytań do API. To tutaj trafiają wszystkie żądania POST, a następnie są kierowane do odpowiednich modułów i metod. nie zapomnij w produkcji usunąć error_reporting, a także ustawić odpowiednie nagłówki (np. CORS, jeśli potrzebujesz).
 class VENDOR
 {
     private MODULES $modules;

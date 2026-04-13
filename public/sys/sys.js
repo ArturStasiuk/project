@@ -16,7 +16,7 @@ class SYS {
     //================================================
     async init() {
         console.log('Inicjalizacja systemu...');
-        await api.send({ method: 'checkLoggedIn' });
+       
 
        
 
@@ -26,24 +26,10 @@ class SYS {
 
     }
     
-    // logowanie uzytkownika
-    async logIn(email, password) {
-        await this.fun.closeWinLogin();
 
-        
-        await this.init(); // Odświeżenie systemu po zalogowaniu
-
-
-    }
     // wylogowanie użytkownika
-    async logOut() {
-       // window.location.href = 'index.php';
-        await this.fun.closeWinLogout();
-        await this.fun.deinitModules(); // Dezaktywacja modułów (usuwa ikony i skrypty) przed odświeżeniem menu
-        //
-        await this.api.crud({ function: 'logoutUsers' });
-        //  await this.init(); // Odświeżenie systemu i menu po wylogowaniu
-        // zaladowanie index.html ponownie, aby wyczyścić wszystkie dane i skrypty związane z zalogowanym użytkownikiem
+    async restart() {
+
         window.location.href = 'index.php';
     }
 

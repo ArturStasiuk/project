@@ -11,22 +11,25 @@ class CONFIG {
    
     // Menu startowe - dynamiczne w zależności od stanu połączenia i logowania
     async getMenuStart() {
-
-       
-
-    
-            return {
-                items: [
-                  
-                        {
-                        id: 'sm-login', icon: '🔒', label: 'Zaloguj', onClick: async () => await this.parent.fun.showWinLogin()
-                        }
-                       
-                ]
+        const dat = await this.parent.api.send({ method: 'checkLoggedIn' });
+        
+             if (dat.loggedIn) {
+                 return {
+                     items: [
+                         {
+                             id: 'sm-logout', icon: '⏻', label: 'Wyloguj', onClick: async () => await this.parent.fun.showWinLogout()
+                         }
+                     ]
+                 };
+             } else {
+                 return {
+                     items: [
+                         {
+                             id: 'sm-login', icon: '🔐', label: 'Zaloguj', onClick: async () => await this.parent.fun.showWinLogin()
+                         }
+                     ]
+                 }; 
             };
-
-
- 
     }
 
 

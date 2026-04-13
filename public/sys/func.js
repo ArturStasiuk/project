@@ -46,7 +46,7 @@ class FUN {
             if (btnLogout) {
                 btnLogout.onclick = null;
                 btnLogout.onclick = async () => { 
-                 await this.parent.logOut();
+                 await this.logOut();
                 }
             }
             if (btn) {
@@ -67,7 +67,9 @@ class FUN {
     }
     // funkcja wylogowująca użytkownika, wysyła żądanie do API, a następnie odświeża system
     async logOut() {
-
+        await this.closeWinLogout();
+        await this.parent.api.send({ modules: 'user', method: 'logoutUsers' });
+        await this.parent.restart(); // Odświeżenie systemu po wylogowaniu
     }
 
 
