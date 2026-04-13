@@ -1,5 +1,5 @@
 <?php // logowanie wylogowywanie rejestracja itd. - wszystko co zwiazane z uzytkownikami
-class LOGIN  // 
+class USER  // 
 {
     private $pdo;
     private $session;

@@ -24,7 +24,7 @@
 
 <script type="module">
     import api from '../api/api.js';
-    window.api = api;
+   // window.api = api;
 
     import sys from '../public/sys/sys.js';
 

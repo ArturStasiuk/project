@@ -70,31 +70,9 @@ echo json_encode(['status' => true, 'message' => 'no module specified']);
 
 //==========includowanie plikow w zaleznosci jakie modules jest wywolywany ===========================================================
 
-// modules test
-function test(){
-    include_once __DIR__ . '/../config/config_db.php';
-    include_once __DIR__ . '/../connect/connect_db.php';
-    include_once __DIR__ . '/../service/session.php';
-    include_once __DIR__ . '/../data_base/tables.php';
-    $config_db = new CONFIG_DB();
-    $connect_db = new CONNECT();
-    $pdo = $connect_db->connect($config_db->getConfig());
-   
 
-    // Przykład: includowanie dodatkowych plików i tworzenie instancji
-    // include_once __DIR__ . '/../repository/UserRepository.php';
-    // $userRepository = new UserRepository($conn);
-    // Zwróć instancje do dalszego użycia w module
-    return [
-        'pdo' => $pdo, // przekazanie instancji POD do modulu /polaczenie z baza danych
-        'session' => new SESSION(), // przekazanie instancji SESSION do modulu
-        'tables' => new TABLES(), // przekazanie instancji TABLES do modulu
-        //, 'userRepository' => $userRepository
-        // dodaj kolejne instancje jeśli potrzeba
-    ];
-}
-// modules login
-function login(){
+// modules users - wszystko co zwiazane z uzytkownikami - logowanie, rejestracja, dane uzytkownika itd
+function user(){
     include_once __DIR__ . '/../config/config_db.php';
     include_once __DIR__ . '/../connect/connect_db.php';
     $config_db = new CONFIG_DB();

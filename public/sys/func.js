@@ -29,7 +29,7 @@ class FUN {
                   const emailInput = document.getElementById('login-email');
                   const passwordInput = document.getElementById('login-password');
                   btn.onclick = null;
-                  btn.onclick = async () => { await window.api.send({ modules: 'login', function: 'loginUsers', param: { email: emailInput.value, password: passwordInput.value } }); await this.parent.logIn(emailInput.value, passwordInput.value); };
+               btn.onclick = async () => { await this.logIn(emailInput.value, passwordInput.value); }; 
               }
        }, 10);
     }
@@ -57,7 +57,17 @@ class FUN {
     async closeWinLogout() {
         await this.parent.view.close({ id: 'win-logout' });
     }
-    
+  
+    // funkcja logujaca użytkownika, wysyła dane do API, a następnie odświeża system
+    async logIn(email, password) {
+        await this.closeWinLogin();
+        await this.parent.api.send({ modules: 'user', function: 'loginUsers', param: { email: email, password: password } });
+        await this.parent.init(); // Odświeżenie systemu po zalogowaniu
+    }
+    // funkcja wylogowująca użytkownika, wysyła żądanie do API, a następnie odświeża system
+    async logOut() {
+
+    }
 
 
 
