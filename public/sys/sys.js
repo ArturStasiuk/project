@@ -16,12 +16,20 @@ class SYS {
     //================================================
     async init() {
         console.log('Inicjalizacja systemu...');
-        await this.fun.showMenuStart();
+        const dat = await this.api.send({ method: 'checkLoggedIn' });
+       
+        await this.fun.showMenuStart(dat.loggedIn);
+       
+        
+        if (dat.loggedIn) {
+         await this.loadaPrivateTools();
+        };    
         await this.loadaPublicTools();
+
     }
     
 
-    // restart striny 
+    // restart strony 
     async restart() {
     window.location.href = 'index.php';
     }
@@ -30,18 +38,22 @@ class SYS {
         const tools = await this.api.send({ method: 'getPublicTools' });
         if (Array.isArray(tools)) {
             for (const path of tools) {
-                try {
-                    await import(`../${path}`);
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = path;
+                script.onload = () => {
                     console.log(`Załadowano moduł: ${path}`);
-                } catch (e) {
+                };
+                script.onerror = (e) => {
                     console.error(`Błąd ładowania modułu: ${path}`, e);
-                }
+                };
+                document.head.appendChild(script);
             }
         }
     }
     // ladowanie modolow prywatnych
     async loadaPrivateTools() {
-        
+      console.log('Ładowanie modułów prywatnych...');  
     }
 
 

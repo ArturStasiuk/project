@@ -8,10 +8,8 @@ class CONFIG {
     }
    
     // Menu startowe - dynamiczne w zależności od stanu połączenia i logowania
-    async getMenuStart() {
-        const dat = await this.parent.api.send({ method: 'checkLoggedIn' });
-        
-             if (dat.loggedIn) {
+    async getMenuStart(login) {
+        if (login) {
                  return {
                      items: [
                          {

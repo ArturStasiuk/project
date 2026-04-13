@@ -13,10 +13,11 @@ class FUN {
         
     }
 
-    async showMenuStart() {
+    async showMenuStart(login) {
         
         
-        await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart());
+        await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart(login));
+        return;
 
         
     }
@@ -63,7 +64,7 @@ class FUN {
     async logIn(email, password) {
         await this.closeWinLogin();
         await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email: email, password: password } });
-        await this.parent.init(); // Odświeżenie systemu po zalogowaniu
+        await this.parent.restart(); // Odświeżenie systemu po zalogowaniu
     }
     // funkcja wylogowująca użytkownika, wysyła żądanie do API, a następnie odświeża system
     async logOut() {
