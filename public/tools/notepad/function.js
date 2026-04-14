@@ -12,9 +12,9 @@ class FUNCTION {
     }
 
     async openWindow() {
-        await window._view.create(await this.parent.conf.getWindowItem());
-        await window._view.refreshMenubar(await this.parent.conf.getWindowMenu());
-        await window._view.addCard(await this.parent.conf.getWindowContent()); 
+        await window._view.addWindow(await this.parent.conf.getWindowItem());
+        await window._view.refreshWindowMenubar(await this.parent.conf.getWindowMenu());
+        await window._view.addWindowCard(await this.parent.conf.getWindowContent()); 
     }
 
 
