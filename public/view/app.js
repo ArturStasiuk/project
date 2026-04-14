@@ -5,120 +5,120 @@
   ── WindowManager ──────────────────────────────────────────
 
   // Utwórz nowe okno (domyślny rozmiar, wszystkie przyciski):
-  view.create({ id: 'win-notes', title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
+  view.addWindow({ id: 'win-notes', title: 'Notatnik', icon: '📝', statusText: 'Nowy dokument' });
 
   // Utwórz okno z podanym rozmiarem (w pikselach):
-  view.create({ id: 'win-sm', title: 'Małe okno', size: { width: 400, height: 300 } });
+  view.addWindow({ id: 'win-sm', title: 'Małe okno', size: { width: 400, height: 300 } });
 
   // Utwórz okno z rozmiarem jako ciąg CSS:
-  view.create({ id: 'win-wide', title: 'Szerokie', size: { width: '80%', height: '60%' } });
+  view.addWindow({ id: 'win-wide', title: 'Szerokie', size: { width: '80%', height: '60%' } });
 
   // Utwórz okno bez przycisku maksymalizacji:
-  view.create({ id: 'win-nomax', title: 'Bez max', controls: { maximize: false } });
+  view.addWindow({ id: 'win-nomax', title: 'Bez max', controls: { maximize: false } });
 
   // Utwórz okno bez przycisku zamknięcia (np. modal):
-  view.create({ id: 'win-modal', title: 'Modal', controls: { close: false } });
+  view.addWindow({ id: 'win-modal', title: 'Modal', controls: { close: false } });
 
   // Utwórz okno tylko z przyciskiem zamknięcia:
-  view.create({ id: 'win-alert', title: 'Alert', controls: { minimize: false, maximize: false } });
+  view.addWindow({ id: 'win-alert', title: 'Alert', controls: { minimize: false, maximize: false } });
 
   // Utwórz okno bez żadnych przycisków tytułpasek:
-  view.create({ id: 'win-bare', title: 'Splash', controls: { minimize: false, maximize: false, close: false } });
+  view.addWindow({ id: 'win-bare', title: 'Splash', controls: { minimize: false, maximize: false, close: false } });
 
   // Utwórz drugie okno z własnym menu:
-  view.create({ id: 'win-calc', title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
-  view.refreshMenubar({ id: 'win-calc', menus: [
+  view.addWindow({ id: 'win-calc', title: 'Kalkulator', icon: '🧮', statusText: 'Gotowe' });
+  view.refreshWindowMenubar({ id: 'win-calc', menus: [
       { label: 'Widok', id: 'calc-view', items: [
-          { icon: '🔢', label: 'Standardowy', onClick: () => view.setStatus({ id: 'win-calc', text: 'Tryb standardowy' }) },
-          { icon: '📐', label: 'Naukowy',     onClick: () => view.setStatus({ id: 'win-calc', text: 'Tryb naukowy' }) }
+          { icon: '🔢', label: 'Standardowy', onClick: () => view.setWindowStatus({ id: 'win-calc', text: 'Tryb standardowy' }) },
+          { icon: '📐', label: 'Naukowy',     onClick: () => view.setWindowStatus({ id: 'win-calc', text: 'Tryb naukowy' }) }
       ]}
   ]});
 
   // Zmień tytuł okna:
-  view.setTitle({ id: 'win-notes', title: 'Notatnik – plik.txt' });
+  view.setWindowTitle({ id: 'win-notes', title: 'Notatnik – plik.txt' });
 
   // Zmień tekst paska stanu:
-  view.setStatus({ id: 'win-notes', text: 'Plik zapisany pomyślnie' });
+  view.setWindowStatus({ id: 'win-notes', text: 'Plik zapisany pomyślnie' });
 
   // Dodaj kartę do zawartości:
-  view.addCard({ id: 'win-notes', cardId: 'card-1', title: '📄 Dokument', text: 'Treść dokumentu.' });
+  view.addWindowCard({ id: 'win-notes', cardId: 'card-1', title: '📄 Dokument', text: 'Treść dokumentu.' });
 
   // Zaktualizuj kartę:
-  view.updateCard({ id: 'win-notes', cardId: 'card-1', title: '📄 Dokument (zmodyfikowany)', text: 'Nowa treść.' });
+  view.updateWindowCard({ id: 'win-notes', cardId: 'card-1', title: '📄 Dokument (zmodyfikowany)', text: 'Nowa treść.' });
 
   // Usuń kartę:
-  view.removeCard({ id: 'win-notes', cardId: 'card-1' });
+  view.removeWindowCard({ id: 'win-notes', cardId: 'card-1' });
 
   // Odśwież całą zawartość okna:
-  view.refreshContent({ id: 'win-notes',
+  view.refreshWindowContent({ id: 'win-notes',
       header: 'Notatnik', subheader: 'Wersja 2.0',
       cards: [{ id: 'c1', title: 'Info', text: 'Nowa zawartość.' }]
   });
 
   // Dodaj pozycję do istniejącego menu:
-  view.addMenuItem({ id: 'win-main', menuId: 'menu-file',
+  view.addWindowMenuItem({ id: 'win-main', menuId: 'menu-file',
       item: { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') }
   });
 
   // Usuń pozycję z menu:
-  view.removeMenuItem({ id: 'win-main', menuId: 'menu-file', itemId: 'mi-print' });
+  view.removeWindowMenuItem({ id: 'win-main', menuId: 'menu-file', itemId: 'mi-print' });
 
   // Dodaj nowe menu do okna:
-  view.addMenu({ id: 'win-main', menuId: 'menu-tools', label: 'Narzędzia', items: [
+  view.addWindowMenu({ id: 'win-main', menuId: 'menu-tools', label: 'Narzędzia', items: [
       { icon: '🔧', label: 'Ustawienia', onClick: () => {} }
   ]});
 
   // Usuń menu z okna:
-  view.removeMenu({ id: 'win-main', menuId: 'menu-view' });
+  view.removeWindowMenu({ id: 'win-main', menuId: 'menu-view' });
 
   // Dodaj przycisk do paska tytułowego:
-  view.addButton({ id: 'win-notes', btnId: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
+  view.addWindowButton({ id: 'win-notes', btnId: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
 
   // Usuń przycisk:
-  view.removeButton({ id: 'win-notes', btnId: 'btn-pin' });
+  view.removeWindowButton({ id: 'win-notes', btnId: 'btn-pin' });
 
   // Minimalizuj / maksymalizuj / przywróć / zamknij okno:
-  view.minimize({ id: 'win-notes' });
-  view.maximize({ id: 'win-notes' });
-  view.restore({ id: 'win-notes' });
-  view.close({ id: 'win-notes' });
+  view.minimizeWindow({ id: 'win-notes' });
+  view.maximizeWindow({ id: 'win-notes' });
+  view.restoreWindow({ id: 'win-notes' });
+  view.removeWindow({ id: 'win-notes' });
 
   // Sprawdź stan okna:
-  view.isMinimized({ id: 'win-main' });   // → true / false
-  view.isMaximized({ id: 'win-main' });   // → true / false
+  view.isWindowMinimized({ id: 'win-main' });   // → true / false
+  view.isWindowMaximized({ id: 'win-main' });   // → true / false
 
   // Dostęp do pełnego obiektu View (dla zaawansowanych operacji):
-  const v = view.getView({ id: 'win-main' });
+  const v = view.getWindow({ id: 'win-main' });
   v.content.addCard({ id: 'extra', title: 'Extra', text: 'Bezpośredni dostęp do View.' });
 
   ── TaskbarManager ─────────────────────────────────────────
 
   // Pełne odświeżenie paska (resetuje wszystkie elementy):
-  taskbar.refresh({ showStart: true, items: [
-      { id: 'tb-notes', icon: '📝', title: 'Notatnik',   onClick: () => view.restore({ id: 'win-notes' }) },
-      { id: 'tb-calc',  icon: '🧮', title: 'Kalkulator', onClick: () => view.restore({ id: 'win-calc' })  }
+  taskbar.refreshTaskbar({ showStart: true, items: [
+      { id: 'tb-notes', icon: '📝', title: 'Notatnik',   onClick: () => view.restoreWindow({ id: 'win-notes' }) },
+      { id: 'tb-calc',  icon: '🧮', title: 'Kalkulator', onClick: () => view.restoreWindow({ id: 'win-calc' })  }
   ]});
 
   // Dodaj element do paska:
-  taskbar.addItem({
+  taskbar.addTaskbarItem({
       id: 'tb-notes', icon: '📝', title: 'Notatnik',
-      onClick: () => view.restore({ id: 'win-notes' }),
+      onClick: () => view.restoreWindow({ id: 'win-notes' }),
       menuItems: [
-          { label: 'Przywróć',    onClick: () => view.restore({ id: 'win-notes' })  },
-          { label: 'Minimalizuj', onClick: () => view.minimize({ id: 'win-notes' }) },
+          { label: 'Przywróć',    onClick: () => view.restoreWindow({ id: 'win-notes' })  },
+          { label: 'Minimalizuj', onClick: () => view.minimizeWindow({ id: 'win-notes' }) },
           'separator',
-          { label: 'Zamknij',     onClick: () => view.close({ id: 'win-notes' })    }
+          { label: 'Zamknij',     onClick: () => view.removeWindow({ id: 'win-notes' })    }
       ]
   });
 
   // Zaktualizuj tytuł elementu paska:
-  taskbar.updateItem({ id: 'tb-notes', title: 'Notatnik *' });
+  taskbar.updateTaskbarItem({ id: 'tb-notes', title: 'Notatnik *' });
 
   // Usuń element z paska:
-  taskbar.removeItem({ id: 'tb-notes' });
+  taskbar.removeTaskbarItem({ id: 'tb-notes' });
 
   // Ustaw pozycję paska zadań:
-  taskbar.setPosition('bottom'); // 'bottom' | 'top' | 'left' | 'right'
+  taskbar.setTaskbarPosition('bottom'); // 'bottom' | 'top' | 'left' | 'right'
   // Przy zmianie pozycji na 'left' lub 'right' elementy paska automatycznie
   // ustawiają się pionowo, a menu otwiera się po właściwej stronie.
 
@@ -126,22 +126,22 @@
   // Gdy włączone – pasek chowa się i okna zajmują cały ekran;
   // po najechaniu myszą (lub dotknięciu na urządzeniach dotykowych) pasek
   // wysuwa się, a okna zmniejszają się automatycznie.
-  taskbar.setAutoHide(true);
-  taskbar.setAutoHide(false);
-  taskbar.toggleAutoHide();
+  taskbar.setTaskbarAutoHide(true);
+  taskbar.setTaskbarAutoHide(false);
+  taskbar.toggleTaskbarAutoHide();
 
   // Całkowite ukrycie / pokazanie paska zadań:
   // hide() – pasek znika, okna automatycznie zajmują całą dostępną przestrzeń.
   // show() – pasek wraca, okna automatycznie zwalniają dla niego miejsce.
-  taskbar.hide();
-  taskbar.show();
+  taskbar.hideTaskbar();
+  taskbar.showTaskbar();
 
   // ── Menu Start – dodawanie pozycji do przycisku Start ──────
 
   // Odśwież całe menu Start (zastępuje poprzednie pozycje):
   taskbar.refreshStartMenu({ items: [
-      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore({ id: 'win-notes' }) },
-      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore({ id: 'win-calc' })  },
+      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restoreWindow({ id: 'win-notes' }) },
+      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restoreWindow({ id: 'win-calc' })  },
       'separator',
       { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
       { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
@@ -158,40 +158,40 @@
 
   // ── Pełny przykład – dwa okna z paskiem zadań ──────────────
 
-  view.create({ id: 'win-a', title: 'Okno A', icon: '🟦', statusText: 'Gotowe' });
-  view.create({ id: 'win-b', title: 'Okno B', icon: '🟩', statusText: 'Gotowe' });
+  view.addWindow({ id: 'win-a', title: 'Okno A', icon: '🟦', statusText: 'Gotowe' });
+  view.addWindow({ id: 'win-b', title: 'Okno B', icon: '🟩', statusText: 'Gotowe' });
 
-  view.refreshContent({ id: 'win-a', header: 'Okno A', cards: [
+  view.refreshWindowContent({ id: 'win-a', header: 'Okno A', cards: [
       { id: 'ca1', title: 'Karta 1', text: 'Zawartość okna A.' }
   ]});
-  view.refreshContent({ id: 'win-b', header: 'Okno B', cards: [
+  view.refreshWindowContent({ id: 'win-b', header: 'Okno B', cards: [
       { id: 'cb1', title: 'Karta 1', text: 'Zawartość okna B.' }
   ]});
 
-  taskbar.addItem({ id: 'tb-a', icon: '🟦', title: 'Okno A',
-      onClick: () => view.restore({ id: 'win-a' }),
+  taskbar.addTaskbarItem({ id: 'tb-a', icon: '🟦', title: 'Okno A',
+      onClick: () => view.restoreWindow({ id: 'win-a' }),
       menuItems: [
-          { label: 'Minimalizuj', onClick: () => view.minimize({ id: 'win-a' }) },
-          { label: 'Maksymalizuj', onClick: () => view.maximize({ id: 'win-a' }) },
+          { label: 'Minimalizuj', onClick: () => view.minimizeWindow({ id: 'win-a' }) },
+          { label: 'Maksymalizuj', onClick: () => view.maximizeWindow({ id: 'win-a' }) },
           'separator',
-          { label: 'Zamknij', onClick: () => { view.close({ id: 'win-a' }); taskbar.removeItem({ id: 'tb-a' }); } }
+          { label: 'Zamknij', onClick: () => { view.removeWindow({ id: 'win-a' }); taskbar.removeTaskbarItem({ id: 'tb-a' }); } }
       ]
   });
-  taskbar.addItem({ id: 'tb-b', icon: '🟩', title: 'Okno B',
-      onClick: () => view.restore({ id: 'win-b' }),
+  taskbar.addTaskbarItem({ id: 'tb-b', icon: '🟩', title: 'Okno B',
+      onClick: () => view.restoreWindow({ id: 'win-b' }),
       menuItems: [
-          { label: 'Minimalizuj', onClick: () => view.minimize({ id: 'win-b' }) },
-          { label: 'Maksymalizuj', onClick: () => view.maximize({ id: 'win-b' }) },
+          { label: 'Minimalizuj', onClick: () => view.minimizeWindow({ id: 'win-b' }) },
+          { label: 'Maksymalizuj', onClick: () => view.maximizeWindow({ id: 'win-b' }) },
           'separator',
-          { label: 'Zamknij', onClick: () => { view.close({ id: 'win-b' }); taskbar.removeItem({ id: 'tb-b' }); } }
+          { label: 'Zamknij', onClick: () => { view.removeWindow({ id: 'win-b' }); taskbar.removeTaskbarItem({ id: 'tb-b' }); } }
       ]
   });
 
   // ── Dodawanie elementu do ikony Start (z menu kontekstowym) ─
   // Możesz dodać dowolne pozycje menu – aplikacje, skróty, separator:
   taskbar.refreshStartMenu({ items: [
-      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restore({ id: 'win-notes' }) },
-      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restore({ id: 'win-calc' })  },
+      { id: 'sm-notes',    icon: '📝', label: 'Notatnik',    onClick: () => view.restoreWindow({ id: 'win-notes' }) },
+      { id: 'sm-calc',     icon: '🧮', label: 'Kalkulator',  onClick: () => view.restoreWindow({ id: 'win-calc' })  },
       'separator',
       { id: 'sm-settings', icon: '⚙️', label: 'Ustawienia',  onClick: () => alert('Ustawienia') },
       { id: 'sm-off',      icon: '⏻',  label: 'Wyłącz',      disabled: true }
@@ -204,7 +204,7 @@
   ── DesktopIconsManager ────────────────────────────────────
 
   // Dodaj ikonę aplikacji (klik lewym otwiera okno):
-  desktop.addIcon({ id: 'di-notes', icon: '📝', label: 'Notatnik', onClick: () => view.restore({ id: 'win-notes' }) });
+  desktop.addIcon({ id: 'di-notes', icon: '📝', label: 'Notatnik', onClick: () => view.restoreWindow({ id: 'win-notes' }) });
 
   // Dodaj ikonę z menu kontekstowym (prawy klik / długie naciśnięcie na dotyk):
   desktop.addIcon({
@@ -219,7 +219,7 @@
 
   // Dodaj ikonę z własną pozycją (x, y w pikselach):
   desktop.addIcon({ id: 'di-calc', icon: '🧮', label: 'Kalkulator', position: { x: 100, y: 20 },
-      onClick: () => view.restore({ id: 'win-calc' }) });
+      onClick: () => view.restoreWindow({ id: 'win-calc' }) });
 
   // Usuń ikonę:
   desktop.removeIcon({ id: 'di-notes' });
@@ -1515,42 +1515,42 @@ class View {
  *  Każda metoda przyjmuje jeden obiekt konfiguracyjny z polem id.
  *
  *  Tworzenie/usuwanie okna:
- *    wm.create({ id, title?, icon?, statusText?, size?, controls? })  → View
+ *    wm.addWindow({ id, title?, icon?, statusText?, size?, controls? })  → View
  *      size: 'auto' (domyślnie) lub { width, height } – rozmiar okna w px lub CSS.
  *      controls: { minimize?, maximize?, close? } – widoczność przycisków tytułpasek
  *        (false = ukryty). Maksymalizacja jest zawsze ukryta na małych ekranach.
  *      Jeśli okno o podanym id już istnieje – aktualizuje tytuł/status i przywraca je.
- *    wm.close({ id })
- *    wm.getView({ id })                              → View | null
+ *    wm.removeWindow({ id })
+ *    wm.getWindow({ id })                              → View | null
  *
  *  Stan okna:
- *    wm.setTitle({ id, title })
- *    wm.setStatus({ id, text })
- *    wm.minimize({ id })
- *    wm.maximize({ id })
- *    wm.restore({ id })
- *    wm.isMinimized({ id })                          → boolean
- *    wm.isMaximized({ id })                          → boolean
+ *    wm.setWindowTitle({ id, title })
+ *    wm.setWindowStatus({ id, text })
+ *    wm.minimizeWindow({ id })
+ *    wm.maximizeWindow({ id })
+ *    wm.restoreWindow({ id })
+ *    wm.isWindowMinimized({ id })                      → boolean
+ *    wm.isWindowMaximized({ id })                      → boolean
  *
  *  Pasek tytułu:
- *    wm.bindControls({ id, onMinimize, onMaximize, onClose })
- *    wm.addButton({ id, btnId, label, onClick, position? })
- *    wm.removeButton({ id, btnId })
+ *    wm.bindWindowControls({ id, onMinimize, onMaximize, onClose })
+ *    wm.addWindowButton({ id, btnId, label, onClick, position? })
+ *    wm.removeWindowButton({ id, btnId })
  *
  *  Zawartość okna:
- *    wm.refreshContent({ id, header, subheader, cards })
- *    wm.setHeader({ id, text })
- *    wm.setSubheader({ id, text })
- *    wm.addCard({ id, cardId, title, text })
- *    wm.removeCard({ id, cardId })
- *    wm.updateCard({ id, cardId, title?, text? })
+ *    wm.refreshWindowContent({ id, header, subheader, cards })
+ *    wm.setWindowHeader({ id, text })
+ *    wm.setWindowSubheader({ id, text })
+ *    wm.addWindowCard({ id, cardId, title, text })
+ *    wm.removeWindowCard({ id, cardId })
+ *    wm.updateWindowCard({ id, cardId, title?, text? })
  *
  *  Menubar okna:
- *    wm.refreshMenubar({ id, menus })
- *    wm.addMenu({ id, menuId, label, items, position? })
- *    wm.removeMenu({ id, menuId })
- *    wm.addMenuItem({ id, menuId, item })
- *    wm.removeMenuItem({ id, menuId, itemId })
+ *    wm.refreshWindowMenubar({ id, menus })
+ *    wm.addWindowMenu({ id, menuId, label, items, position? })
+ *    wm.removeWindowMenu({ id, menuId })
+ *    wm.addWindowMenuItem({ id, menuId, item })
+ *    wm.removeWindowMenuItem({ id, menuId, itemId })
  * ════════════════════════════════════════════════════════════ */
 class WindowManager {
     constructor({ containerId = 'windowContainer', taskbarId = 'taskbar' } = {}) {
@@ -1569,7 +1569,7 @@ class WindowManager {
      *   Steruje widocznością przycisków tytułpasek. Pominięte lub true = widoczny.
      *   Przycisk maksymalizacji jest zawsze ukryty na małych ekranach.
      */
-    async create({ id, title = '', icon = null, statusText = 'Gotowe', size = 'auto', controls = {} } = {}) {
+    async addWindow({ id, title = '', icon = null, statusText = 'Gotowe', size = 'auto', controls = {} } = {}) {
         if (typeof id !== 'string' || !id.trim()) { console.warn('WindowManager: id okna musi być niepustym ciągiem znaków.'); return null; }
         if (this._windows.has(id)) {
             const v = this._windows.get(id);
@@ -1610,7 +1610,7 @@ class WindowManager {
      * Zwraca instancję View dla danego id lub null
      * @param {{ id }} cfg
      */
-    async getView({ id } = {}) { return this._windows.get(id) || null; }
+    async getWindow({ id } = {}) { return this._windows.get(id) || null; }
 
     async _get(id) {
         if (typeof id !== 'string' || !id.trim()) { console.warn('WindowManager: id okna musi być niepustym ciągiem znaków.'); return null; }
@@ -1620,70 +1620,70 @@ class WindowManager {
     }
 
     /* ── operacje na oknie ────────────────────────────────── */
-    async setTitle({ id, title } = {})   { const v = await this._get(id); await v?.window.setTitle(title); }
-    async setStatus({ id, text } = {})   { const v = await this._get(id); await v?.window.setStatus(text); }
-    async minimize({ id } = {})          { const v = await this._get(id); await v?.window.minimize(); }
-    async maximize({ id } = {})          { const v = await this._get(id); await v?.window.maximize(); }
-    async restore({ id } = {})           { const v = await this._get(id); await v?.window.restore(); }
-    async close({ id } = {})             {
+    async setWindowTitle({ id, title } = {})   { const v = await this._get(id); await v?.window.setTitle(title); }
+    async setWindowStatus({ id, text } = {})   { const v = await this._get(id); await v?.window.setStatus(text); }
+    async minimizeWindow({ id } = {})          { const v = await this._get(id); await v?.window.minimize(); }
+    async maximizeWindow({ id } = {})          { const v = await this._get(id); await v?.window.maximize(); }
+    async restoreWindow({ id } = {})           { const v = await this._get(id); await v?.window.restore(); }
+    async removeWindow({ id } = {})             {
         const v = await this._get(id);
         if (v) { await v.window.close(); this._windows.delete(id); }
     }
-    async isMinimized({ id } = {})       { const v = await this._get(id); return await v?.isMinimized() ?? null; }
-    async isMaximized({ id } = {})       { const v = await this._get(id); return await v?.isMaximized() ?? null; }
+    async isWindowMinimized({ id } = {})       { const v = await this._get(id); return await v?.isMinimized() ?? null; }
+    async isWindowMaximized({ id } = {})       { const v = await this._get(id); return await v?.isMaximized() ?? null; }
 
     /* ── pasek tytułu ─────────────────────────────────────── */
-    async bindControls({ id, onMinimize, onMaximize, onClose } = {}) {
+    async bindWindowControls({ id, onMinimize, onMaximize, onClose } = {}) {
         const v = await this._get(id);
         await v?.titlebar.bindControls({ onMinimize, onMaximize, onClose });
     }
-    async addButton({ id, btnId, label, onClick, position } = {}) {
+    async addWindowButton({ id, btnId, label, onClick, position } = {}) {
         const v = await this._get(id);
         await v?.titlebar.addButton({ id: btnId, label, onClick, position });
     }
-    async removeButton({ id, btnId } = {}) {
+    async removeWindowButton({ id, btnId } = {}) {
         const v = await this._get(id);
         await v?.titlebar.removeButton(btnId);
     }
 
     /* ── zawartość ────────────────────────────────────────── */
-    async refreshContent({ id, header, subheader, cards } = {}) {
+    async refreshWindowContent({ id, header, subheader, cards } = {}) {
         const v = await this._get(id);
         await v?.content.refresh({ header, subheader, cards });
     }
-    async setHeader({ id, text } = {})      { const v = await this._get(id); await v?.content.setHeader(text); }
-    async setSubheader({ id, text } = {})   { const v = await this._get(id); await v?.content.setSubheader(text); }
-    async addCard({ id, cardId, title, text } = {}) {
+    async setWindowHeader({ id, text } = {})      { const v = await this._get(id); await v?.content.setHeader(text); }
+    async setWindowSubheader({ id, text } = {})   { const v = await this._get(id); await v?.content.setSubheader(text); }
+    async addWindowCard({ id, cardId, title, text } = {}) {
         const v = await this._get(id);
         await v?.content.addCard({ id: cardId, title, text });
     }
-    async removeCard({ id, cardId } = {}) {
+    async removeWindowCard({ id, cardId } = {}) {
         const v = await this._get(id);
         await v?.content.removeCard(cardId);
     }
-    async updateCard({ id, cardId, title, text } = {}) {
+    async updateWindowCard({ id, cardId, title, text } = {}) {
         const v = await this._get(id);
         await v?.content.updateCard(cardId, { title, text });
     }
 
     /* ── menubar ──────────────────────────────────────────── */
-    async refreshMenubar({ id, menus } = {}) {
+    async refreshWindowMenubar({ id, menus } = {}) {
         const v = await this._get(id);
         await v?.menubar.refresh({ menus });
     }
-    async addMenu({ id, menuId, label, items, position } = {}) {
+    async addWindowMenu({ id, menuId, label, items, position } = {}) {
         const v = await this._get(id);
         await v?.menubar.addMenu({ id: menuId, label, items, position });
     }
-    async removeMenu({ id, menuId } = {}) {
+    async removeWindowMenu({ id, menuId } = {}) {
         const v = await this._get(id);
         await v?.menubar.removeMenu(menuId);
     }
-    async addMenuItem({ id, menuId, item } = {}) {
+    async addWindowMenuItem({ id, menuId, item } = {}) {
         const v = await this._get(id);
         await v?.menubar.addMenuItem(menuId, item);
     }
-    async removeMenuItem({ id, menuId, itemId } = {}) {
+    async removeWindowMenuItem({ id, menuId, itemId } = {}) {
         const v = await this._get(id);
         await v?.menubar.removeMenuItem(menuId, itemId);
     }
@@ -1695,12 +1695,19 @@ class WindowManager {
  *  obiekt konfiguracyjny z polem id (gdzie wymagane).
  *
  *  Pełne odświeżenie:
- *    tb.refresh({ showStart?, items? })
+ *    tb.refreshTaskbar({ showStart?, items? })
  *
  *  Operacje na elementach:
- *    tb.addItem({ id, icon?, title, onClick, menuItems? })
- *    tb.removeItem({ id })
- *    tb.updateItem({ id, title?, icon?, onClick?, menuItems? })
+ *    tb.addTaskbarItem({ id, icon?, title, onClick, menuItems? })
+ *    tb.removeTaskbarItem({ id })
+ *    tb.updateTaskbarItem({ id, title?, icon?, onClick?, menuItems? })
+ *
+ *  Pozycja i widoczność:
+ *    tb.setTaskbarPosition('bottom' | 'top' | 'left' | 'right')
+ *    tb.setTaskbarAutoHide(enabled)
+ *    tb.toggleTaskbarAutoHide()
+ *    tb.hideTaskbar()
+ *    tb.showTaskbar()
  *
  *  Menu Start:
  *    tb.refreshStartMenu({ items })
@@ -1721,10 +1728,10 @@ class TaskbarManager {
         this._isHidden              = false;
     }
 
-    async refresh(cfg = {})               { await this._tb.refresh(cfg); }
-    async addItem({ id, ...cfg } = {})    { await this._tb.addItem({ id, ...cfg }); }
-    async removeItem({ id } = {})         { await this._tb.removeItem(id); }
-    async updateItem({ id, ...cfg } = {}) { await this._tb.updateItem(id, cfg); }
+    async refreshTaskbar(cfg = {})               { await this._tb.refresh(cfg); }
+    async addTaskbarItem({ id, ...cfg } = {})    { await this._tb.addItem({ id, ...cfg }); }
+    async removeTaskbarItem({ id } = {})         { await this._tb.removeItem(id); }
+    async updateTaskbarItem({ id, ...cfg } = {}) { await this._tb.updateItem(id, cfg); }
 
     async refreshStartMenu({ items = [] } = {})  { await this._tb.refreshStartMenu(items); }
     async addStartMenuItem(item)                 { await this._tb.addStartMenuItem(item); }
@@ -1760,7 +1767,7 @@ class TaskbarManager {
      * Ustawia pozycję paska zadań
      * @param {'bottom'|'top'|'left'|'right'} position
      */
-    async setPosition(position = 'bottom') {
+    async setTaskbarPosition(position = 'bottom') {
         const bar  = this._view._taskbarEl;
         const body = document.body;
 
@@ -1782,7 +1789,7 @@ class TaskbarManager {
      * Przy najechaniu/interakcji pasek wysuwa się i okna zmniejszają się.
      * @param {boolean} enabled
      */
-    async setAutoHide(enabled = false) {
+    async setTaskbarAutoHide(enabled = false) {
         const bar = this._view._taskbarEl;
 
         /* usuń poprzednie listenery autohide */
@@ -1842,15 +1849,15 @@ class TaskbarManager {
     }
 
     /** Przełącza automatyczne ukrywanie paska zadań */
-    async toggleAutoHide() {
-        await this.setAutoHide(!this._autoHideActive);
+    async toggleTaskbarAutoHide() {
+        await this.setTaskbarAutoHide(!this._autoHideActive);
     }
 
     /**
      * Całkowicie ukrywa pasek zadań.
      * Okna automatycznie rozszerzają się na całą dostępną przestrzeń.
      */
-    async hide() {
+    async hideTaskbar() {
         this._view._taskbarEl.style.display = 'none';
         this._isHidden = true;
         await this._syncCSSVars();
@@ -1861,7 +1868,7 @@ class TaskbarManager {
      * Pokazuje pasek zadań po wcześniejszym ukryciu.
      * Okna automatycznie zwalniają miejsce dla paska.
      */
-    async show() {
+    async showTaskbar() {
         this._view._taskbarEl.style.display = '';
         this._isHidden = false;
         await this._syncCSSVars();
@@ -2400,8 +2407,8 @@ class ContextMenuManager {
 
 const view = new WindowManager({ containerId: 'windowContainer', taskbarId: 'taskbar' });
 const taskbar = new TaskbarManager({ taskbarId: 'taskbar' });
-await taskbar.refresh({ showStart: true, items: [] });
-await taskbar.setPosition('bottom'); /* domyślna pozycja */
+await taskbar.refreshTaskbar({ showStart: true, items: [] });
+await taskbar.setTaskbarPosition('bottom'); /* domyślna pozycja */
 const desktopIcons = new DesktopIconsManager({ containerId: 'desktopIcons' });
 const contextMenu  = new ContextMenuManager();
 
@@ -2448,5 +2455,5 @@ export default view;
 
 
 
-//taskbar.setAutoHide(true);
+//taskbar.setTaskbarAutoHide(true);
 

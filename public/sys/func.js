@@ -23,8 +23,8 @@ class FUN {
     }
 
    async showWinLogin() {
-       await this.parent.view.create(await this.parent.con.getWinLogin());
-       await this.parent.view.addCard(await this.parent.con.getContentWinLogin()); 
+       await this.parent.view.addWindow(await this.parent.con.getWinLogin());
+       await this.parent.view.addWindowCard(await this.parent.con.getContentWinLogin()); 
        setTimeout(() => {
               const btn = document.getElementById('login-button');
            if (btn) {
@@ -36,11 +36,11 @@ class FUN {
        }, 10);
     }
    async closeWinLogin() {
-        await this.parent.view.close({ id: 'win-login' });
+        await this.parent.view.removeWindow({ id: 'win-login' });
     }
     async showWinLogout() {
-        await this.parent.view.create(await this.parent.con.getWinLogout());
-        await this.parent.view.addCard(await this.parent.con.getContentWinLogout());
+        await this.parent.view.addWindow(await this.parent.con.getWinLogout());
+        await this.parent.view.addWindowCard(await this.parent.con.getContentWinLogout());
         setTimeout(() => {
             const btn = document.getElementById('cancel-logout');
             const btnLogout = document.getElementById('confirm-logout');
@@ -57,7 +57,7 @@ class FUN {
         }, 10);
     }
     async closeWinLogout() {
-        await this.parent.view.close({ id: 'win-logout' });
+        await this.parent.view.removeWindow({ id: 'win-logout' });
     }
   
     // funkcja logujaca użytkownika, wysyła dane do API, a następnie odświeża system

@@ -41,20 +41,17 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
   refresh({ showStart?, items? })                               → Promise<void>
     Czyści i przebudowuje cały pasek zadań.
     showStart  – czy wyświetlać przycisk Start (domyślnie: true).
-    items      – tablica elementów paska: [{ id, icon?, title, onClick, menuItems? }].
+    items      – tablica elementów paska.
     Zawsze rysuje prawy obszar (przycisk listy okien + zegar).
 
   addItem({ id, icon?, title, onClick, menuItems? })            → Promise<void>
     Dodaje element do paska lub aktualizuje istniejący (upsert).
-    Jeśli element o danym id już istnieje, jest zastępowany nowym.
-    menuItems – opcjonalna tablica pozycji menu kontekstowego (prawy klik).
 
   removeItem(id)                                                → Promise<void>
     Usuwa element o podanym id z paska.
 
   updateItem(id, { title?, icon?, onClick?, menuItems? })       → Promise<void>
     Aktualizuje tytuł, ikonę lub handler kliknięcia elementu paska.
-    Zmiana onClick wymaga klonowania elementu (usuwa poprzednie listenery).
 
   refreshStartMenu(items)                                       → Promise<void>
     Zastępuje całą zawartość menu Start nową listą pozycji.
@@ -62,8 +59,6 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
 
   addStartMenuItem(item)                                        → Promise<void>
     Dołącza pozycję do menu Start lub aktualizuje istniejącą (upsert).
-    Jeśli pozycja o danym id już istnieje, jest zastępowana nową.
-    item – obiekt { id?, icon?, label, disabled?, onClick } lub ciąg 'separator'.
 
   removeStartMenuItem(id)                                       → Promise<void>
     Usuwa pozycję menu Start o podanym id.
@@ -75,130 +70,54 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
     title      – tytuł wyświetlany na pasku tytułowym (domyślnie: '').
     icon       – emoji lub tekst ikony okna (domyślnie: null).
     statusText – tekst paska stanu (domyślnie: 'Gotowe').
-    size       – 'auto' (domyślnie) lub { width, height }:
-                   • 'auto' – rozmiar ustalany dynamicznie przez _updateSize().
-                   • { width, height } – liczba (traktowana jako px) lub ciąg CSS
-                     (np. '50%', '640px'). Ignorowane na małych ekranach, gdzie
-                     okno jest zawsze maksymalizowane.
-    controls   – obiekt { minimize?, maximize?, close? } (wartości boolean):
-                   • pominięty lub true  – przycisk widoczny,
-                   • false              – przycisk ukryty.
-                   Przycisk maksymalizacji jest zawsze ukryty gdy
-                   window.innerWidth ≤ MOBILE_BREAKPOINT, niezależnie od flagi.
-
-    Po utworzeniu okno jest przeciągalne za pasek tytułowy i wysuwa się na
-    wierzch przy kliknięciu. Na małych ekranach jest automatycznie
-    maksymalizowane.
+    size       – 'auto' (domyślnie) lub { width, height } (px lub ciąg CSS).
+    controls   – obiekt { minimize?, maximize?, close? } (wartości boolean).
 
   setTitle(title)                                               → Promise<void>
-    Zmienia tytuł okna i aktualizuje wpis w globalnym rejestrze okien.
-
   setStatus(text)                                               → Promise<void>
-    Ustawia tekst paska stanu.
-
   minimize()                                                    → Promise<void>
-    Minimalizuje okno. Jeśli okno jest już zminimalizowane – przywraca.
-
   maximize()                                                    → Promise<void>
-    Maksymalizuje okno na dostępny obszar roboczy (z uwzględnieniem paska
-    zadań). Zapamiętuje poprzedni rozmiar i pozycję. Jeśli okno jest już
-    zmaksymalizowane – przywraca.
-
   restore()                                                     → Promise<void>
-    Przywraca okno z minimalizacji lub maksymalizacji. Na małych ekranach
-    przywrócenie zawsze skutkuje ponowną maksymalizacją.
-
   close()                                                       → Promise<void>
-    Zamyka okno (animacja + ukrycie elementu DOM). Usuwa wpis z rejestru.
 
   ── TitlebarModule (view.titlebar) ──────────────────────────────────────────
 
-    ({ onMinimize?, onMaximize?, onClose? })          → Promise<void>
-    Podpina funkcje zwrotne pod przyciski paska tytułowego.
-    Przyciski, które nie istnieją (np. ukryte przez parametr controls), są
-    bezpiecznie pomijane.
-
+  bindControls({ onMinimize?, onMaximize?, onClose? })          → Promise<void>
   addButton({ id?, label, onClick, position? })                 → Promise<void>
-    Dodaje własny przycisk do paska tytułowego lub aktualizuje istniejący (upsert).
-    Jeśli przycisk o danym id już istnieje, jest zastępowany nowym.
-    id       – opcjonalny identyfikator (data-tbtn-id).
-    label    – tekst / emoji przycisku.
-    position – 'before-controls' (domyślnie) | 'after-icon':
-               'before-controls' – wstawia przed grupą przycisków min/max/close,
-               'after-icon'      – wstawia jako pierwszy w grupie przycisków.
-
   removeButton(id)                                              → Promise<void>
-    Usuwa przycisk o podanym data-tbtn-id z paska tytułowego.
 
   ── MenubarModule (view.menubar) ────────────────────────────────────────────
 
   refresh({ menus? })                                           → Promise<void>
-    Czyści i przebudowuje całe menu górne okna.
-    menus – tablica [{ label, id, items }].
-    Automatycznie dodaje przycisk hamburger widoczny tylko na małych ekranach.
-
   addMenu({ label, id, items?, position? })                     → Promise<void>
-    Dodaje nowe menu do paska lub aktualizuje istniejące (upsert).
-    Jeśli menu o danym id już istnieje, jest zastępowane nowym.
-    position – indeks numeryczny, 'first' lub 'last' (domyślnie).
-
   removeMenu(id)                                                → Promise<void>
-    Usuwa menu o podanym data-menu-id.
-
   addMenuItem(menuId, item)                                     → Promise<void>
-    Dołącza pozycję do istniejącego menu lub aktualizuje istniejącą (upsert).
-    Jeśli pozycja o danym id już istnieje, jest zastępowana nową.
-    item – { id?, icon?, label, shortcut?, disabled?, separator?, submenu?,
-             onClick }.
-
   removeMenuItem(menuId, itemId)                                → Promise<void>
-    Usuwa pozycję o podanym data-mi-id z menu o podanym data-menu-id.
 
   ── ContentModule (view.content) ────────────────────────────────────────────
 
   refresh({ header?, subheader?, cards? })                      → Promise<void>
-    Czyści i przebudowuje całą zawartość okna.
-    cards – tablica [{ id?, title, text }].
-
   setHeader(text)                                               → Promise<void>
-    Ustawia lub tworzy nagłówek sekcji zawartości.
-
   setSubheader(text)                                            → Promise<void>
-    Ustawia lub tworzy podtytuł sekcji zawartości.
-
   addCard({ id?, title?, text? })                               → Promise<void>
-    Dodaje kartę do zawartości okna lub aktualizuje istniejącą (upsert).
-    Jeśli karta o danym id już istnieje, jej zawartość jest odświeżana.
-
   removeCard(id)                                                → Promise<void>
-    Usuwa kartę o podanym data-card-id.
-
   updateCard(id, { title?, text? })                             → Promise<void>
-    Aktualizuje tytuł lub treść (HTML) istniejącej karty.
 
   ── Metody pomocnicze View ───────────────────────────────────────────────────
 
   isMinimized()                                                 → Promise<boolean>
-    Zwraca true jeśli okno jest aktualnie zminimalizowane.
-
   isMaximized()                                                 → Promise<boolean>
-    Zwraca true jeśli okno jest aktualnie zmaksymalizowane.
-
   _wmAction(action)                                             → Promise<void>
     Wewnętrzna logika: 'minimize' | 'maximize' | 'restore' | 'close'.
-    Zarządza stanem okna, klasami CSS i rejestrem okien.
-
   _updateSize()                                                 → Promise<void>
-    Przelicza rozmiar okna (max 900×600 lub bieżąca wielkość ekranu − 40 px).
-    Wywoływany przy przywracaniu i zdarzeniu window resize.
+    Przelicza rozmiar okna przy przywracaniu i zdarzeniu window resize.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   class WindowManager
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   Zarządza wieloma oknami za pomocą unikalnego id. Każde okno to osobna
-  instancja View. Metody przyjmują obiekt z polem `id` (i opcjonalnie innymi
-  parametrami).
+  instancja View. Metody przyjmują obiekt z polem `id`.
 
   Konstruktor
   ───────────
@@ -208,69 +127,154 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
 
   Tworzenie i zarządzanie oknami
   ──────────────────────────────
-  create({ id, title?, icon?, statusText?, size?, controls? })  → Promise<View|null>
+  addWindow({ id, title?, icon?, statusText?, size?, controls? })  → Promise<View|null>
     Tworzy nowe okno lub aktualizuje istniejące (upsert).
     Jeśli okno o danym id już istnieje – aktualizuje tytuł/status i je przywraca.
     Zwraca instancję View lub null gdy id jest puste.
-    Parametry size i controls – patrz View.window.create() powyżej.
-    Automatycznie podpina przyciski min/max/close i rejestruje obsługę
-    zdarzenia window.resize dla zmaksymalizowanych okien.
 
-  getView({ id })                                               → Promise<View|null>
+    Przykład:
+      await view.addWindow({ id: 'win-editor', title: 'Edytor', icon: '📝',
+          statusText: 'Nowy dokument', size: { width: 800, height: 500 } });
+
+  getWindow({ id })                                             → Promise<View|null>
     Zwraca instancję View dla danego id lub null.
 
-  close({ id })                                                 → Promise<void>
+    Przykład:
+      const v = await view.getWindow({ id: 'win-editor' });
+      await v.content.addCard({ id: 'extra', title: 'Info', text: 'Dane' });
+
+  removeWindow({ id })                                          → Promise<void>
     Zamyka okno i usuwa je z mapy okien.
+
+    Przykład:
+      await view.removeWindow({ id: 'win-editor' });
 
   Stan okna
   ─────────
-  setTitle({ id, title })                                       → Promise<void>
-  setStatus({ id, text })                                       → Promise<void>
-  minimize({ id })                                              → Promise<void>
-  maximize({ id })                                              → Promise<void>
-  restore({ id })                                               → Promise<void>
-  isMinimized({ id })                                           → Promise<boolean|null>
-  isMaximized({ id })                                           → Promise<boolean|null>
+  setWindowTitle({ id, title })                                 → Promise<void>
+    Przykład:
+      await view.setWindowTitle({ id: 'win-editor', title: 'Edytor – plik.txt' });
+
+  setWindowStatus({ id, text })                                 → Promise<void>
+    Przykład:
+      await view.setWindowStatus({ id: 'win-editor', text: 'Zapisano pomyślnie' });
+
+  minimizeWindow({ id })                                        → Promise<void>
+    Przykład:
+      await view.minimizeWindow({ id: 'win-editor' });
+
+  maximizeWindow({ id })                                        → Promise<void>
+    Przykład:
+      await view.maximizeWindow({ id: 'win-editor' });
+
+  restoreWindow({ id })                                         → Promise<void>
+    Przykład:
+      await view.restoreWindow({ id: 'win-editor' });
+
+  isWindowMinimized({ id })                                     → Promise<boolean|null>
+    Przykład:
+      if (await view.isWindowMinimized({ id: 'win-editor' }))
+          await view.restoreWindow({ id: 'win-editor' });
+
+  isWindowMaximized({ id })                                     → Promise<boolean|null>
+    Przykład:
+      console.log(await view.isWindowMaximized({ id: 'win-editor' }));
 
   Pasek tytułowy
   ──────────────
-  bindControls({ id, onMinimize?, onMaximize?, onClose? })      → Promise<void>
-    Nadpisuje handlery przycisków min/max/close (np. po własnej logice zamknięcia).
+  bindWindowControls({ id, onMinimize?, onMaximize?, onClose? }) → Promise<void>
+    Nadpisuje handlery przycisków min/max/close.
 
-  addButton({ id, btnId?, label, onClick, position? })          → Promise<void>
-    Dodaje własny przycisk do paska tytułowego okna id lub aktualizuje istniejący (upsert).
-    Jeśli przycisk o danym btnId już istnieje, jest zastępowany nowym.
+    Przykład:
+      await view.bindWindowControls({ id: 'win-editor',
+          onClose: async () => {
+              if (confirm('Zamknąć?')) await view.removeWindow({ id: 'win-editor' });
+          }
+      });
 
-  removeButton({ id, btnId })                                   → Promise<void>
-    Usuwa przycisk o btnId z paska tytułowego okna id.
+  addWindowButton({ id, btnId?, label, onClick, position? })    → Promise<void>
+    Przykład:
+      await view.addWindowButton({ id: 'win-editor', btnId: 'btn-save',
+          label: '💾', onClick: () => alert('Zapisano!') });
+
+  removeWindowButton({ id, btnId })                             → Promise<void>
+    Przykład:
+      await view.removeWindowButton({ id: 'win-editor', btnId: 'btn-save' });
 
   Zawartość okna
   ──────────────
-  refreshContent({ id, header?, subheader?, cards? })           → Promise<void>
-  setHeader({ id, text })                                       → Promise<void>
-  setSubheader({ id, text })                                    → Promise<void>
-  addCard({ id, cardId?, title?, text? })                       → Promise<void>
-  removeCard({ id, cardId })                                    → Promise<void>
-  updateCard({ id, cardId, title?, text? })                     → Promise<void>
-    addCard stosuje upsert: jeśli karta o danym cardId już istnieje, aktualizuje jej treść HTML.
+  refreshWindowContent({ id, header?, subheader?, cards? })     → Promise<void>
+    Przykład:
+      await view.refreshWindowContent({ id: 'win-editor',
+          header: 'Edytor tekstu', subheader: 'Wersja 1.0',
+          cards: [{ id: 'c1', title: 'Dokument', text: 'Treść.' }] });
+
+  setWindowHeader({ id, text })                                 → Promise<void>
+    Przykład:
+      await view.setWindowHeader({ id: 'win-editor', text: 'Mój dokument' });
+
+  setWindowSubheader({ id, text })                              → Promise<void>
+    Przykład:
+      await view.setWindowSubheader({ id: 'win-editor', text: 'Ostatnio: 12:00' });
+
+  addWindowCard({ id, cardId?, title?, text? })                 → Promise<void>
+    Dodaje kartę lub aktualizuje istniejącą (upsert).
+
+    Przykład:
+      await view.addWindowCard({ id: 'win-editor', cardId: 'c1',
+          title: 'Sekcja 1', text: '<p>Treść sekcji.</p>' });
+
+  removeWindowCard({ id, cardId })                              → Promise<void>
+    Przykład:
+      await view.removeWindowCard({ id: 'win-editor', cardId: 'c1' });
+
+  updateWindowCard({ id, cardId, title?, text? })               → Promise<void>
+    Przykład:
+      await view.updateWindowCard({ id: 'win-editor', cardId: 'c1',
+          text: 'Zaktualizowana treść.' });
 
   Menu górne okna
   ───────────────
-  refreshMenubar({ id, menus })                                 → Promise<void>
-  addMenu({ id, menuId, label, items?, position? })             → Promise<void>
-    Dodaje menu lub aktualizuje istniejące (upsert) – jeśli menuId już istnieje, zastępuje je.
-  removeMenu({ id, menuId })                                    → Promise<void>
-  addMenuItem({ id, menuId, item })                             → Promise<void>
-    Dodaje pozycję do menu lub aktualizuje istniejącą (upsert) – jeśli item.id już istnieje, zastępuje ją.
-  removeMenuItem({ id, menuId, itemId })                        → Promise<void>
+  refreshWindowMenubar({ id, menus })                           → Promise<void>
+    Przykład:
+      await view.refreshWindowMenubar({ id: 'win-editor', menus: [
+          { label: 'Plik', id: 'menu-file', items: [
+              { icon: '📄', label: 'Nowy',    onClick: () => {} },
+              { icon: '💾', label: 'Zapisz',  onClick: () =>
+                  view.setWindowStatus({ id: 'win-editor', text: 'Zapisano' }) }
+          ]}
+      ]});
+
+  addWindowMenu({ id, menuId, label, items?, position? })       → Promise<void>
+    Dodaje menu lub aktualizuje istniejące (upsert).
+
+    Przykład:
+      await view.addWindowMenu({ id: 'win-editor', menuId: 'menu-tools',
+          label: 'Narzędzia',
+          items: [{ icon: '⚙️', label: 'Ustawienia', onClick: () => {} }] });
+
+  removeWindowMenu({ id, menuId })                              → Promise<void>
+    Przykład:
+      await view.removeWindowMenu({ id: 'win-editor', menuId: 'menu-tools' });
+
+  addWindowMenuItem({ id, menuId, item })                       → Promise<void>
+    Dodaje pozycję do menu lub aktualizuje istniejącą (upsert).
+
+    Przykład:
+      await view.addWindowMenuItem({ id: 'win-editor', menuId: 'menu-file',
+          item: { icon: '📤', label: 'Eksportuj', onClick: () => alert('Eksport!') } });
+
+  removeWindowMenuItem({ id, menuId, itemId })                  → Promise<void>
+    Przykład:
+      await view.removeWindowMenuItem({ id: 'win-editor', menuId: 'menu-file',
+          itemId: 'mi-export' });
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   class TaskbarManager
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   Zarządza paskiem zadań: pozycją, widocznością, auto-ukrywaniem oraz
-  zawartością (elementy, menu Start). Wewnętrznie deleguje operacje do
-  TaskbarModule wewnątrz instancji View.
+  zawartością (elementy, menu Start).
 
   Konstruktor
   ───────────
@@ -280,68 +284,114 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
 
   Zarządzanie zawartością
   ───────────────────────
-  refresh(cfg)                                                  → Promise<void>
+  refreshTaskbar(cfg)                                           → Promise<void>
     Pełne odświeżenie paska. cfg – patrz View.taskbar.refresh().
 
-  addItem({ id, icon?, title, onClick, menuItems? })            → Promise<void>
+    Przykład:
+      await taskbar.refreshTaskbar({ showStart: true, items: [
+          { id: 'tb-editor', icon: '📝', title: 'Edytor',
+            onClick: () => view.restoreWindow({ id: 'win-editor' }) }
+      ]});
+
+  addTaskbarItem({ id, icon?, title, onClick, menuItems? })     → Promise<void>
     Dodaje element do paska lub aktualizuje istniejący (upsert).
-    Jeśli element o danym id już istnieje, jest zastępowany nowym.
 
-  removeItem({ id })                                            → Promise<void>
-    Usuwa element o podanym id.
+    Przykład:
+      await taskbar.addTaskbarItem({
+          id: 'tb-editor', icon: '📝', title: 'Edytor',
+          onClick: () => view.restoreWindow({ id: 'win-editor' }),
+          menuItems: [
+              { label: 'Przywróć',    onClick: () => view.restoreWindow({ id: 'win-editor' }) },
+              { label: 'Minimalizuj', onClick: () => view.minimizeWindow({ id: 'win-editor' }) },
+              'separator',
+              { label: 'Zamknij', onClick: () => {
+                  view.removeWindow({ id: 'win-editor' });
+                  taskbar.removeTaskbarItem({ id: 'tb-editor' });
+              }}
+          ]
+      });
 
-  updateItem({ id, title?, icon?, onClick?, menuItems? })       → Promise<void>
-    Aktualizuje właściwości elementu paska.
+  removeTaskbarItem({ id })                                     → Promise<void>
+    Przykład:
+      await taskbar.removeTaskbarItem({ id: 'tb-editor' });
+
+  updateTaskbarItem({ id, title?, icon?, onClick?, menuItems? }) → Promise<void>
+    Przykład:
+      await taskbar.updateTaskbarItem({ id: 'tb-editor', title: 'Edytor *' });
 
   refreshStartMenu({ items })                                   → Promise<void>
     Zastępuje całą zawartość menu Start.
-    items – [{ id?, icon?, label, disabled?, onClick }|'separator'].
+
+    Przykład:
+      await taskbar.refreshStartMenu({ items: [
+          { id: 'sm-editor', icon: '📝', label: 'Edytor',
+            onClick: () => view.restoreWindow({ id: 'win-editor' }) },
+          'separator',
+          { id: 'sm-off', icon: '⏻', label: 'Wyłącz', disabled: true }
+      ]});
 
   addStartMenuItem(item)                                        → Promise<void>
     Dodaje pozycję do menu Start lub aktualizuje istniejącą (upsert).
-    Jeśli pozycja o danym id już istnieje, jest zastępowana nową.
+
+    Przykład:
+      await taskbar.addStartMenuItem({ id: 'sm-browser', icon: '🌐',
+          label: 'Przeglądarka', onClick: () => alert('Przeglądarka') });
+      await taskbar.addStartMenuItem('separator');
 
   removeStartMenuItem({ id })                                   → Promise<void>
-    Usuwa pozycję menu Start o podanym id.
+    Przykład:
+      await taskbar.removeStartMenuItem({ id: 'sm-browser' });
 
   Pozycja paska zadań
   ───────────────────
-  setPosition(position)                                         → Promise<void>
+  setTaskbarPosition(position)                                  → Promise<void>
     Ustawia pozycję paska: 'bottom' | 'top' | 'left' | 'right'.
     Aktualizuje CSS-owe zmienne --tb-top/bottom/left/right i przelicza
     rozmiar wszystkich zmaksymalizowanych okien.
 
+    Przykład:
+      await taskbar.setTaskbarPosition('top');
+      await taskbar.setTaskbarPosition('left');
+      await taskbar.setTaskbarPosition('bottom');
+
   Automatyczne ukrywanie
   ──────────────────────
-  setAutoHide(enabled)                                          → Promise<void>
+  setTaskbarAutoHide(enabled)                                   → Promise<void>
     Włącza (true) lub wyłącza (false) automatyczne ukrywanie paska.
     Gdy włączone: pasek chowa się; okna zajmują cały ekran. Po najechaniu
-    myszą lub dotknięciu (urządzenia dotykowe) pasek wysuwa się, a okna
-    zmniejszają się automatycznie.
+    myszą lub dotknięciu pasek wysuwa się, a okna zmniejszają się.
 
-  toggleAutoHide()                                              → Promise<void>
-    Przełącza tryb auto-ukrywania (włącza jeśli wyłączony, wyłącza jeśli
-    włączony).
+    Przykład:
+      await taskbar.setTaskbarAutoHide(true);
+      await taskbar.setTaskbarAutoHide(false);
+
+  toggleTaskbarAutoHide()                                       → Promise<void>
+    Przełącza tryb auto-ukrywania.
+
+    Przykład:
+      await taskbar.toggleTaskbarAutoHide();
 
   Całkowite ukrycie/pokazanie
   ───────────────────────────
-  hide()                                                        → Promise<void>
-    Całkowicie ukrywa pasek zadań (display: none). Okna automatycznie
-    rozszerzają się na całą dostępną przestrzeń.
+  hideTaskbar()                                                 → Promise<void>
+    Całkowicie ukrywa pasek zadań. Okna rozszerzają się na cały ekran.
 
-  show()                                                        → Promise<void>
-    Pokazuje pasek zadań po wcześniejszym ukryciu. Okna automatycznie
-    zwalniają miejsce dla paska.
+    Przykład:
+      await taskbar.hideTaskbar();
+
+  showTaskbar()                                                 → Promise<void>
+    Pokazuje pasek zadań po ukryciu. Okna zwalniają dla niego miejsce.
+
+    Przykład:
+      await taskbar.showTaskbar();
 
   Metody wewnętrzne
   ─────────────────
   _syncCSSVars()                                                → Promise<void>
-    Przelicza i ustawia zmienne CSS --tb-top/bottom/left/right na podstawie
-    aktualnej pozycji, stanu auto-ukrywania i widoczności paska.
+    Przelicza i ustawia zmienne CSS --tb-top/bottom/left/right.
 
   _resizeAllWindows()                                           → Promise<void>
-    Przelicza rozmiar wszystkich aktualnie zmaksymalizowanych okien
-    (wywoływane po każdej zmianie paska, by okna zajęły prawidłowy obszar).
+    Przelicza rozmiar wszystkich zmaksymalizowanych okien.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   class DesktopIconsManager
@@ -360,60 +410,56 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
   addIcon(iconObj)                                              → Promise<this>
     Dodaje ikonę lub tablicę ikon na pulpit.
     iconObj – { id, icon, label, position?, onClick?, menuItems?, disabled? }
-      id        – unikalny identyfikator ikony.
-      icon      – emoji / tekst ikony (domyślnie: '📄').
-      label     – etykieta pod ikoną.
-      position  – { x, y } w px (opcjonalne; domyślnie następna pozycja siatki).
-      onClick   – funkcja wywoływana przy kliknięciu lewym przyciskiem.
-      menuItems – tablica pozycji menu kontekstowego wyświetlanego zamiast
-                  onClick lub przy prawym kliku: [{ icon?, label, onClick,
-                  disabled? }|'separator'].
     Jeśli ikona o danym id już istnieje, jest najpierw usuwana.
 
+    Przykład:
+      await desktop.addIcon({ id: 'di-editor', icon: '��', label: 'Edytor',
+          onClick: () => view.restoreWindow({ id: 'win-editor' }) });
+
+      await desktop.addIcon({
+          id: 'di-folder', icon: '📁', label: 'Moje pliki',
+          menuItems: [
+              { icon: '📄', label: 'Dokument.txt', onClick: () => alert('Plik') },
+              'separator',
+              { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Folder') }
+          ]
+      });
+
   removeIcon({ id })                                            → Promise<this>
-    Usuwa ikonę o podanym id z pulpitu.
+    Przykład:
+      await desktop.removeIcon({ id: 'di-editor' });
 
   updateIcon(iconObj)                                           → Promise<this>
-    Aktualizuje właściwości istniejącej ikony (lub tablicę ikon).
-    iconObj – { id, ...cfg } – tylko podane pola są nadpisywane.
+    Aktualizuje właściwości istniejącej ikony. Tylko podane pola są nadpisywane.
+
+    Przykład:
+      await desktop.updateIcon({ id: 'di-editor', label: 'Edytor *', icon: '📋' });
 
   getIconPosition({ id })                               → Promise<{x,y}|null>
-    Zwraca bieżącą pozycję ikony { x, y } lub null jeśli ikona nie istnieje.
+    Przykład:
+      const pos = await desktop.getIconPosition({ id: 'di-editor' });
+      console.log(pos); // { x: 20, y: 20 }
 
   setIconPosition(iconObj)                                      → Promise<this>
-    Ustawia pozycję ikony lub tablicy ikon.
-    iconObj – { id, position: { x, y } }.
+    Przykład:
+      await desktop.setIconPosition({ id: 'di-editor', position: { x: 100, y: 200 } });
 
   getIcons()                               → Promise<Array<{id,...cfg}>>
-    Zwraca tablicę wszystkich ikon wraz z ich bieżącymi pozycjami i
-    konfiguracją.
+    Zwraca tablicę wszystkich ikon wraz z ich bieżącymi pozycjami.
+
+    Przykład:
+      const icons = await desktop.getIcons();
+      // [ { id: 'di-editor', icon: '📝', label: 'Edytor', position: { x: 20, y: 20 } } ]
 
   Wewnętrzne metody
   ─────────────────
   _nextGridPos()                                       → Promise<{x,y}>
-    Oblicza następną dostępną pozycję siatki (kolumna od góry, potem
-    kolejna kolumna). Uwzględnia wysokość paska zadań (--tb-bottom).
-
   _createEl(id, cfg, pos)                              → Promise<HTMLElement>
-    Tworzy element DOM ikony i podpina zdarzenia kliknięcia i menu.
-
   _selectIcon(id)                                               → Promise<void>
-    Zaznacza ikonę (klasa CSS 'selected'), odznaczając pozostałe.
-
   _openMenu(e, id, cfg, items)                                  → Promise<void>
-    Wyświetla menu kontekstowe przy współrzędnych zdarzenia e.
-    Koryguje pozycję by menu nie wychodziło poza ekran.
-
   _closeMenu()                                                  → Promise<void>
-    Zamyka aktualnie otwarte menu kontekstowe.
-
   _makeDraggable(el, id)                                        → Promise<void>
-    Podpina obsługę przeciągania (mysz i dotyk) z progiem DRAG_THRESHOLD = 5 px.
-    Długie naciśnięcie (LONG_PRESS_DELAY = 600 ms) otwiera menu kontekstowe.
-    Po zakończeniu przeciągania zapisuje nową pozycję przez _savePos().
-
   _savePos(id, el)                                              → Promise<void>
-    Zapisuje bieżącą pozycję ikony (left/top) do wewnętrznej mapy _icons.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   INICJALIZACJA (bottom of app.js)
@@ -423,162 +469,214 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
   const taskbar  = new TaskbarManager({ taskbarId: 'taskbar' });
   const desktopIcons = new DesktopIconsManager({ containerId: 'desktopIcons' });
 
-  Pasek zadań jest inicjowany z pozycją 'bottom'.
+  await taskbar.refreshTaskbar({ showStart: true, items: [] });
+  await taskbar.setTaskbarPosition('bottom');
 
-  Metody DesktopIconsManager są kopiowane (bind) na obiekt `view`, dzięki czemu
-  można wywoływać np. view.addIcon(...), view.removeIcon(...) itp.
+  Metody DesktopIconsManager są kopiowane (bind) na obiekt `view`:
+    view.addIcon(...), view.removeIcon(...) itp.
 
-  Metody TaskbarManager są kopiowane (bind) na obiekt `view`, dzięki czemu
-  można wywoływać np. view.refresh(...), view.setPosition(...) itp.
+  Metody TaskbarManager są kopiowane (bind) na obiekt `view`:
+    view.refreshTaskbar(...), view.setTaskbarPosition(...) itp.
 
-  Metody WindowManager, które nie są jeszcze w `view`, pozostają powiązane
-  z instancją WindowManager (view.create, view.close itp.).
+  Metody WindowManager pozostają na instancji view:
+    view.addWindow(...), view.removeWindow(...) itp.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   PRZYKŁADY UŻYCIA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  ── Okno z automatycznym rozmiarem (domyślnie) ──────────────────────────────
+  ── Typowy workflow: okno + menu + treść + pasek + ikona pulpitu ─────────────
 
-  view.create({ id: 'win-1', title: 'Notatnik', icon: '📝' });
+  // 1. Utwórz okno
+  await view.addWindow({ id: 'win-editor', title: 'Edytor', icon: '📝',
+      statusText: 'Nowy dokument', size: { width: 800, height: 500 } });
 
-  ── Okno z podanym rozmiarem ────────────────────────────────────────────────
+  // 2. Dodaj menu
+  await view.refreshWindowMenubar({ id: 'win-editor', menus: [
+      { label: 'Plik', id: 'menu-file', items: [
+          { icon: '📄', label: 'Nowy',   onClick: () => {} },
+          { icon: '💾', label: 'Zapisz', onClick: () =>
+              view.setWindowStatus({ id: 'win-editor', text: 'Zapisano' }) }
+      ]},
+      { label: 'Widok', id: 'menu-view', items: [
+          { icon: '🔍', label: 'Powiększ', onClick: () => {} }
+      ]}
+  ]});
 
-  // Rozmiar w pikselach:
-  view.create({ id: 'win-2', title: 'Kalkulator', size: { width: 400, height: 300 } });
+  // 3. Dodaj treść
+  await view.refreshWindowContent({ id: 'win-editor',
+      header: 'Edytor tekstu', subheader: 'Wersja 1.0',
+      cards: [
+          { id: 'card-main', title: '📄 Dokument', text: '<p>Witaj!</p>' }
+      ]
+  });
 
-  // Rozmiar jako ciąg CSS:
-  view.create({ id: 'win-3', title: 'Przeglądarka', size: { width: '80%', height: '70%' } });
+  // 4. Dodaj do paska zadań
+  await taskbar.addTaskbarItem({
+      id: 'tb-editor', icon: '📝', title: 'Edytor',
+      onClick: () => view.restoreWindow({ id: 'win-editor' }),
+      menuItems: [
+          { label: 'Przywróć',    onClick: () => view.restoreWindow({ id: 'win-editor' }) },
+          { label: 'Minimalizuj', onClick: () => view.minimizeWindow({ id: 'win-editor' }) },
+          { label: 'Maksymalizuj',onClick: () => view.maximizeWindow({ id: 'win-editor' }) },
+          'separator',
+          { label: 'Zamknij', onClick: () => {
+              view.removeWindow({ id: 'win-editor' });
+              taskbar.removeTaskbarItem({ id: 'tb-editor' });
+          }}
+      ]
+  });
 
-  ── Okno bez przycisku zamknięcia ───────────────────────────────────────────
+  // 5. Dodaj ikonę pulpitu
+  await desktop.addIcon({ id: 'di-editor', icon: '📝', label: 'Edytor',
+      onClick: () => view.restoreWindow({ id: 'win-editor' }) });
 
-  view.create({ id: 'win-4', title: 'Modal', controls: { close: false } });
+  ── Różne warianty tworzenia okien ──────────────────────────────────────────
 
-  ── Okno tylko z przyciskiem zamknięcia ─────────────────────────────────────
+  // Okno z automatycznym rozmiarem:
+  await view.addWindow({ id: 'win-1', title: 'Notatnik', icon: '📝' });
 
-  view.create({ id: 'win-5', title: 'Alert', controls: { minimize: false, maximize: false } });
+  // Okno z rozmiarem w pikselach:
+  await view.addWindow({ id: 'win-2', title: 'Kalkulator', size: { width: 400, height: 300 } });
 
-  ── Okno bez żadnych przycisków ─────────────────────────────────────────────
+  // Okno z rozmiarem CSS:
+  await view.addWindow({ id: 'win-3', title: 'Przeglądarka', size: { width: '80%', height: '70%' } });
 
-  view.create({ id: 'win-6', title: 'Splash', controls: { minimize: false, maximize: false, close: false } });
+  // Modal bez przycisku zamknięcia:
+  await view.addWindow({ id: 'win-4', title: 'Modal', controls: { close: false } });
+
+  // Alert – tylko przycisk zamknięcia:
+  await view.addWindow({ id: 'win-5', title: 'Alert', controls: { minimize: false, maximize: false } });
+
+  // Splash – bez żadnych przycisków:
+  await view.addWindow({ id: 'win-6', title: 'Splash',
+      controls: { minimize: false, maximize: false, close: false } });
+
+  ── Dynamiczne modyfikacje okna ─────────────────────────────────────────────
+
+  await view.setWindowTitle({ id: 'win-1', title: 'Notatnik – plik.txt' });
+  await view.setWindowStatus({ id: 'win-1', text: 'Plik zapisany' });
+  await view.setWindowHeader({ id: 'win-1', text: 'Mój dokument' });
+  await view.setWindowSubheader({ id: 'win-1', text: 'Ostatnio: 12:00' });
+
+  await view.addWindowCard({ id: 'win-1', cardId: 'c1', title: 'Sekcja', text: 'Treść.' });
+  await view.updateWindowCard({ id: 'win-1', cardId: 'c1', text: 'Nowa treść.' });
+  await view.removeWindowCard({ id: 'win-1', cardId: 'c1' });
+
+  await view.addWindowButton({ id: 'win-1', btnId: 'btn-pin', label: '📌',
+      onClick: () => alert('Przypięto!') });
+  await view.removeWindowButton({ id: 'win-1', btnId: 'btn-pin' });
+
+  await view.addWindowMenu({ id: 'win-1', menuId: 'menu-tools', label: 'Narzędzia',
+      items: [{ icon: '🔧', label: 'Opcje', onClick: () => {} }] });
+  await view.addWindowMenuItem({ id: 'win-1', menuId: 'menu-tools',
+      item: { icon: '📊', label: 'Statystyki', onClick: () => {} } });
+  await view.removeWindowMenuItem({ id: 'win-1', menuId: 'menu-tools', itemId: 'mi-stat' });
+  await view.removeWindowMenu({ id: 'win-1', menuId: 'menu-tools' });
+
+  await view.minimizeWindow({ id: 'win-1' });
+  await view.maximizeWindow({ id: 'win-1' });
+  await view.restoreWindow({ id: 'win-1' });
+  const zmin = await view.isWindowMinimized({ id: 'win-1' });
+  const zmax = await view.isWindowMaximized({ id: 'win-1' });
+  await view.removeWindow({ id: 'win-1' });
 
   ── Pasek zadań ─────────────────────────────────────────────────────────────
 
-  // Zmień pozycję:
-  view.setPosition('top');
+  await taskbar.setTaskbarPosition('top');
+  await taskbar.setTaskbarPosition('left');
+  await taskbar.setTaskbarPosition('bottom');
 
-  // Włącz auto-ukrywanie:
-  view.setAutoHide(true);
+  await taskbar.setTaskbarAutoHide(true);
+  await taskbar.setTaskbarAutoHide(false);
+  await taskbar.toggleTaskbarAutoHide();
 
-  // Ukryj pasek:
-  view.hide();
+  await taskbar.hideTaskbar();
+  await taskbar.showTaskbar();
 
-  // Pokaż pasek:
-  view.show();
+  await taskbar.refreshStartMenu({ items: [
+      { id: 'sm-editor', icon: '📝', label: 'Edytor',
+        onClick: () => view.restoreWindow({ id: 'win-editor' }) },
+      'separator',
+      { id: 'sm-off', icon: '⏻', label: 'Wyłącz', disabled: true }
+  ]});
 
   ── Ikony pulpitu ────────────────────────────────────────────────────────────
 
-  view.addIcon({ id: 'di-notes', icon: '📝', label: 'Notatnik',
-      onClick: () => view.restore({ id: 'win-1' }) });
+  await desktop.addIcon({ id: 'di-1', icon: '📝', label: 'Notatnik',
+      onClick: () => view.restoreWindow({ id: 'win-1' }) });
 
-  view.setIconPosition({ id: 'di-notes', position: { x: 100, y: 200 } });
+  await desktop.addIcon({
+      id: 'di-folder', icon: '📁', label: 'Moje pliki',
+      menuItems: [
+          { icon: '📄', label: 'Dokument.txt',  onClick: () => alert('Plik') },
+          'separator',
+          { icon: '📂', label: 'Otwórz folder', onClick: () => alert('Folder') }
+      ]
+  });
 
-  view.removeIcon({ id: 'di-notes' });
+  await desktop.updateIcon({ id: 'di-1', label: 'Notatnik *' });
+  await desktop.setIconPosition({ id: 'di-1', position: { x: 100, y: 200 } });
+  const pos = await desktop.getIconPosition({ id: 'di-1' });
+  const icons = await desktop.getIcons();
+  await desktop.removeIcon({ id: 'di-1' });
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   class ContextMenuManager
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Globalny menedżer menu kontekstowych. Pozwala dołączyć menu kontekstowe
-  (prawy klik na desktop / długie naciśnięcie na urządzeniach dotykowych)
-  do dowolnego elementu DOM lub do grupy elementów pasujących do selektora CSS.
-  Menu automatycznie koryguje swoją pozycję, aby nie wychodziło poza ekran
-  – działa zarówno na dużych, jak i małych ekranach.
+  Globalny menedżer menu kontekstowych. Pozwala dołączyć menu (prawy klik /
+  długie naciśnięcie) do dowolnego elementu DOM lub grupy elementów CSS.
+  Menu automatycznie koryguje pozycję, aby nie wychodziło poza ekran.
 
-  Eksportowana instancja: `contextMenu`
-  Import: import view, { contextMenu } from './app.js';
+  Eksport: import view, { contextMenu } from './app.js';
 
-  Konstruktor
-  ───────────
-  new ContextMenuManager()
-    Tworzy menedżer. Automatycznie rejestruje globalny listener zamykający
-    aktywne menu po kliknięciu poza nim.
-
-  ── Publiczne metody ────────────────────────────────────────────────────────
-
+  Publiczne metody
+  ────────────────
   attachTo({ element, items })                              → Promise<this>
-    Dołącza menu kontekstowe do konkretnego elementu DOM.
-    element – referencja do HTMLElement.
-    items   – tablica pozycji menu (patrz: format item poniżej).
-    Na urządzeniach dotykowych menu otwiera się po długim naciśnięciu (600 ms).
-    Jeśli element miał już przypisane menu, zostaje ono najpierw odłączone.
-
   attachToSelector({ selector, items, container? })         → Promise<this>
-    Dołącza menu kontekstowe do wszystkich elementów pasujących do selektora CSS.
-    selector  – ciąg selektora CSS (np. '.lista-item', '#moj-id button').
-    items     – tablica pozycji menu.
-    container – opcjonalny HTMLElement ograniczający zakres querySelectorAll
-                (domyślnie: document).
-
   detachFrom({ element })                                   → Promise<this>
-    Odłącza menu kontekstowe od elementu (usuwa listenery contextmenu i touch).
-
   open({ x, y, items })                                     → Promise<this>
-    Otwiera menu programowo w podanej pozycji ekranowej (x, y w pikselach).
-    Przydatne do otwierania menu w reakcji na własny event (np. klik przycisku).
-
   close()                                                   → Promise<this>
-    Zamyka aktywne menu kontekstowe.
 
-  ── Format pozycji menu (item) ──────────────────────────────────────────────
+  Format pozycji menu (item)
+  ──────────────────────────
+  { icon?, label, disabled?, onClick? }  lub  'separator'
 
-  Każda pozycja tablicy items to obiekt lub ciąg 'separator':
-
-    { icon?, label, disabled?, onClick? }
-      icon     – emoji lub tekst (opcjonalnie, wyświetlane przed etykietą).
-      label    – wyświetlana etykieta pozycji.
-      disabled – jeśli true, pozycja jest wyszarzona i niepodpinalna.
-      onClick  – async function(event) wywoływana po kliknięciu pozycji.
-
-    'separator'
-      Wstawia poziomą linię rozdzielającą.
-
-  ── Przykłady użycia ────────────────────────────────────────────────────────
-
-  // Import contextMenu obok view:
+  Przykłady
+  ─────────
   import view, { contextMenu } from './app.js';
 
-  // 1. Menu kontekstowe na konkretnym elemencie:
+  // 1. Menu na konkretnym elemencie:
   const el = document.getElementById('moj-element');
-  contextMenu.attachTo({
+  await contextMenu.attachTo({
       element: el,
       items: [
-          { icon: '✏️', label: 'Edytuj',  onClick: async () => { /* edytuj */ } },
-          { icon: '📋', label: 'Kopiuj',  onClick: async () => { /* kopiuj */ } },
+          { icon: '✏️', label: 'Edytuj', onClick: async () => {} },
+          { icon: '📋', label: 'Kopiuj', onClick: async () => {} },
           'separator',
-          { icon: '🗑️', label: 'Usuń',    onClick: async () => { /* usuń */   } },
-          { label: 'Wyłączona opcja', disabled: true }
+          { icon: '🗑️', label: 'Usuń',   onClick: async () => {} },
+          { label: 'Wyłączona', disabled: true }
       ]
   });
 
-  // 2. Menu kontekstowe na wszystkich elementach listy:
-  contextMenu.attachToSelector({
+  // 2. Menu na grupie elementów:
+  await contextMenu.attachToSelector({
       selector: '.lista-item',
       items: [
-          { icon: '🔍', label: 'Szczegóły', onClick: async ev => console.log('Szczegóły', ev) },
-          { icon: '⭐', label: 'Ulubione',  onClick: async ev => console.log('Ulubione',  ev) }
+          { icon: '🔍', label: 'Szczegóły', onClick: async ev => console.log(ev) },
+          { icon: '⭐', label: 'Ulubione',  onClick: async ev => console.log(ev) }
       ]
   });
 
   // 3. Ograniczenie selektora do kontenera:
-  const container = document.getElementById('moj-kontener');
-  contextMenu.attachToSelector({
+  await contextMenu.attachToSelector({
       selector: 'button.akcja',
-      items: [ { label: 'Akcja', onClick: async () => alert('OK') } ],
-      container
+      items: [{ label: 'Akcja', onClick: async () => alert('OK') }],
+      container: document.getElementById('moj-kontener')
   });
 
-  // 4. Otwieranie menu ręcznie (np. z własnego przycisku):
+  // 4. Otwieranie menu ręcznie:
   document.getElementById('btn-menu').addEventListener('click', async e => {
       const r = e.target.getBoundingClientRect();
       await contextMenu.open({
@@ -591,15 +689,12 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
       });
   });
 
-  // 5. Odłączenie menu od elementu:
+  // 5. Odłącz i zamknij:
   await contextMenu.detachFrom({ element: el });
-
-  // 6. Zamknięcie aktywnego menu programowo:
   await contextMenu.close();
 
-  // 7. Menu kontekstowe na ikonie pulpitu (prawy klik / długie naciśnięcie):
-  //    Używaj pola menuItems w addIcon zamiast attachTo – jest to wbudowana obsługa.
-  desktop.addIcon({
+  // 6. Menu wbudowane w ikonę pulpitu (użyj menuItems w addIcon):
+  await desktop.addIcon({
       id: 'di-folder', icon: '📁', label: 'Moje pliki',
       menuItems: [
           { icon: '📄', label: 'Dokument.txt',  onClick: async () => alert('Plik') },
@@ -607,12 +702,11 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
       ]
   });
 
-  // 8. Integracja z dynamicznie tworzonymi elementami:
-  //    Po wstawieniu nowych węzłów DOM dołącz menu do nich osobno.
+  // 7. Dynamiczne elementy DOM:
   const newRow = document.createElement('div');
   newRow.className = 'lista-item';
   document.getElementById('lista').appendChild(newRow);
   await contextMenu.attachTo({
       element: newRow,
-      items: [ { label: 'Usuń wiersz', onClick: async () => newRow.remove() } ]
+      items: [{ label: 'Usuń wiersz', onClick: async () => newRow.remove() }]
   });
