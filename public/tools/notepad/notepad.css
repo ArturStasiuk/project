@@ -1,0 +1,35 @@
+/* Styl notatnika inspirowany systemem Windows 11 */
+.notepad-editor {
+    width: 100%;
+    height: calc(100vh - 120px);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+}
+
+.notepad-textarea {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: none;
+    outline: none;
+    padding: 16px;
+    box-sizing: border-box;
+    font-size: 15px;
+    line-height: 1.6;
+    font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+    background: #fff;
+    margin: 0;
+    display: block;
+    color: #222;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.06);
+    transition: box-shadow 0.15s, border 0.15s;
+}
+.notepad-textarea:focus {
+    box-shadow: 0 0 0 2px #1976d2;
+    border: 1.5px solid #1976d2;
+    outline: none;
+}

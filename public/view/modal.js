@@ -23,9 +23,10 @@ class MODAL {
                 resolve();
             });
         });
-  }
+    }
    
     // prosty confirm modalny z dwoma przyciskami Yes i No, zwraca true dla Yes i false dla No
+    
   async confirm(message, title = 'Potwierdzenie') {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
@@ -50,7 +51,7 @@ class MODAL {
                 resolve(false);
             });
         });
-  }
+    }
 
    // okno oczekiwania z animacja ladowania pierwsze wywolanie okna pokazuje je a kolejne wywolanie zamyka, mozna tez przekazac tekst do wyswietlenia
    async loading(message = 'Ładowanie...', title = 'Proszę czekać') {
