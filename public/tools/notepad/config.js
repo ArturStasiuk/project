@@ -31,12 +31,23 @@ class CONFIG {
     async getWindowMenu() {
         return {
             id: this.idWindow,
-            menuId: 'menu-notepad',
-            label: 'Menu',
-            items: [
-                { icon: '📂', label: 'Otwórz', onClick: () => { alert('Funkcja otwierania pliku nie jest jeszcze zaimplementowana.'); } },
-                { icon: '💾', label: 'Zapisz', onClick: () => { alert('Funkcja zapisu pliku nie jest jeszcze zaimplementowana.'); } },
-                { icon: '❌', label: 'Zamknij', onClick: () => { } }
+            menus: [
+                {
+                    label: 'Widok',
+                    id: 'notepad-view',
+                    items: [
+                        { icon: '🔢', label: 'Standardowy', onClick: () => view.setStatus({ id: this.idWindow, text: 'Tryb standardowy' }) },
+                        { icon: '📐', label: 'Naukowy', onClick: () => view.setStatus({ id: this.idWindow, text: 'Tryb naukowy' }) }
+                    ]
+                },
+                {
+                    label: 'Opcje',
+                    id: 'notepad-options',
+                    items: [
+                        { icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia!') },
+                        { icon: '❓', label: 'Pomoc', onClick: () => alert('Pomoc!') }
+                    ]
+                }
             ]
         };
     }
