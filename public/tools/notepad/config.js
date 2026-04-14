@@ -72,9 +72,10 @@ class CONFIG {
      */
     async getWindowContent(cardId = 'card-1', title = '📄 Dokument', text) {
         const content = text ?? `
-            <div class="notepad-editor">
+            <div class="notepad-editor" style="width:100%;height:calc(100vh - 120px);min-height:300px;display:flex;flex-direction:column;">
                 <textarea class="notepad-textarea"
-                          placeholder="Wpisz tutaj swoje notatki..."></textarea>
+                    style="flex:1;width:100%;height:100%;resize:none;border:none;outline:none;padding:16px;box-sizing:border-box;font-size:15px;line-height:1.6;font-family:'Segoe UI',Arial,sans-serif;background:#fff;margin:0;display:block;"
+                    placeholder="Wpisz tutaj swoje notatki..."></textarea>
             </div>`;
         return {
             id:     this.idWindow,

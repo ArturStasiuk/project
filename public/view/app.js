@@ -2493,7 +2493,7 @@ for (const key of Object.getOwnPropertyNames(wmProto)) {
 }
 
 export { contextMenu };
-    window._view = view; /* globalny dostęp do view (np. z konsoli) */
+   // window._view = view; /* globalny dostęp do view (np. z konsoli) */
 export default view;
 
 
