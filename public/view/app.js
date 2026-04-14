@@ -1594,7 +1594,7 @@ class WindowManager {
             window.addEventListener('resize', async () => {
                 for (const wm of window._wm.instances) {
                     for (const view of wm._windows.values()) {
-                        if (!await view.isWindowMaximized()) await view._updateSize();
+                        if (!await view.isMaximized()) await view._updateSize();
                     }
                 }
             });
