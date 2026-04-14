@@ -1,6 +1,8 @@
+import modal from '../public/view/modal.js';
 class API {
 
     constructor() {
+        this.modal = modal;
         this.infoModules = { name: 'API', version: '0.1', author: 'Artur', description: 'API for data base connection' };
         // 
         this.response = null;
@@ -34,6 +36,7 @@ class API {
         }
         try {
             console.log(`wyslano >> ${fileName}:`, data);
+            await this.modal.loading();
             this.response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -51,17 +54,21 @@ class API {
             }
             console.log(`${fileName}: << odebrano`, result);
             if (result === undefined || result === null || result === '') {
-                console.error(`API error: Brak odpowiedzi z serwera (${fileName})`);
+             //   console.error(`API error: Brak odpowiedzi z serwera (${fileName})`);
+                await this.modal.loading();
+                await this.modal.alert(`Błąd: brak odpowiedzi z serwera (${fileName})`);
             }
-            // await window.systemWindows.loadingWindow();
+            await this.modal.loading();
             return result;
         } catch (error) {
-            console.error(`Error in sendRequest to ${fileName}:`, error);
+           // console.error(`Error in sendRequest to ${fileName}:`, error);
             if (error && error.stack) {
                 console.log('Stack trace:', error.stack);
             }
-            // await window.systemWindows.loadingWindow();
+            await this.modal.loading();
+            await this.modal.alert(`Błąd: ${error.message || error}`);
             this.response = null;
+            
             return { status: 'error', error: error.message || error };
         }
     }

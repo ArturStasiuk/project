@@ -1,0 +1,119 @@
+/* Styl okna modalnego zgodny z resztą aplikacji */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(30,30,30,0.25);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s;
+    backdrop-filter: blur(8px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal-content {
+    background: rgba(243,243,243,0.98);
+    border-radius: 12px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.5);
+    padding: 32px 28px 24px 28px;
+    min-width: 340px;
+    max-width: 96vw;
+    text-align: center;
+    font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+    color: #222;
+    border: 1px solid rgba(255,255,255,0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-content p {
+    margin-bottom: 28px;
+    font-size: 1.13rem;
+    line-height: 1.6;
+    color: #222;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0;
+}
+
+#ok-btn, .modal-btn {
+    padding: 0.6em 2.2em;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #eaf1fb 0%, #d2e3fc 100%);
+    color: #222;
+    border: 1px solid #b4c7e7;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, border 0.15s, color 0.15s;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+    margin-right: 12px;
+    outline: none;
+}
+#ok-btn:last-child, .modal-btn:last-child { margin-right: 0; }
+#ok-btn:hover, .modal-btn:hover {
+    background: linear-gradient(180deg, #d2e3fc 0%, #eaf1fb 100%);
+    border: 1px solid #1976d2;
+    color: #1976d2;
+}
+.modal-btn--yes {
+    background: linear-gradient(180deg, #eaf1fb 0%, #d2e3fc 100%);
+    color: #1976d2;
+    border: 1px solid #1976d2;
+}
+.modal-btn--yes:hover {
+    background: linear-gradient(180deg, #d2e3fc 0%, #eaf1fb 100%);
+    color: #1565c0;
+    border: 1px solid #1565c0;
+}
+.modal-btn--no {
+    background: linear-gradient(180deg, #fbeaea 0%, #fcd2d2 100%);
+    color: #d32f2f;
+    border: 1px solid #d32f2f;
+}
+.modal-btn--no:hover {
+    background: linear-gradient(180deg, #fcd2d2 0%, #fbeaea 100%);
+    color: #b71c1c;
+    border: 1px solid #b71c1c;
+}
+
+/* --- LOADING MODAL --- */
+.modal--loading .modal-content {
+    min-width: 260px;
+    padding: 32px 24px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.modal--loading p {
+    margin-bottom: 24px;
+    font-size: 1.08rem;
+    color: #1976d2;
+    letter-spacing: 0.01em;
+}
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #e3eafc;
+    border-top: 5px solid #1976d2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

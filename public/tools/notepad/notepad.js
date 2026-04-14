@@ -1,6 +1,7 @@
 import CONFIG   from './config.js';
 import FUNCTION from './function.js';
-import view     from '../../view/app.js';
+import view from '../../view/app.js';
+import modal from '../../view/modal.js';
 
 /**
  * NOTEPAD – prosty notatnik tekstowy.
@@ -13,6 +14,7 @@ import view     from '../../view/app.js';
  */
 class NOTEPAD {
     constructor() {
+        this.modal = modal;
         this.view = view;
         this.conf = new CONFIG(this);
         this.func = new FUNCTION(this);
@@ -26,6 +28,21 @@ class NOTEPAD {
     async init() {
         console.log('NOTEPAD: init()');
         await this.func.addStartMenuItem();
+       await this.modal.alert('Notatnik został zainicjalizowany!');
+       await this.modal.confirm('Czy chcesz otworzyć notatnik?').then((result) => {
+            if (result) {
+                console.log('Użytkownik chce otworzyć notatnik.');
+            } else {
+                console.log('Użytkownik nie chce otworzyć notatnika.');
+            }
+
+        });
+      //  await this.modal.loading();
+
+
+
+
+
     }
 }
 
