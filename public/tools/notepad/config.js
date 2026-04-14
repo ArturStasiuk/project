@@ -61,9 +61,7 @@ class CONFIG {
         if (!title) title = '📄 Dokument';
                 if (!text) text = `<div style="width:100%;height:calc(100vh - 120px);min-height:300px;display:flex;flex-direction:column;">
     <textarea style="flex:1;width:100%;height:100%;resize:none;border:none;outline:none;padding:16px;font-size:18px;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;font-weight:bold;background:#fff;margin:0;display:block;" placeholder="Wpisz tutaj swoje notatki..."></textarea>
-    <div style="display:flex;justify-content:flex-end;padding:8px 0 0 0;">
-        <button style="padding:8px 24px;font-size:16px;font-family:'Segoe UI',Arial,sans-serif;font-weight:bold;background:#1976d2;color:#fff;border:none;border-radius:6px;cursor:pointer;">Zapisz</button>
-    </div>
+
 </div>`;
         return {
             id: this.idWindow,
