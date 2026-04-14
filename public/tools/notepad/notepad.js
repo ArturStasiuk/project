@@ -1,10 +1,12 @@
 import CONFIG from './config.js';
 import FUNCTION from './function.js';
+import view from '../../view/app.js';
 
 class NOTEPAD {
 
 
-    constructor() {
+  constructor() {
+      this.view = view;
      this.conf = new CONFIG(this); 
        this.func = new FUNCTION(this);
 
