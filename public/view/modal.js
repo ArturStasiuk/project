@@ -4,14 +4,17 @@ class MODAL {
         
     }
   // prosty alert modalny
-  async alert(message) {
+  async alert(message, title = 'Informacja') {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
                 <div class="modal-content">
+                    <div class="modal-titlebar">${title}</div>
                     <p>${message}</p>
-                    <button id="ok-btn">OK</button>
+                    <div class="modal-actions" style="justify-content:center;">
+                        <button id="ok-btn">OK</button>
+                    </div>
                 </div>
             `;
             document.body.appendChild(modal);
@@ -23,12 +26,13 @@ class MODAL {
   }
    
     // prosty confirm modalny z dwoma przyciskami Yes i No, zwraca true dla Yes i false dla No
-  async confirm(message) {
+  async confirm(message, title = 'Potwierdzenie') {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
                 <div class="modal-content">
+                    <div class="modal-titlebar">${title}</div>
                     <p>${message}</p>
                     <div class="modal-actions">
                         <button id="yes-btn" class="modal-btn modal-btn--yes">Yes</button>
@@ -49,7 +53,7 @@ class MODAL {
   }
 
    // okno oczekiwania z animacja ladowania pierwsze wywolanie okna pokazuje je a kolejne wywolanie zamyka, mozna tez przekazac tekst do wyswietlenia
-   async loading(message = 'Ładowanie...') {
+   async loading(message = 'Ładowanie...', title = 'Proszę czekać') {
         let modal = document.querySelector('.modal--loading');
         if (modal) {
             // jeśli okno już istnieje, usuń je
@@ -61,6 +65,7 @@ class MODAL {
         modal.classList.add('modal', 'modal--loading');
         modal.innerHTML = `
             <div class="modal-content">
+                <div class="modal-titlebar">${title}</div>
                 <p>${message}</p>
                 <div class="loader"></div>
             </div>

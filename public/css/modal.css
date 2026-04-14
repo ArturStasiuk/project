@@ -1,14 +1,23 @@
-/* Styl okna modalnego zgodny z resztą aplikacji */
+/* Styl okna modalnego inspirowany Windows 11 */
 .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(30,30,30,0.25);
+    background: rgba(30,30,30,0.35); /* ciemniejsze, bez blur */
     z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
     animation: fadeIn 0.2s;
-    backdrop-filter: blur(8px);
+    /* usunięto: backdrop-filter: blur(8px); */
+    pointer-events: auto;
+}
+
+body.modal-open > *:not(.modal) {
+    pointer-events: none !important;
+}
+
+body > *:not(.modal) {
+    pointer-events: auto !important;
 }
 
 @keyframes fadeIn {
@@ -20,20 +29,38 @@
     background: rgba(243,243,243,0.98);
     border-radius: 12px;
     box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.5);
-    padding: 32px 28px 24px 28px;
+    padding: 0 0 24px 0;
     min-width: 340px;
     max-width: 96vw;
     text-align: center;
     font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
     color: #222;
-    border: 1px solid rgba(255,255,255,0.18);
+    border: 1.5px solid #b4c7e7;
+    outline: 2.5px solid #eaf1fb;
+    outline-offset: -6px;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+}
+
+.modal-titlebar {
+    height: 44px;
+    background: linear-gradient(90deg, #eaf1fb 0%, #d2e3fc 100%);
+    border-bottom: 1px solid #b4c7e7;
+    display: flex;
     align-items: center;
+    padding: 0 18px;
+    font-size: 1.08rem;
+    font-weight: 500;
+    color: #1976d2;
+    letter-spacing: 0.01em;
+    user-select: none;
+    justify-content: flex-start;
 }
 
 .modal-content p {
-    margin-bottom: 28px;
+    margin: 32px 28px 28px 28px;
     font-size: 1.13rem;
     line-height: 1.6;
     color: #222;
@@ -92,13 +119,13 @@
 /* --- LOADING MODAL --- */
 .modal--loading .modal-content {
     min-width: 260px;
-    padding: 32px 24px 28px 24px;
+    padding: 0 0 28px 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
 }
 .modal--loading p {
-    margin-bottom: 24px;
+    margin: 32px 28px 24px 28px;
     font-size: 1.08rem;
     color: #1976d2;
     letter-spacing: 0.01em;
