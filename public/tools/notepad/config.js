@@ -1,78 +1,88 @@
-
 class CONFIG {
     constructor(parent) {
-        this.parent = parent;
+        this.parent   = parent;
+        /** Unikalny identyfikator okna notatnika */
         this.idWindow = 'win-notepad';
     }
-    // konfuguracja elementu meniu w pasku startowym, czyli ikona, nazwa i funkcja po kliknieciu
+
+    /**
+     * Zwraca konfigurację pozycji w menu startowym.
+     * Po kliknięciu otwiera okno notatnika.
+     * @returns {object}
+     */
     async getStartMenuItem() {
         return {
-            id: 'sm-notepad',
-            icon: '📝',
-            label: 'Notatnik',
+            id:       'sm-notepad',
+            icon:     '📝',
+            label:    'Notatnik',
             disabled: false,
-            onClick: async () => {
-                await this.parent.func.openWindow();
-            }
+            onClick:  async () => await this.parent.func.openWindow()
         };
-
     }
-    // konfiguracja okna czyli id, tytul, ikona i tekst statusu
+
+    /**
+     * Zwraca konfigurację okna notatnika (id, tytuł, ikona, tekst statusu).
+     * @returns {object}
+     */
     async getWindowItem() {
         return {
-            id: this.idWindow,
-            title: 'Notatnik',
-            icon: '📝',
-            statusText: 'Nowy dokument',
+            id:         this.idWindow,
+            title:      'Notatnik',
+            icon:       '📝',
+            statusText: 'Nowy dokument'
         };
     }
 
-    // konfiguracja meniu okna 
+    /**
+     * Zwraca konfigurację paska menu okna notatnika.
+     * @returns {object}
+     */
     async getWindowMenu() {
+        const view = this.parent.view;
+        const id   = this.idWindow;
         return {
-            id: this.idWindow,
+            id,
             menus: [
                 {
                     label: 'Widok',
-                    id: 'notepad-view',
+                    id:    'notepad-view',
                     items: [
-                        { icon: '🔢', label: 'Standardowy', onClick: () => view.setStatus({ id: this.idWindow, text: 'Tryb standardowy' }) },
-                        { icon: '📐', label: 'Naukowy', onClick: () => view.setStatus({ id: this.idWindow, text: 'Tryb naukowy' }) }
+                        { icon: '🔢', label: 'Standardowy', onClick: () => view.setWindowStatus({ id, text: 'Tryb standardowy' }) },
+                        { icon: '📐', label: 'Naukowy',     onClick: () => view.setWindowStatus({ id, text: 'Tryb naukowy' }) }
                     ]
                 },
                 {
                     label: 'Opcje',
-                    id: 'notepad-options',
+                    id:    'notepad-options',
                     items: [
                         { icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia!') },
-                        { icon: '❓', label: 'Pomoc', onClick: () => alert('Pomoc!') }
+                        { icon: '❓', label: 'Pomoc',       onClick: () => alert('Pomoc!') }
                     ]
                 }
             ]
         };
     }
 
-
-
-
-    // configuracja zawartosci okna czyli id karty, tytul i zawartosc
-    async getWindowContent(cardId ,title, text) {
-        if (!cardId) cardId = 'card-1';
-        if (!title) title = '📄 Dokument';
-                if (!text) text = `<div style="width:100%;height:calc(100vh - 120px);min-height:300px;display:flex;flex-direction:column;">
-    <textarea style="flex:1;width:100%;height:100%;resize:none;border:none;outline:none;padding:16px;font-size:18px;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;font-weight:bold;background:#fff;margin:0;display:block;" placeholder="Wpisz tutaj swoje notatki..."></textarea>
-
-</div>`;
+    /**
+     * Zwraca zawartość okna notatnika – karta z polem tekstowym.
+     * @param {string} [cardId='card-1'] – identyfikator karty
+     * @param {string} [title='📄 Dokument'] – tytuł karty
+     * @param {string} [text] – opcjonalna niestandardowa zawartość HTML
+     * @returns {object}
+     */
+    async getWindowContent(cardId = 'card-1', title = '📄 Dokument', text) {
+        const content = text ?? `
+            <div class="notepad-editor">
+                <textarea class="notepad-textarea"
+                          placeholder="Wpisz tutaj swoje notatki..."></textarea>
+            </div>`;
         return {
-            id: this.idWindow,
-            cardId: cardId,
-            title: title,
-            text: text
+            id:     this.idWindow,
+            cardId,
+            title,
+            text:   content
         };
-
     }
-
-
 }
-//const conf = new CONFIG();
+
 export default CONFIG;

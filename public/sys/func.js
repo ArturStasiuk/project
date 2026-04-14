@@ -2,80 +2,85 @@
 class FUN {
     constructor(parent) {
         this.parent = parent;
-
-        // Zbiór nazw modułów, których skrypty zostały już wstrzyknięte do DOM
-        this._loadedModules = new Set();
-
         this.init();
     }
-    async init() {
-        //  console.log('Inicjalizacja funkcji...');
-        
-    }
 
+    /** Metoda inicjalizacyjna (zarezerwowana na przyszłe rozszerzenia). */
+    async init() {}
+
+    /**
+     * Odświeża menu startowe w pasku zadań na podstawie stanu logowania.
+     * @param {boolean} login – true gdy użytkownik jest zalogowany
+     */
     async showMenuStart(login) {
-        
-        
         await this.parent.view.refreshStartMenu(await this.parent.con.getMenuStart(login));
-        return;
-
-        
     }
 
-   async showWinLogin() {
-       await this.parent.view.addWindow(await this.parent.con.getWinLogin());
-       await this.parent.view.addWindowCard(await this.parent.con.getContentWinLogin()); 
-       setTimeout(() => {
-              const btn = document.getElementById('login-button');
-           if (btn) {
-                  const emailInput = document.getElementById('login-email');
-                  const passwordInput = document.getElementById('login-password');
-                  btn.onclick = null;
-               btn.onclick = async () => { await this.logIn(emailInput.value, passwordInput.value); }; 
-              }
-       }, 10);
+    /**
+     * Otwiera okno logowania i podpina obsługę przycisku „Zaloguj się".
+     * Dane formularza (email, hasło) są odczytywane po kliknięciu przycisku.
+     */
+    async showWinLogin() {
+        await this.parent.view.addWindow(await this.parent.con.getWinLogin());
+        await this.parent.view.addWindowCard(await this.parent.con.getContentWinLogin());
+
+        // Po wyrenderowaniu karty elementy formularza są dostępne w DOM
+        const btn           = document.getElementById('login-button');
+        const emailInput    = document.getElementById('login-email');
+        const passwordInput = document.getElementById('login-password');
+        if (btn) {
+            btn.onclick = async () => {
+                await this.logIn(emailInput.value, passwordInput.value);
+            };
+        }
     }
-   async closeWinLogin() {
+
+    /** Zamyka okno logowania. */
+    async closeWinLogin() {
         await this.parent.view.removeWindow({ id: 'win-login' });
     }
+
+    /**
+     * Otwiera okno wylogowania i podpina przyciski potwierdzenia / anulowania.
+     */
     async showWinLogout() {
         await this.parent.view.addWindow(await this.parent.con.getWinLogout());
         await this.parent.view.addWindowCard(await this.parent.con.getContentWinLogout());
-        setTimeout(() => {
-            const btn = document.getElementById('cancel-logout');
-            const btnLogout = document.getElementById('confirm-logout');
-            if (btnLogout) {
-                btnLogout.onclick = null;
-                btnLogout.onclick = async () => { 
-                 await this.logOut();
-                }
-            }
-            if (btn) {
-                btn.onclick = null;
-                btn.onclick = async () => { await this.closeWinLogout(); };
-            }
-        }, 10);
+
+        const btnConfirm = document.getElementById('confirm-logout');
+        const btnCancel  = document.getElementById('cancel-logout');
+        if (btnConfirm) {
+            btnConfirm.onclick = async () => { await this.logOut(); };
+        }
+        if (btnCancel) {
+            btnCancel.onclick = async () => { await this.closeWinLogout(); };
+        }
     }
+
+    /** Zamyka okno wylogowania. */
     async closeWinLogout() {
         await this.parent.view.removeWindow({ id: 'win-logout' });
     }
-  
-    // funkcja logujaca użytkownika, wysyła dane do API, a następnie odświeża system
+
+    /**
+     * Loguje użytkownika – wysyła dane do API i restartuje aplikację.
+     * @param {string} email
+     * @param {string} password
+     */
     async logIn(email, password) {
         await this.closeWinLogin();
-        await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email: email, password: password } });
-        await this.parent.restart(); // Odświeżenie systemu po zalogowaniu
+        await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email, password } });
+        await this.parent.restart();
     }
-    // funkcja wylogowująca użytkownika, wysyła żądanie do API, a następnie odświeża system
+
+    /**
+     * Wylogowuje użytkownika – wysyła żądanie do API i restartuje aplikację.
+     */
     async logOut() {
         await this.closeWinLogout();
         await this.parent.api.send({ modules: 'user', method: 'logoutUsers' });
-        await this.parent.restart(); // Odświeżenie systemu po wylogowaniu
+        await this.parent.restart();
     }
-
-
-
-
-
 }
+
 export default FUN;
