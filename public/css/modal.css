@@ -2,13 +2,12 @@
 .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(30,30,30,0.35); /* ciemniejsze, bez blur */
+    background: rgba(30,30,30,0.35);
     z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
     animation: fadeIn 0.2s;
-    /* usunięto: backdrop-filter: blur(8px); */
     pointer-events: auto;
 }
 
@@ -26,18 +25,17 @@ body > *:not(.modal) {
 }
 
 .modal-content {
-    background: rgba(243,243,243,0.98);
+    background: rgba(243,243,243,0.95);
     border-radius: 12px;
-    box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
     padding: 0 0 24px 0;
     min-width: 340px;
     max-width: 96vw;
     text-align: center;
     font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
     color: #222;
-    border: 1.5px solid #b4c7e7;
-    outline: 2.5px solid #eaf1fb;
-    outline-offset: -6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    outline: none;
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -45,15 +43,15 @@ body > *:not(.modal) {
 }
 
 .modal-titlebar {
-    height: 44px;
-    background: linear-gradient(90deg, #eaf1fb 0%, #d2e3fc 100%);
-    border-bottom: 1px solid #b4c7e7;
+    height: 48px;
+    background: rgba(32,32,32,0.85);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
     display: flex;
     align-items: center;
-    padding: 0 18px;
+    padding: 0 16px;
     font-size: 1.08rem;
     font-weight: 500;
-    color: #1976d2;
+    color: #fff;
     letter-spacing: 0.01em;
     user-select: none;
     justify-content: flex-start;
