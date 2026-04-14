@@ -269,6 +269,28 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
       await view.removeWindowMenuItem({ id: 'win-editor', menuId: 'menu-file',
           itemId: 'mi-export' });
 
+  addMeniuWindow({ id, menuId, label, items?, position? })      → Promise<void>
+    Dodaje całe nowe menu do okna.
+
+    Przykład:
+      await view.addMeniuWindow({ id: 'win-editor', menuId: 'menu-tools',
+          label: 'Narzędzia',
+          items: [{ icon: '⚙️', label: 'Ustawienia', onClick: () => {} }] });
+
+  refreshMeniuWindow({ id, menuId, label?, items })             → Promise<void>
+    Odświeża (zastępuje) istniejące menu po menuId. Zachowuje dotychczasową
+    etykietę, jeśli nie podano label.
+
+    Przykład:
+      await view.refreshMeniuWindow({ id: 'win-editor', menuId: 'menu-tools',
+          items: [{ icon: '🔧', label: 'Nowe opcje', onClick: () => {} }] });
+
+  deleteMeniuWindow({ id, menuId })                             → Promise<void>
+    Usuwa menu z okna po menuId.
+
+    Przykład:
+      await view.deleteMeniuWindow({ id: 'win-editor', menuId: 'menu-tools' });
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   class TaskbarManager
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -573,6 +595,12 @@ automatycznie maksymalizowane i pozbawione przycisku maksymalizacji.
       item: { icon: '📊', label: 'Statystyki', onClick: () => {} } });
   await view.removeWindowMenuItem({ id: 'win-1', menuId: 'menu-tools', itemId: 'mi-stat' });
   await view.removeWindowMenu({ id: 'win-1', menuId: 'menu-tools' });
+
+  await view.addMeniuWindow({ id: 'win-1', menuId: 'menu-edit', label: 'Edycja',
+      items: [{ icon: '✏️', label: 'Edytuj', onClick: () => {} }] });
+  await view.refreshMeniuWindow({ id: 'win-1', menuId: 'menu-edit',
+      items: [{ icon: '✂️', label: 'Wytnij', onClick: () => {} }] });
+  await view.deleteMeniuWindow({ id: 'win-1', menuId: 'menu-edit' });
 
   await view.minimizeWindow({ id: 'win-1' });
   await view.maximizeWindow({ id: 'win-1' });

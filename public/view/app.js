@@ -71,6 +71,19 @@
   // Usuń menu z okna:
   view.removeWindowMenu({ id: 'win-main', menuId: 'menu-view' });
 
+  // Dodaj całe nowe menu (skrócona forma):
+  view.addMeniuWindow({ id: 'win-main', menuId: 'menu-edit', label: 'Edycja', items: [
+      { icon: '✂️', label: 'Wytnij', onClick: () => {} }
+  ]});
+
+  // Odśwież istniejące menu po menuId:
+  view.refreshMeniuWindow({ id: 'win-main', menuId: 'menu-edit', items: [
+      { icon: '📋', label: 'Wklej', onClick: () => {} }
+  ]});
+
+  // Usuń menu po menuId (skrócona forma):
+  view.deleteMeniuWindow({ id: 'win-main', menuId: 'menu-edit' });
+
   // Dodaj przycisk do paska tytułowego:
   view.addWindowButton({ id: 'win-notes', btnId: 'btn-pin', label: '📌', onClick: () => alert('Przypięto!') });
 
@@ -1221,6 +1234,19 @@ class View {
             },
 
             /**
+             * Odświeża (zastępuje) istniejące menu po data-menu-id
+             * @param {string} id
+             * @param {{ label?, items? }} cfg
+             */
+            async refreshMenu(id, { label, items = [] } = {}) {
+                const mb = _getMenubar(); if (!mb) return;
+                const existing = mb.querySelector(`[data-menu-id="${id}"]`);
+                if (!existing) { console.warn(`menubar.refreshMenu: brak menu "${id}".`); return; }
+                const newLabel = label !== undefined ? label : (existing.childNodes[0]?.nodeType === Node.TEXT_NODE ? existing.childNodes[0].textContent.trim() : '');
+                existing.replaceWith(_makeMenu({ label: newLabel, id, items }));
+            },
+
+            /**
              * Dodaje pozycję do istniejącego menu
              * @param {string} menuId
              * @param {object} item  – { id?, icon?, label, shortcut?, disabled?, separator?, submenu?, onClick }
@@ -1551,6 +1577,9 @@ class View {
  *    wm.removeWindowMenu({ id, menuId })
  *    wm.addWindowMenuItem({ id, menuId, item })
  *    wm.removeWindowMenuItem({ id, menuId, itemId })
+ *    wm.addMeniuWindow({ id, menuId, label, items, position? })
+ *    wm.refreshMeniuWindow({ id, menuId, label?, items })
+ *    wm.deleteMeniuWindow({ id, menuId })
  * ════════════════════════════════════════════════════════════ */
 class WindowManager {
     constructor({ containerId = 'windowContainer', taskbarId = 'taskbar' } = {}) {
@@ -1686,6 +1715,23 @@ class WindowManager {
     async removeWindowMenuItem({ id, menuId, itemId } = {}) {
         const v = await this._get(id);
         await v?.menubar.removeMenuItem(menuId, itemId);
+    }
+
+    /* ── skrócone metody menu okna (Meniu) ────────────────── */
+    /** Dodaje całe nowe menu do okna. */
+    async addMeniuWindow({ id, menuId, label, items, position } = {}) {
+        const v = await this._get(id);
+        await v?.menubar.addMenu({ id: menuId, label, items, position });
+    }
+    /** Odświeża (zastępuje) istniejące menu po menuId. */
+    async refreshMeniuWindow({ id, menuId, label, items } = {}) {
+        const v = await this._get(id);
+        await v?.menubar.refreshMenu(menuId, { label, items });
+    }
+    /** Usuwa menu z okna po menuId. */
+    async deleteMeniuWindow({ id, menuId } = {}) {
+        const v = await this._get(id);
+        await v?.menubar.removeMenu(menuId);
     }
 }
 
