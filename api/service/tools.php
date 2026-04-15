@@ -2,20 +2,24 @@
 class TOOLS{
     public function __construct(){}
 
-    public function getPublicTools(): array
+    /**
+     * Zwraca ścieżki do wszystkich narzędzi (publiczne i prywatne)
+     * @param bool $includePrivate Czy dołączyć narzędzia prywatne
+     * @return array
+     */
+    public function getAllTools(bool $includePrivate = false): array
     {
         $toolsPaths = [];
-        // Szukaj w katalogu 'public/tools' względem katalogu projektu
-        $toolsDir = __DIR__ . '/../../public/tools';
-        if (is_dir($toolsDir)) {
-            $dirs = scandir($toolsDir);
+        // Publiczne narzędzia
+        $publicDir = __DIR__ . '/../../public/tools';
+        if (is_dir($publicDir)) {
+            $dirs = scandir($publicDir);
             foreach ($dirs as $dir) {
                 if ($dir !== '.' && $dir !== '..') {
-                    $subDirPath = $toolsDir . '/' . $dir;
+                    $subDirPath = $publicDir . '/' . $dir;
                     if (is_dir($subDirPath)) {
                         $jsFile = $subDirPath . '/' . $dir . '.js';
                         if (file_exists($jsFile)) {
-                            // Zwróć ścieżkę względną względem katalogu publicznego serwera www, czyli 'tools/nazwa/nazwa.js'
                             $relativePath = 'tools/' . $dir . '/' . $dir . '.js';
                             $toolsPaths[] = $relativePath;
                         }
@@ -23,26 +27,22 @@ class TOOLS{
                 }
             }
         }
-        return $toolsPaths;
-    }
-
-    /** metoda zwraca listę ścieżek do prywatnych narzędzi */
-   public function getPrivateTools(): array
-    {
-        $toolsPaths = [];
-        // Szukaj w katalogu 'private/tools' względem katalogu projektu
-        $toolsDir = __DIR__ . '/../../private/tools';
-        if (is_dir($toolsDir)) {
-            $dirs = scandir($toolsDir);
-            foreach ($dirs as $dir) {
-                if ($dir !== '.' && $dir !== '..') {
-                    $subDirPath = $toolsDir . '/' . $dir;
-                    if (is_dir($subDirPath)) {
-                        $jsFile = $subDirPath . '/' . $dir . '.js';
-                        if (file_exists($jsFile)) {
-                            // Zwróć ścieżkę do loadera PHP, który udostępni plik z private/tools
-                            $relativePath = 'tools_loader.php?file=private/tools/' . $dir . '/' . $dir . '.js';
-                            $toolsPaths[] = $relativePath;
+        // Prywatne narzędzia
+        // pomijamy sprawdzanie zalogowanego 
+        $includePrivate = true; // ustawiamy na true, aby zawsze dołączać narzędzia prywatne
+        if ($includePrivate) {
+            $privateDir = __DIR__ . '/../../private/tools';
+            if (is_dir($privateDir)) {
+                $dirs = scandir($privateDir);
+                foreach ($dirs as $dir) {
+                    if ($dir !== '.' && $dir !== '..') {
+                        $subDirPath = $privateDir . '/' . $dir;
+                        if (is_dir($subDirPath)) {
+                            $jsFile = $subDirPath . '/' . $dir . '.js';
+                            if (file_exists($jsFile)) {
+                                $relativePath = 'api/service/tools_loader.php?file=private/tools/' . $dir . '/' . $dir . '.js';
+                                $toolsPaths[] = $relativePath;
+                            }
                         }
                     }
                 }
@@ -50,5 +50,4 @@ class TOOLS{
         }
         return $toolsPaths;
     }
-
 }

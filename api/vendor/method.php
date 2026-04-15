@@ -24,20 +24,12 @@ class METHOD
     }
 
     // pobranie sciezek do modolow public function getModulesPaths(mixed $param = null): array
-    private function getPublicTools(mixed $param = null): array
+    private function getAllTools(mixed $param = null): array
     {
         include_once __DIR__ . '/../service/tools.php';
         $tools = new TOOLS();
-      //  $tools->getPublicTools(); // pobierz sciezki do prywatnych narzedzi, ale ich nie zwracaj
-        return $tools->getPublicTools();
-    }
-    // pobranie sciezek do modolow prywatnych wymaga sprawdzenia  czy uzytkownik jest zalogowany,
-    private function getPrivateTools(mixed $param = null): array
-    {
-        include_once __DIR__ . '/../service/tools.php';
-        $tools = new TOOLS();
-       // $tools->getPrivateTools(); // pobierz sciezki do publicznych narzedzi, ale ich nie zwracaj
-        return $tools->getPrivateTools();
+   
+        return $tools->getAllTools();
     }
 
 

@@ -25,8 +25,8 @@ if (strpos($file, '..') !== false) {
     exit('Niedozwolona ścieżka');
 }
 
-$fullPath = realpath(__DIR__ . '/../' . $file);
-$privateToolsDir = realpath(__DIR__ . '/../private/tools/');
+$fullPath = realpath(__DIR__ . '/../../' . $file);
+$privateToolsDir = realpath(__DIR__ . '/../../private/tools/');
 error_log('tools_loader.php: Pełna ścieżka resolved: ' . $fullPath);
 error_log('tools_loader.php: Katalog private/tools resolved: ' . $privateToolsDir);
 

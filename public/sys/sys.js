@@ -29,10 +29,7 @@ class SYS {
         // ladowanie menu startowego zależnie od stanu logowania
         await this.fun.showMenuStart(dat.loggedIn);
        // ladowanie tools 
-        if (dat.loggedIn) {
-            await this.loadPrivateTools();
-        }
-        await this.loadPublicTools();
+        await this.loadAllTools(dat.loggedIn);
     }
 
     /**
@@ -80,19 +77,10 @@ class SYS {
     }
 
     /**
-     * Pobiera i ładuje publiczne narzędzia dostępne dla wszystkich użytkowników.
+     * Pobiera i ładuje wszystkie narzędzia (publiczne i prywatne, jeśli zalogowany)
      */
-    async loadPublicTools() {
-        const tools = await this.api.send({ method: 'getPublicTools' });
-        await this._loadToolScripts(tools);
-    }
-
-    /**
-     * Pobiera i ładuje prywatne narzędzia dostępne tylko dla zalogowanych użytkowników.
-     */
-    async loadPrivateTools() {
-
-        const tools = await this.api.send({ method: 'getPrivateTools' });
+    async loadAllTools(includePrivate = false) {
+        const tools = await this.api.send({ method: 'getAllTools', includePrivate });
         await this._loadToolScripts(tools);
     }
 }
