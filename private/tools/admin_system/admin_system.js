@@ -15,3 +15,5 @@ class ADMIN_SYSTEM {
     }
     
 }
+
+new ADMIN_SYSTEM();
