@@ -26,9 +26,9 @@ class SYS {
     async init() {
         console.log('Inicjalizacja systemu...');
         const dat = await this.api.send({ method: 'checkLoggedIn' });
-
+        // ladowanie menu startowego zależnie od stanu logowania
         await this.fun.showMenuStart(dat.loggedIn);
-
+       // ladowanie tools 
         if (dat.loggedIn) {
             await this.loadPrivateTools();
         }
