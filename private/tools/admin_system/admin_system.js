@@ -1,7 +1,8 @@
 class ADMIN_SYSTEM {
     
     constructor() {
-
+        console.log('Tworzenie instancji ADMIN_SYSTEM...');
+   
         this.parent = parent;
         this.initialize();
     }

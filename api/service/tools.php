@@ -29,7 +29,7 @@ class TOOLS{
         }
         // Prywatne narzędzia
         // pomijamy sprawdzanie zalogowanego 
-        $includePrivate = true; // ustawiamy na true, aby zawsze dołączać narzędzia prywatne
+      //  $includePrivate = true; // ustawiamy na true, aby zawsze dołączać narzędzia prywatne
         if ($includePrivate) {
             $privateDir = __DIR__ . '/../../private/tools';
             if (is_dir($privateDir)) {
