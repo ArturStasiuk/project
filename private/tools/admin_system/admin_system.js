@@ -13,10 +13,7 @@ class ADMIN_SYSTEM {
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     initialize() {
-        modal.alert('Witaj w panelu administracyjnym!');
-       console.log('Inicjalizacja ADMIN_SYSTEM...');
-        // Tutaj możesz dodać kod inicjalizacyjny, np. rejestrację w menu startowym
-        // lub innych elementów interfejsu użytkownika.
+
     }
     
 }

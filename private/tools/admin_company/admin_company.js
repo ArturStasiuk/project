@@ -13,10 +13,8 @@ class ADMIN_COMPANY{
     }
     /** Inicjalizacja modułu ADMIN_COMPANY */
     initialize() {
-        modal.alert('Witaj w panelu company');
-        //console.log('Inicjalizacja ADMIN_COMPANY...');
-        // Tutaj możesz dodać kod inicjalizacyjny, np. rejestrację w menu startowym
-        // lub innych elementów interfejsu użytkownika.
+
+        
     }
 
 }

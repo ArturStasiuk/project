@@ -5,7 +5,7 @@ class CONFIG {
     }
     /** Inicjalizacja modułu CONFIG */
     initialize() {
-        this.parent.modal.alert('Konfiguracja narzędzia ADMIN_SYSTEM została załadowana!');
+     //   this.parent.modal.alert('Konfiguracja narzędzia ADMIN_SYSTEM została załadowana!');
         // Tutaj możesz dodać kod inicjalizacyjny, np. rejestrację w menu startowym
         // lub innych elementów interfejsu użytkownika.
     }

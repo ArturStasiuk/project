@@ -23,7 +23,6 @@
         "imports": {
             "modal": "./view/modal.js",
             "view":  "./view/app.js",
-            "sys":   "./sys/sys.js",
             "api":   "../api/api.js"
         }
     }
