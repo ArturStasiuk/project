@@ -67,41 +67,7 @@ class SYS {
      */
     async _loadToolScripts(paths) {
         if (!Array.isArray(paths)) return;
-
-        const pending = paths.map(path => new Promise(async (resolve, reject) => {
-            let finalPath = path;
-            if (this._loadedScripts.has(finalPath)) {
-                console.log(`Moduł już załadowany, pomijam: ${finalPath}`);
-                resolve();
-                return;
-            }
-            // Jeśli ścieżka kończy się na .js, ładuj przez <script src="...">
-            if (finalPath.endsWith('.js')) {
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = finalPath.startsWith('api/service/tools_loader.php') ? '/' + finalPath : finalPath;
-                script.onload = () => {
-                    this._loadedScripts.add(finalPath);
-                    resolve();
-                };
-                script.onerror = (e) => {
-                    alert(`Błąd ładowania modułu: ${finalPath}`, e);
-                    reject(e);
-                };
-                document.head.appendChild(script);
-            } else {
-                // Jeśli to nie jest ścieżka do pliku .js, traktuj jako kod JS
-                try {
-                    this.injectModuleCode(finalPath);
-                    this._loadedScripts.add(finalPath);
-                    resolve();
-                } catch (e) {
-                    alert(`Błąd ładowania kodu modułu: ${finalPath}`, e);
-                    reject(e);
-                }
-            }
-        }));
-
+        const pending = paths.map(path => this._loadOneTool(path));
         await Promise.allSettled(pending);
     }
 
