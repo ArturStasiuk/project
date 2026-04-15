@@ -51,21 +51,26 @@ class SYS {
         if (!Array.isArray(paths)) return;
 
         const pending = paths.map(path => new Promise((resolve, reject) => {
-            if (this._loadedScripts.has(path)) {
-                console.log(`Moduł już załadowany, pomijam: ${path}`);
+            let finalPath = path;
+            if (this._loadedScripts.has(finalPath)) {
+                console.log(`Moduł już załadowany, pomijam: ${finalPath}`);
                 resolve();
                 return;
             }
             const script = document.createElement('script');
             script.type = 'module';
-            script.src = path;
+            // Jeśli ścieżka zaczyna się od 'tools_loader.php', ustaw src bezwzględnie
+            if (finalPath.startsWith('tools_loader.php')) {
+                script.src = '/' + finalPath;
+            } else {
+                script.src = finalPath;
+            }
             script.onload = () => {
-                this._loadedScripts.add(path);
-                console.log(`Załadowano moduł: ${path}`);
+                this._loadedScripts.add(finalPath);
                 resolve();
             };
             script.onerror = (e) => {
-                console.error(`Błąd ładowania modułu: ${path}`, e);
+                alert(`Błąd ładowania modułu: ${finalPath}`, e);
                 reject(e);
             };
             document.head.appendChild(script);
@@ -86,7 +91,7 @@ class SYS {
      * Pobiera i ładuje prywatne narzędzia dostępne tylko dla zalogowanych użytkowników.
      */
     async loadPrivateTools() {
-        console.log('Ładowanie modułów prywatnych...');
+
         const tools = await this.api.send({ method: 'getPrivateTools' });
         await this._loadToolScripts(tools);
     }
