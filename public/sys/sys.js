@@ -42,26 +42,86 @@ class SYS {
     /**
      * Ładuje moduły narzędzi z podanej listy ścieżek.
      * Każdy skrypt jest ładowany tylko raz (deduplication przez _loadedScripts).
-     * @param {string[]} paths – tablica ścieżek do skryptów ES module
+     * Prywatne narzędzia (prefiks 'private-tool://') są pobierane przez API
+     * i wstrzykiwane jako skrypt przez Blob URL.
+     * @param {string[]} paths – tablica ścieżek/identyfikatorów skryptów
      */
     async _loadToolScripts(paths) {
         if (!Array.isArray(paths)) return;
 
-        const pending = paths.map(path => new Promise((resolve, reject) => {
-            let finalPath = path;
-            if (this._loadedScripts.has(finalPath)) {
-                console.log(`Moduł już załadowany, pomijam: ${finalPath}`);
-                resolve();
-                return;
-            }
+        const pending = paths.map(path => this._loadOneTool(path));
+        await Promise.allSettled(pending);
+    }
+
+    /**
+     * Ładuje jedno narzędzie. Prywatne – przez API i Blob URL; publiczne – bezpośrednio.
+     * @param {string} finalPath
+     */
+    async _loadOneTool(finalPath) {
+        if (this._loadedScripts.has(finalPath)) {
+            console.log(`Moduł już załadowany, pomijam: ${finalPath}`);
+            return;
+        }
+
+        if (finalPath.startsWith('private-tool://')) {
+            await this._loadPrivateTool(finalPath);
+        } else {
+            await this._loadPublicTool(finalPath);
+        }
+    }
+
+    /**
+     * Pobiera treść JS prywatnego narzędzia przez API i wstrzykuje jako Blob URL.
+     * @param {string} finalPath – identyfikator w formacie 'private-tool://NAME'
+     */
+    async _loadPrivateTool(finalPath) {
+        const toolName = finalPath.substring('private-tool://'.length);
+        let result;
+        try {
+            result = await this.api.send({ method: 'getPrivateToolContent', param: toolName });
+        } catch (e) {
+            console.error(`Wyjątek podczas pobierania prywatnego narzędzia: ${toolName}`, e);
+            return;
+        }
+
+        if (!result || !result.status || !result.content) {
+            console.error(`Błąd ładowania prywatnego narzędzia: ${toolName}`, result);
+            return;
+        }
+
+        const blob = new Blob([result.content], { type: 'application/javascript' });
+        const blobUrl = URL.createObjectURL(blob);
+
+        await new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.type = 'module';
-            // Jeśli ścieżka zaczyna się od 'api/service/tools_loader.php', ustaw src bezwzględnie
-            if (finalPath.startsWith('api/service/tools_loader.php')) {
-                script.src = '/' + finalPath;
-            } else {
-                script.src = finalPath;
-            }
+            script.src = blobUrl;
+            script.onload = () => {
+                this._loadedScripts.add(finalPath);
+                // Dla <script type="module"> zdarzenie onload odpala się dopiero po
+                // załadowaniu i wykonaniu całego grafu importów, więc Blob URL można
+                // bezpiecznie zwolnić w następnym cyklu pętli zdarzeń.
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
+                resolve();
+            };
+            script.onerror = (e) => {
+                URL.revokeObjectURL(blobUrl);
+                console.error(`Błąd wykonania prywatnego narzędzia: ${toolName}`, e);
+                reject(e);
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    /**
+     * Ładuje publiczne narzędzie jako skrypt ES module.
+     * @param {string} finalPath – ścieżka do pliku JS
+     */
+    _loadPublicTool(finalPath) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = finalPath;
             script.onload = () => {
                 this._loadedScripts.add(finalPath);
                 resolve();
@@ -71,9 +131,7 @@ class SYS {
                 reject(e);
             };
             document.head.appendChild(script);
-        }));
-
-        await Promise.allSettled(pending);
+        });
     }
 
     /**
