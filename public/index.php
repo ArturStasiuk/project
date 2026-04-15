@@ -10,6 +10,24 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modal.css">
 
+    <!--
+        Import map: mapuje krótkie nazwy modułów na ich publiczne URL-e.
+        Dzięki temu prywatne narzędzia ładowane przez Blob URL mogą importować
+        publiczne moduły używając krótkich nazw, np.:
+            import modal from 'modal';
+            import api   from 'api';
+        zamiast ścieżek względnych (które nie działają w kontekście Blob URL).
+    -->
+    <script type="importmap">
+    {
+        "imports": {
+            "modal": "./view/modal.js",
+            "view":  "./view/app.js",
+            "sys":   "./sys/sys.js",
+            "api":   "../api/api.js"
+        }
+    }
+    </script>
 
 </head>
 <body>

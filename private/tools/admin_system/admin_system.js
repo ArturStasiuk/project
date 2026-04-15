@@ -1,19 +1,22 @@
+// Prywatne narzędzie ładowane przez API jako Blob URL.
+// Ścieżki względne (np. '../../view/modal.js') nie działają w Blob URL —
+// zamiast tego używamy krótkich nazw zdefiniowanych w import map (index.php).
+import modal from 'modal';
+
 class ADMIN_SYSTEM {
     
     constructor() {
-        console.log('Tworzenie instancji ADMIN_SYSTEM...');
-   
-        this.parent = parent;
+        this.modal = modal;
+       
         this.initialize();
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     initialize() {
-        // Możesz usunąć ten alert po testach
-        alert('Moduł ADMIN_SYSTEM został załadowany.'); 
+       console.log('Inicjalizacja ADMIN_SYSTEM...');
         // Tutaj możesz dodać kod inicjalizacyjny, np. rejestrację w menu startowym
         // lub innych elementów interfejsu użytkownika.
     }
     
 }
 
-new ADMIN_SYSTEM();
+const adminSystem = new ADMIN_SYSTEM();
