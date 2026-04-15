@@ -69,7 +69,14 @@ class FUN {
      */
     async logIn(email, password) {
         await this.closeWinLogin();
-        await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email, password } });
+        const odp = await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email, password } });
+
+        if (!odp.status) {
+            await this.parent.modal.alert('Nieprawidłowy email lub hasło. Spróbuj ponownie.');
+            await this.showWinLogin();
+            return;
+        }
+        await this.parent.modal.alert('Zalogowano pomyślnie!');
         await this.parent.restart();
     }
 
@@ -78,7 +85,14 @@ class FUN {
      */
     async logOut() {
         await this.closeWinLogout();
-        await this.parent.api.send({ modules: 'user', method: 'logoutUsers' });
+        const odp = await this.parent.api.send({ modules: 'user', method: 'logoutUsers' });
+
+        if (!odp.status) {
+            await this.parent.modal.alert('Wystąpił błąd podczas wylogowywania. Spróbuj ponownie.');
+            await this.showWinLogout();
+            return;
+        }
+        await this.parent.modal.alert('Wylogowano pomyślnie!');
         await this.parent.restart();
     }
 }

@@ -48,32 +48,7 @@ class NOTEPAD {
 
 
     }
-    async openFile() {
-        // Sprawdzenie czy w localStorage jest katalog art-com/projekt/notepad-files
-        if (!await this.func.checkDirectoryLocalStorage()) {
-            await this.modal.alert('Nie można otworzyć pliku, ponieważ katalog "notepad-files" nie istnieje w localStorage. Utwórz katalog i dodaj pliki, aby móc je otworzyć.');
-            return;
-        }
-        const files = await this.func.loadLocalStorageFile();
-        console.log('Dostępne pliki .txt w katalogu "notepad-files":', files);
-        
-    }
 
-    async saveFile() { 
-      // Sprawdzenie czy w localStorage jest katalog art-com/projekt/notepad-files
-        if (!await this.func.checkDirectoryLocalStorage()) {
-            await this.modal.confirm('Nie można zapisać pliku, ponieważ katalog "notepad-files" nie istnieje w localStorage. Czy chcesz go utworzyć?').then(async (result) => {
-                if (result) {
-                    localStorage.setItem(this.dirFilesLocalStorage, JSON.stringify({}));
-                    await this.modal.alert('Katalog "notepad-files" został utworzony. Teraz możesz zapisać plik.');
-                    // tu kod do zapisania pliku po utwozeniu katalogu 
-                } else {
-                    await this.modal.alert('Nie można zapisać pliku bez katalogu "notepad-files".');
-                }
-            });
-            return;
-        }   
-    }
 
 
 

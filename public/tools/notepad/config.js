@@ -38,25 +38,16 @@ class CONFIG {
      * @returns {object}
      */
     async getWindowMenu() {
-        const view = this.parent.view;
-        const id   = this.idWindow;
+
         return {
-            id,
+            id: this.idWindow,
             menus: [
                 {
                     label: 'Plik',
                     id:    'notepad-file',
                     items: [
-                        { icon: '📂', label: 'Otwórz', onClick: async () => await this.parent.openFile() },
-                        { icon: '💾', label: 'Zapisz', onClick: async () => await this.parent.saveFile(document.querySelector('.notepad-textarea').value) }
-                    ]
-                },
-                {
-                    label: 'Widok',
-                    id:    'notepad-view',
-                    items: [
-                        { icon: '🔢', label: 'Standardowy', onClick: () => view.setWindowStatus({ id, text: 'Tryb standardowy' }) },
-                        { icon: '📐', label: 'Naukowy',     onClick: () => view.setWindowStatus({ id, text: 'Tryb naukowy' }) }
+                        { icon: '📂', label: 'Otwórz', onClick: async () =>{} },
+                        { icon: '💾', label: 'Zapisz', onClick: async () => {} }
                     ]
                 },
                 {

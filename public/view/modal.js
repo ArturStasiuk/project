@@ -26,7 +26,7 @@ class MODAL {
     }
    
     // prosty confirm modalny z dwoma przyciskami Yes i No, zwraca true dla Yes i false dla No
-    
+
   async confirm(message, title = 'Potwierdzenie') {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
@@ -74,6 +74,34 @@ class MODAL {
         document.body.appendChild(modal);
     }   
     
+    /** modal do podania danych przez użytkownika (prompt) */
+    async prompt(message, defaultValue = '', title = 'Wprowadź dane') {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-titlebar">${title}</div>
+                    <p>${message}</p>
+                    <input type="text" id="prompt-input" value="${defaultValue}">
+                    <div class="modal-actions">
+                        <button id="ok-btn" class="modal-btn modal-btn--ok">OK</button>
+                        <button id="cancel-btn" class="modal-btn modal-btn--cancel">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('#ok-btn').addEventListener('click', () => {
+                const input = modal.querySelector('#prompt-input').value;
+                document.body.removeChild(modal);
+                resolve(input);
+            });
+            modal.querySelector('#cancel-btn').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                resolve(null);
+            });
+        });
+    }
 
 
 
@@ -82,11 +110,7 @@ class MODAL {
 
 
 
-
-
-
-
-
+    
 
 
 
@@ -94,3 +118,4 @@ class MODAL {
 
 const modal = new MODAL();
 export default modal;
+

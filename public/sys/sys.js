@@ -1,3 +1,4 @@
+import modal from '../view/modal.js';
 import view from '../view/app.js';
 import api from '../../api/api.js';
 import CONFIG from './conf.js';
@@ -5,6 +6,7 @@ import FUN from './func.js';
 
 class SYS {
     constructor() {
+        this.modal = modal;
         this.api = api;
         this.view = view;
 

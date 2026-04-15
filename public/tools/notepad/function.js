@@ -21,35 +21,8 @@ class FUNCTION {
         await this.parent.view.addWindowCard(await this.parent.conf.getWindowContent());
     }
     
-    /** sprawdzenie czy istnieje katalog w localStorage */
-    async checkDirectoryLocalStorage() {
-        const dirExists = localStorage.getItem(this.parent.dirFilesLocalStorage) !== null;
-        if (!dirExists) {
-          return false;
-        }
-        return true;
-    }
-    
-    /** pobranie pliku z localStorage listy plikow .txt jezeli istnieja i zwrocenie wyniku */
-    async loadLocalStorageFile() { 
-        // Pobierz katalog plików z localStorage
-        const dirKey = this.parent.dirFilesLocalStorage;
-        const filesJson = localStorage.getItem(dirKey);
-        if (!filesJson) {
-            return [];
-        }
-        let files;
-        try {
-            files = JSON.parse(filesJson);
-        } catch (e) {
-            console.error('Błąd parsowania plików z localStorage:', e);
-            return [];
-        }
-        // Zwróć tylko pliki .txt
-        return Array.isArray(files) ? files.filter(f => typeof f === 'string' && f.endsWith('.txt')) : [];
-    }
+ 
 
-    
 
 
 }
