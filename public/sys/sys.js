@@ -138,7 +138,7 @@ class SYS {
      * Pobiera i ładuje wszystkie narzędzia (publiczne i prywatne, jeśli zalogowany)
      */
     async loadAllTools(includePrivate = false) {
-        const tools = await this.api.send({ method: 'getAllTools', includePrivate });
+        const tools = await this.api.send({ method: 'getAllTools', param: includePrivate });
         await this._loadToolScripts(tools);
     }
 }

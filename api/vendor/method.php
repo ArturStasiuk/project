@@ -29,7 +29,7 @@ class METHOD
         include_once __DIR__ . '/../service/tools.php';
         $tools = new TOOLS();
    
-        return $tools->getAllTools();
+        return $tools->getAllTools((bool)$param);
     }
 
     /**
