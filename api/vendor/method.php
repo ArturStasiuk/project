@@ -73,4 +73,60 @@ class METHOD
         return ['status' => true, 'content' => file_get_contents($jsFileReal)];
     }
 
+    /**
+     * Zwraca zawartość konkretnego pliku JS z katalogu prywatnego narzędzia.
+     * $param – ścieżka w formacie 'nazwa_narzedzia/plik.js' (tylko pliki .js, bez podkatalogów)
+     */
+    private function getPrivateToolFile(mixed $param = null): array
+    {
+        if (empty($param) || !is_string($param)) {
+            return ['status' => false, 'content' => null, 'error' => 'Nieprawidłowy parametr'];
+        }
+
+        $parts = explode('/', $param, 2);
+        if (count($parts) !== 2) {
+            return ['status' => false, 'content' => null, 'error' => 'Oczekiwany format: narzedzie/plik.js'];
+        }
+
+        [$toolName, $fileName] = $parts;
+
+        // Walidacja nazwy narzędzia – tylko prosta nazwa, bez slashy i ".."
+        if (basename($toolName) !== $toolName || $toolName === '' || $toolName === '.' || $toolName === '..') {
+            return ['status' => false, 'content' => null, 'error' => 'Nieprawidłowa nazwa narzędzia'];
+        }
+
+        // Walidacja nazwy pliku – tylko plik w tym samym katalogu, bez podkatalogów i ".."
+        if (basename($fileName) !== $fileName || $fileName === '' || $fileName === '.' || $fileName === '..') {
+            return ['status' => false, 'content' => null, 'error' => 'Nieprawidłowa nazwa pliku'];
+        }
+
+        // Tylko pliki .js o bezpiecznej nazwie (litery, cyfry, podkreślnik, myślnik)
+        if (!preg_match('/^[a-zA-Z0-9_-]+\.js$/', $fileName)) {
+            return ['status' => false, 'content' => null, 'error' => 'Dozwolone są tylko pliki .js o bezpiecznej nazwie'];
+        }
+
+        $privateDir = realpath(__DIR__ . '/../../private/tools/');
+        if (!$privateDir) {
+            return ['status' => false, 'content' => null, 'error' => 'Katalog private/tools nie istnieje'];
+        }
+
+        $filePath = $privateDir . '/' . $toolName . '/' . $fileName;
+        $fileReal = realpath($filePath);
+
+        if (!$fileReal) {
+            return ['status' => false, 'content' => null, 'error' => 'Plik nie istnieje'];
+        }
+
+        // Ochrona przed path traversal – plik musi leżeć wewnątrz private/tools/
+        if (!str_starts_with($fileReal . DIRECTORY_SEPARATOR, $privateDir . DIRECTORY_SEPARATOR)) {
+            return ['status' => false, 'content' => null, 'error' => 'Niedozwolona ścieżka'];
+        }
+
+        if (!is_readable($fileReal)) {
+            return ['status' => false, 'content' => null, 'error' => 'Brak dostępu do pliku'];
+        }
+
+        return ['status' => true, 'content' => file_get_contents($fileReal)];
+    }
+
 }

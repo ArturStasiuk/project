@@ -89,6 +89,73 @@ class SYS {
     }
 
     /**
+     * Skanuje kod JS w poszukiwaniu względnych importów (np. './config.js'),
+     * pobiera te pliki przez API, tworzy dla nich Blob URL i podmienia ścieżki
+     * w kodzie źródłowym, aby działały w kontekście Blob URL.
+     * Działa rekurencyjnie – zależności też mogą mieć własne zależności.
+     * @param {string} toolName – nazwa narzędzia (katalog w private/tools/)
+     * @param {string} content  – kod źródłowy JS
+     * @param {Set<string>} [_visited] – wewnętrzny zbiór odwiedzonych plików (zapobiega cyklom)
+     * @returns {Promise<string>} – zmodyfikowany kod z Blob URL zamiast ścieżek względnych
+     */
+    async _resolvePrivateImports(toolName, content, _visited = new Set()) {
+        // Dopasowuje: from './plik.js'  oraz  import './plik.js'  (cudzysłów lub apostrof)
+        // Regex celowo dopasowuje tylko './' – importy z '..' lub podkatalogów są odrzucane poniżej.
+        const importRegex = /(?:from|import)\s+(['"])(\.\/[^'"]+)\1/g;
+        const relativeImports = new Set();
+        let match;
+        while ((match = importRegex.exec(content)) !== null) {
+            relativeImports.add(match[2]);
+        }
+
+        if (relativeImports.size === 0) return content;
+
+        const blobUrls = new Map();
+        for (const importPath of relativeImports) {
+            // Obsługujemy tylko proste importy z tego samego katalogu: './plik.js'
+            if (!importPath.startsWith('./') || importPath.includes('..') || importPath.slice(2).includes('/')) {
+                continue;
+            }
+
+            const fileName = importPath.slice(2); // usuń './'
+            const cacheKey = `${toolName}/${fileName}`;
+
+            if (_visited.has(cacheKey)) {
+                console.warn(`Wykryto cykl importów, pomijam: ${cacheKey}`);
+                continue;
+            }
+            _visited.add(cacheKey);
+
+            try {
+                const res = await this.api.send({ method: 'getPrivateToolFile', param: cacheKey });
+                if (!res || !res.status || !res.content) {
+                    console.error(`Błąd ładowania zależności: ${importPath}`, res);
+                    continue;
+                }
+                // Rekurencyjnie rozwiąż zależności tej zależności
+                const resolvedContent = await this._resolvePrivateImports(toolName, res.content, _visited);
+                const depBlob = new Blob([resolvedContent], { type: 'application/javascript' });
+                blobUrls.set(importPath, URL.createObjectURL(depBlob));
+            } catch (e) {
+                console.error(`Wyjątek podczas ładowania zależności: ${importPath}`, e);
+            }
+        }
+
+        // Podmień ścieżki względne na Blob URL w kodzie źródłowym
+        let patchedContent = content;
+        for (const [importPath, blobUrl] of blobUrls) {
+            // Escapujemy znaki specjalne regex w ścieżce importu
+            const escaped = importPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            patchedContent = patchedContent.replace(
+                new RegExp(`(['"])${escaped}\\1`, 'g'),
+                `'${blobUrl}'`
+            );
+        }
+
+        return patchedContent;
+    }
+
+    /**
      * Pobiera treść JS prywatnego narzędzia przez API i wstrzykuje jako Blob URL.
      * @param {string} finalPath – identyfikator w formacie 'private-tool://NAME'
      */
@@ -107,7 +174,9 @@ class SYS {
             return;
         }
 
-        const blob = new Blob([result.content], { type: 'application/javascript' });
+        // Zastąp względne importy Blob URL, aby działały w kontekście Blob URL
+        const resolvedContent = await this._resolvePrivateImports(toolName, result.content);
+        const blob = new Blob([resolvedContent], { type: 'application/javascript' });
         const blobUrl = URL.createObjectURL(blob);
 
         await new Promise((resolve, reject) => {
