@@ -56,8 +56,8 @@ class SYS {
             }
             const script = document.createElement('script');
             script.type = 'module';
-            // Jeśli ścieżka zaczyna się od 'tools_loader.php', ustaw src bezwzględnie
-            if (finalPath.startsWith('tools_loader.php')) {
+            // Jeśli ścieżka zaczyna się od 'api/service/tools_loader.php', ustaw src bezwzględnie
+            if (finalPath.startsWith('api/service/tools_loader.php')) {
                 script.src = '/' + finalPath;
             } else {
                 script.src = finalPath;
