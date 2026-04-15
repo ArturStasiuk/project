@@ -32,5 +32,45 @@ class METHOD
         return $tools->getAllTools();
     }
 
+    /**
+     * Zwraca zawartość pliku JS prywatnego narzędzia.
+     * $param – nazwa narzędzia (np. 'admin_system')
+     */
+    private function getPrivateToolContent(mixed $param = null): array
+    {
+        if (empty($param) || !is_string($param)) {
+            return ['status' => false, 'content' => null, 'error' => 'Nieprawidłowy parametr'];
+        }
+
+        // Zabezpieczenie: tylko prosta nazwa narzędzia, bez slashy i ".."
+        $toolName = basename($param);
+        if ($toolName !== $param || $toolName === '' || $toolName === '.' || $toolName === '..') {
+            return ['status' => false, 'content' => null, 'error' => 'Nieprawidłowa nazwa narzędzia'];
+        }
+
+        $privateDir = realpath(__DIR__ . '/../../private/tools/');
+        if (!$privateDir) {
+            return ['status' => false, 'content' => null, 'error' => 'Katalog private/tools nie istnieje'];
+        }
+
+        $jsFilePath = $privateDir . '/' . $toolName . '/' . $toolName . '.js';
+        $jsFileReal = realpath($jsFilePath);
+
+        if (!$jsFileReal) {
+            return ['status' => false, 'content' => null, 'error' => 'Plik nie istnieje'];
+        }
+
+        // Obie ścieżki pochodzą z realpath(), który zwraca kanoniczną ścieżkę
+        // z jednolitą wielkością liter na każdym systemie plików – strpos() jest tu poprawne.
+        if (strpos($jsFileReal, $privateDir) !== 0) {
+            return ['status' => false, 'content' => null, 'error' => 'Niedozwolona ścieżka'];
+        }
+
+        if (!is_readable($jsFileReal)) {
+            return ['status' => false, 'content' => null, 'error' => 'Brak dostępu do pliku'];
+        }
+
+        return ['status' => true, 'content' => file_get_contents($jsFileReal)];
+    }
 
 }

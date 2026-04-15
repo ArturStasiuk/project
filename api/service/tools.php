@@ -40,7 +40,7 @@ class TOOLS{
                         if (is_dir($subDirPath)) {
                             $jsFile = $subDirPath . '/' . $dir . '.js';
                             if (file_exists($jsFile)) {
-                                $relativePath = 'api/service/tools_loader.php?file=private/tools/' . $dir . '/' . $dir . '.js';
+                                $relativePath = 'private-tool://' . $dir;
                                 $toolsPaths[] = $relativePath;
                             }
                         }
