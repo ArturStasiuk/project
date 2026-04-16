@@ -26,10 +26,21 @@ class METHOD
     // pobranie sciezek do modolow public function getModulesPaths(mixed $param = null): array
     private function getAllTools(mixed $param = null): array
     {
+        include_once __DIR__ . '/../config/config_db.php';
+        include_once __DIR__ . '/../connect/connect_db.php';
         include_once __DIR__ . '/../service/tools.php';
+        include_once __DIR__ . '/../data_base/access_tools.php';
+        include_once __DIR__ . '/../service/session.php';
+
+        $session = new SESSION();
         $tools = new TOOLS();
-   
-        return $tools->getAllTools((bool)$param);
+        $acessTools = new ACCESS_TOOLS();
+        $config_db  = new CONFIG_DB();
+        $connect_db = new CONNECT();
+        $pdo = $connect_db->connect($config_db->getConfig());
+
+        return  $acessTools->getAccessToolsByUserId($pdo , $session->getKey('id_users'));
+       // return $tools->getAllTools((bool)$param);
     }
 
     /**

@@ -32,6 +32,7 @@ class MODULES
         include_once __DIR__ . '/../data_base/company_users.php';
         include_once __DIR__ . '/../data_base/company.php';
 
+        
         return [
             'pdo' => $connect_db->connect($config_db->getConfig()),
             'session' => new SESSION(),
