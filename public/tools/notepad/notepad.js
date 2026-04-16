@@ -18,7 +18,7 @@ document.head.appendChild(link);
 class NOTEPAD {
     constructor() {
         this.dirFilesLocalStorage = 'art-com/projekt/notepad-files';
-        this.lang = 'en';
+        this.lang = 'sv';
         this.modal = modal;
         this.view = view;
         this.conf = new CONFIG(this);

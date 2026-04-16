@@ -10,7 +10,7 @@ class SYS {
         this.api = api;
         this.view = view;
 
-        this.lang = 'en';
+        this.lang = 'sv'; // Przykładowa właściwość języka, można rozbudować o obsługę wielu języków
 
         this.con = new CONFIG(this);
         this.fun = new FUN(this);
