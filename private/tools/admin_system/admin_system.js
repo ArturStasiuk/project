@@ -9,13 +9,17 @@ class ADMIN_SYSTEM {
     
     constructor() {
         this.modal = modal;
+        this.api = api;
+        this.view = view;
         this.config = new CONFIG(this);
 
         this.initialize();
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
-    initialize() {
-        modal.alert('ADMIN_SYSTEM initialized', 'Initialization complete');
+    async initialize() {
+     await this.view.addStartMenuItem(await this.config.getMenuItem());
+
+
     }
     
 }

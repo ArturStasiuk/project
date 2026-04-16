@@ -5,10 +5,23 @@ class CONFIG {
     }
     /** Inicjalizacja modułu CONFIG */
     initialize() {
-     //   this.parent.modal.alert('Konfiguracja narzędzia ADMIN_SYSTEM została załadowana!');
-        // Tutaj możesz dodać kod inicjalizacyjny, np. rejestrację w menu startowym
-        // lub innych elementów interfejsu użytkownika.
+
     }
+
+    // Zwraca konfigurację pozycji w menu startowym dla narzędzia ADMIN_SYSTEM
+   async getMenuItem() {
+        return {
+            id: "sm-admin_system",
+            icon: '⚙️',
+            label: 'Admin System',
+            disabled: false,
+            onClick: async () => await this.parent.func.openWindow()
+        };
+    }
+
+
+
+
 }
 
 export default CONFIG;
