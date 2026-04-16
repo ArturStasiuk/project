@@ -8,22 +8,19 @@ import CONFIG from './config.js';
 class ADMIN_COMPANY{
 
     constructor() {
+        this.lang = 'en';
         this.modal = modal;
+        this.api = api;
+        this.view = view;
         this.config = new CONFIG(this);
 
         this.initialize();
     }
     /** Inicjalizacja modułu ADMIN_COMPANY */
     async initialize() {
-
-       await modal.alert('ADMIN_COMPANY initialized', 'Initialization complete');
-        await view.addStartMenuItem({
-            id: "this.idadmin_company",
-            icon: '🏢',
-            label: 'Admin Company',
-            disabled: false,
-            onClick: async () => await this.openWindow()
-        });
+        const t = this.config._t();
+        await modal.alert(t.initialized, t.init_complete);
+        await view.addStartMenuItem(await this.config.getStartMenuItem());
     }
         
 }
