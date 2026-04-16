@@ -22,6 +22,14 @@ class METHOD
         $loggedIn = $session->getKey('id_users') !== null;
         return ['loggedIn' => $loggedIn];
     }
+    /** pobranie jezyka uzytkownika */
+    private function getUserLanguage(mixed $param = null): array
+    {
+        include_once __DIR__ . '/../service/session.php';
+        $session = new SESSION();
+        $lang = $session->getKey('lang') ?? 'English';
+        return ['lang' => $lang];
+    }
 
     // pobranie sciezek do modolow public function getModulesPaths(mixed $param = null): array
     private function getAllTools(mixed $param = null): array

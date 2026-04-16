@@ -3,12 +3,13 @@ import LAUNGE from './launge.js';
 class CONFIG {
     constructor(parent) {
         this.parent = parent;
-        this.lang = parent.lang || 'English';
+        this.lang = parent.lang;
         this.translations = LAUNGE;
         this.initialize();
     }
     /** Inicjalizacja modułu CONFIG */
     initialize() {
+        
 
     }
 

@@ -10,7 +10,7 @@ class SYS {
         this.api = api;
         this.view = view;
 
-        this.lang = 'sv'; // Przykładowa właściwość języka, można rozbudować o obsługę wielu języków
+        this.lang = null; // Zainicjalizowane w init()
 
         this.con = new CONFIG(this);
         this.fun = new FUN(this);
@@ -46,10 +46,12 @@ class SYS {
      */
     async init() {
         console.log('Inicjalizacja systemu...');
+        this.lang = await this.api.send({ method: "getUserLanguage" });
+        this.con.lang = this.lang;
         const dat = await this.api.send({ method: 'checkLoggedIn' });
         // ladowanie menu startowego zależnie od stanu logowania
         await this.fun.showMenuStart(dat.loggedIn);
-       // ladowanie tools 
+        // ladowanie tools 
         await this.loadAllTools(dat.loggedIn);
     }
 

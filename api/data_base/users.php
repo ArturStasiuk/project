@@ -74,12 +74,12 @@ class USERS  //
 
   // pobranie danych uzytkownika po id bez hasla
   public function getUserDataById($pdo, $id){
-      $stmt = $pdo->prepare("SELECT id,role, name, last_name ,email, active FROM users WHERE id = :id LIMIT 1");
+      $stmt = $pdo->prepare("SELECT id, role, name, last_name, email, active FROM users WHERE id = :id LIMIT 1");
       $stmt->execute(['id' => $id]);
       return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  //
+  
 
 
 

@@ -64,6 +64,7 @@ class USER  //
         $this->session->setKey('last_name', $userData['last_name']);
         $this->session->setKey('email', $userData['email']);
         $this->session->setKey('active', $userData['active']);
+        $this->session->setKey('lang', $userData['lang'] ?? 'Svenska');
         // pobranie id_company z tabeli company_users dla zalogowanego uzytkownika jezeli istnieje 
         $companyId = $this->company_users->getCompanyIdUsers($this->pdo, $userData['id']);
         if ($companyId['status']) {
