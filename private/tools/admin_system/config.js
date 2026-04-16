@@ -9,13 +9,12 @@ class CONFIG {
     }
     /** Inicjalizacja modułu CONFIG */
     initialize() {
-        
-
+        this.t = this.translations[this.lang] || {};
     }
 
     // Zwraca konfigurację pozycji w menu startowym dla narzędzia ADMIN_SYSTEM
    async getMenuItem() {
-        const t = this.translations[this.lang] || {};
+        const t = this.t;
         return {
             id: "zarzadaj_firmami",
             icon: t.icon || ' 🏬',
@@ -26,7 +25,7 @@ class CONFIG {
    }
 
     async getWelcomeMessage() {
-        const t = this.translations[this.lang] || {};
+        const t = this.t;
         return {
             message: t.welcome || 'Welcome to the admin panel!',
             title: t.title_welcome || 'Welcome'
