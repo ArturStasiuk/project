@@ -18,11 +18,10 @@ class ADMIN_SYSTEM {
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     async initialize() {
-        await this.modal.alert(await this.config.getWelcomeMessage());
+        const { message, title } = await this.config.getWelcomeMessage();
+        await this.modal.alert(message, title);
         await this.view.addStartMenuItem(await this.config.getMenuItem());
         await this.view.addStartMenuItem(await this.config.getMeniuItem2());
-
-
     }
     
 }

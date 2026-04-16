@@ -1,6 +1,5 @@
-
-
 const LAUNGE = {
+
 	en: {
 		icon: "⚙️",
 		label_admin_system: "Admin System",

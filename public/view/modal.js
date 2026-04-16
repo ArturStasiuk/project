@@ -4,7 +4,7 @@ class MODAL {
         
     }
   // prosty alert modalny
-  async alert(message, title = 'Informacja') {
+  async alert(message, title ="INFO") {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
