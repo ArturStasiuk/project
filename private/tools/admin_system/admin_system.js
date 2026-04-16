@@ -8,6 +8,7 @@ import CONFIG from './config.js';
 class ADMIN_SYSTEM {
     
     constructor() {
+        this.lang = 'sv'; // Przykładowa właściwość języka, można rozbudować o obsługę wielu języków
         this.modal = modal;
         this.api = api;
         this.view = view;
@@ -17,7 +18,9 @@ class ADMIN_SYSTEM {
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     async initialize() {
-     await this.view.addStartMenuItem(await this.config.getMenuItem());
+        await this.modal.alert(await this.config.getWelcomeMessage());
+        await this.view.addStartMenuItem(await this.config.getMenuItem());
+        await this.view.addStartMenuItem(await this.config.getMeniuItem2());
 
 
     }
