@@ -4,7 +4,7 @@ class USER  //
     private $pdo;
     private $session;
     private $users;
-    private $access_tables;
+   // private $access_tables;
     private $company_users;
     private $company;
     private $params;
@@ -13,7 +13,7 @@ class USER  //
         $this->pdo = $pdo;
         $this->session = $session;
         $this->users = $users;
-        $this->access_tables = $access_tables;
+       // $this->access_tables = $access_tables;
         $this->company_users = $company_users;
         $this->company = $company;
         $this->params = $params;
@@ -64,7 +64,7 @@ class USER  //
         $this->session->setKey('last_name', $userData['last_name']);
         $this->session->setKey('email', $userData['email']);
         $this->session->setKey('active', $userData['active']);
-        $this->session->setKey('lang', $userData['lang'] ?? 'Svenska');
+        $this->session->setKey('lang', $userData['lang'] ?? 'Polski');
         // pobranie id_company z tabeli company_users dla zalogowanego uzytkownika jezeli istnieje 
         $companyId = $this->company_users->getCompanyIdUsers($this->pdo, $userData['id']);
         if ($companyId['status']) {
