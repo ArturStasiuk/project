@@ -48,10 +48,11 @@ class SYS {
         console.log('Inicjalizacja systemu...');
         const langResponse = await this.api.send({ method: "getUserLanguage" });
         this.lang = langResponse?.lang || 'English';
-        // Przekazanie języka do wszystkich modułów
-        if (typeof this.modal.setLang === 'function') this.modal.setLang(this.lang);
-        if (typeof this.con.setLang === 'function') this.con.setLang(this.lang);
-        if (typeof this.fun.setLang === 'function') this.fun.setLang(this.lang);
+        if (typeof this.con.setLang === 'function') {
+            this.con.setLang(this.lang);
+        } else {
+            this.con.lang = this.lang;
+        }
         const dat = await this.api.send({ method: 'checkLoggedIn' });
         // ladowanie menu startowego zależnie od stanu logowania
         await this.fun.showMenuStart(dat.loggedIn);

@@ -1,61 +1,43 @@
-import LAUNGE from './launge.js';
-// import api usunięty – język przekazywany z SYS
-
 // clasa do wyswietlania okien systemowych modalnych takich jak alert, confirm, prompt itp. oraz do tworzenia własnych okien modalnych
- class MODAL { 
-constructor() {
-        this.lang = 'English';
-        this.translations = LAUNGE;
+class MODAL {
+    constructor() {
+        
     }
-
-    setLang(lang) {
-        this.lang = lang || 'English';
-    }
-
-    /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
-    _t() {
-        return this.translations[this.lang] || this.translations['English'];
-    }
-
   // prosty alert modalny
-      async alert(message, title) {
-            const t = this._t();
-            const alertTitle = title ?? t.title_info;
-            return new Promise((resolve) => {
-                const modal = document.createElement('div');
-                modal.classList.add('modal');
-                modal.innerHTML = `
-                    <div class="modal-content">
-                        <div class="modal-titlebar">${alertTitle}</div>
-                        <p>${message}</p>
-                        <div class="modal-actions" style="justify-content:center;">
-                            <button id="ok-btn">${t.btn_ok}</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-                modal.querySelector('#ok-btn').addEventListener('click', () => {
-                    document.body.removeChild(modal);
-                    resolve();
-                });
-            });
-        }
-   
-    // prosty confirm modalny z dwoma przyciskami Yes i No, zwraca true dla Yes i false dla No
-
-  async confirm(message, title) {
-        const t = this._t();
-        const confirmTitle = title ?? t.title_confirm;
+  async alert(message, title ="INFO") {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
                 <div class="modal-content">
-                    <div class="modal-titlebar">${confirmTitle}</div>
+                    <div class="modal-titlebar">${title}</div>
+                    <p>${message}</p>
+                    <div class="modal-actions" style="justify-content:center;">
+                        <button id="ok-btn">OK</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('#ok-btn').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                resolve();
+            });
+        });
+    }
+   
+    // prosty confirm modalny z dwoma przyciskami Yes i No, zwraca true dla Yes i false dla No
+
+  async confirm(message, title = 'Potwierdzenie') {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-titlebar">${title}</div>
                     <p>${message}</p>
                     <div class="modal-actions">
-                        <button id="yes-btn" class="modal-btn modal-btn--yes">${t.btn_yes}</button>
-                        <button id="no-btn" class="modal-btn modal-btn--no">${t.btn_no}</button>
+                        <button id="yes-btn" class="modal-btn modal-btn--yes">Yes</button>
+                        <button id="no-btn" class="modal-btn modal-btn--no">No</button>
                     </div>
                 </div>
             `;
@@ -72,11 +54,8 @@ constructor() {
     }
 
    // okno oczekiwania z animacja ladowania pierwsze wywolanie okna pokazuje je a kolejne wywolanie zamyka, mozna tez przekazac tekst do wyswietlenia
-   async loading(message, title) {
-       const t = this._t();
-       const loadingMessage = message ?? t.msg_loading;
-       const loadingTitle   = title   ?? t.title_loading;
-       let modal = document.querySelector('.modal--loading');
+   async loading(message = 'Ładowanie...', title = 'Proszę czekać') {
+        let modal = document.querySelector('.modal--loading');
         if (modal) {
             // jeśli okno już istnieje, usuń je
             document.body.removeChild(modal);
@@ -87,8 +66,8 @@ constructor() {
         modal.classList.add('modal', 'modal--loading');
         modal.innerHTML = `
             <div class="modal-content">
-                <div class="modal-titlebar">${loadingTitle}</div>
-                <p>${loadingMessage}</p>
+                <div class="modal-titlebar">${title}</div>
+                <p>${message}</p>
                 <div class="loader"></div>
             </div>
         `;
@@ -96,20 +75,18 @@ constructor() {
     }   
     
     /** modal do podania danych przez użytkownika (prompt) */
-    async prompt(message, defaultValue = '', title) {
-        const t = this._t();
-        const promptTitle = title ?? t.title_prompt;
+    async prompt(message, defaultValue = '', title = 'Wprowadź dane') {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
                 <div class="modal-content">
-                    <div class="modal-titlebar">${promptTitle}</div>
+                    <div class="modal-titlebar">${title}</div>
                     <p>${message}</p>
                     <input type="text" id="prompt-input" value="${defaultValue}">
                     <div class="modal-actions">
-                        <button id="ok-btn" class="modal-btn modal-btn--ok">${t.btn_ok}</button>
-                        <button id="cancel-btn" class="modal-btn modal-btn--cancel">${t.btn_cancel}</button>
+                        <button id="ok-btn" class="modal-btn modal-btn--ok">OK</button>
+                        <button id="cancel-btn" class="modal-btn modal-btn--cancel">Cancel</button>
                     </div>
                 </div>
             `;

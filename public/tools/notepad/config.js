@@ -1,24 +1,17 @@
 import LAUNGE from './launge.js';
-import api from '../../../api/api.js';
 
 class CONFIG {
     constructor(parent) {
         this.parent   = parent;
-        this.api      = api;
-        this.lang     = 'English';
+        this.lang = parent?.lang || 'en';
         this.translations = LAUNGE;
         /** Unikalny identyfikator okna notatnika */
         this.idWindow = 'win-notepad';
     }
 
-    /** Ustawia język użytkownika przekazany z SYS */
-    setLang(lang) {
-        this.lang = lang || 'English';
-    }
-
     /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
     _t() {
-        return this.translations[this.lang] || this.translations['English'];
+        return this.translations[this.lang] || this.translations['en'];
     }
 
     /**

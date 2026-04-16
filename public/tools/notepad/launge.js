@@ -1,6 +1,6 @@
 const LAUNGE = {
 
-	English: {
+	en: {
 		icon: '📝',
 		label: 'Notepad',
 		title: 'Notepad',
@@ -14,7 +14,7 @@ const LAUNGE = {
 		menu_settings: 'Settings',
 		menu_help: 'Help'
 	},
-	Polski: {
+	pl: {
 		icon: '📝',
 		label: 'Notatnik',
 		title: 'Notatnik',
@@ -28,7 +28,7 @@ const LAUNGE = {
 		menu_settings: 'Ustawienia',
 		menu_help: 'Pomoc'
 	},
-	Svenska: {
+	sv: {
 		icon: '📝',
 		label: 'Anteckningar',
 		title: 'Anteckningar',

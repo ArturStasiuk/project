@@ -8,19 +8,24 @@ import CONFIG from './config.js';
 class ADMIN_SYSTEM {
     
     constructor() {
-    this.modal = modal;
+        this.lang = null; // Domyślny język polski; można zmienić na obsługiwany kod języka (np. 'Polski', 'English', 'Svenska')
+        this.modal = modal;
         this.api = api;
         this.view = view;
         this.config = new CONFIG(this);
+
         this.initialize();
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     async initialize() {
-        // Przekazanie języka do config (możesz ustawić na podstawie this.lang lub domyślnie)
-        this.config.setLang(this.lang || 'English');
+        const odp = await this.api.send({ method: "getUserLanguage" });
+        this.lang = odp.lang || 'English';
+        this.config.lang = this.lang;
+        console.log(`Język użytkownika: ${this.lang}`);
         const { message, title } = await this.config.getWelcomeMessage();
         await this.modal.alert(message, title);
         await this.view.addStartMenuItem(await this.config.getMenuItem());
+
     }
     
 }
