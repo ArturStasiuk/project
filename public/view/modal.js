@@ -1,19 +1,44 @@
+import LAUNGE from './launge.js';
+import api from '../../api/api.js';
+
 // clasa do wyswietlania okien systemowych modalnych takich jak alert, confirm, prompt itp. oraz do tworzenia własnych okien modalnych
 class MODAL {
     constructor() {
-        
+        this.lang = null;
+        this.translations = LAUNGE;
     }
+
+    /** Pobiera język użytkownika z API (jednorazowo, wynik jest cachowany). */
+    async _initLang() {
+        if (this.lang) return;
+        try {
+            const { lang = 'English' } = await api.send({ method: 'getUserLanguage' }) || {};
+            this.lang = lang;
+        } catch (e) {
+            console.error('MODAL: błąd pobierania języka użytkownika:', e);
+            this.lang = 'English';
+        }
+    }
+
+    /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
+    _t() {
+        return this.translations[this.lang] || this.translations['English'];
+    }
+
   // prosty alert modalny
-  async alert(message, title ="INFO") {
+  async alert(message, title) {
+        await this._initLang();
+        const t = this._t();
+        const alertTitle = title ?? t.title_info;
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
                 <div class="modal-content">
-                    <div class="modal-titlebar">${title}</div>
+                    <div class="modal-titlebar">${alertTitle}</div>
                     <p>${message}</p>
                     <div class="modal-actions" style="justify-content:center;">
-                        <button id="ok-btn">OK</button>
+                        <button id="ok-btn">${t.btn_ok}</button>
                     </div>
                 </div>
             `;
@@ -27,17 +52,20 @@ class MODAL {
    
     // prosty confirm modalny z dwoma przyciskami Yes i No, zwraca true dla Yes i false dla No
 
-  async confirm(message, title = 'Potwierdzenie') {
+  async confirm(message, title) {
+        await this._initLang();
+        const t = this._t();
+        const confirmTitle = title ?? t.title_confirm;
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
                 <div class="modal-content">
-                    <div class="modal-titlebar">${title}</div>
+                    <div class="modal-titlebar">${confirmTitle}</div>
                     <p>${message}</p>
                     <div class="modal-actions">
-                        <button id="yes-btn" class="modal-btn modal-btn--yes">Yes</button>
-                        <button id="no-btn" class="modal-btn modal-btn--no">No</button>
+                        <button id="yes-btn" class="modal-btn modal-btn--yes">${t.btn_yes}</button>
+                        <button id="no-btn" class="modal-btn modal-btn--no">${t.btn_no}</button>
                     </div>
                 </div>
             `;
@@ -54,7 +82,11 @@ class MODAL {
     }
 
    // okno oczekiwania z animacja ladowania pierwsze wywolanie okna pokazuje je a kolejne wywolanie zamyka, mozna tez przekazac tekst do wyswietlenia
-   async loading(message = 'Ładowanie...', title = 'Proszę czekać') {
+   async loading(message, title) {
+        await this._initLang();
+        const t = this._t();
+        const loadingMessage = message ?? t.msg_loading;
+        const loadingTitle   = title   ?? t.title_loading;
         let modal = document.querySelector('.modal--loading');
         if (modal) {
             // jeśli okno już istnieje, usuń je
@@ -66,8 +98,8 @@ class MODAL {
         modal.classList.add('modal', 'modal--loading');
         modal.innerHTML = `
             <div class="modal-content">
-                <div class="modal-titlebar">${title}</div>
-                <p>${message}</p>
+                <div class="modal-titlebar">${loadingTitle}</div>
+                <p>${loadingMessage}</p>
                 <div class="loader"></div>
             </div>
         `;
@@ -75,18 +107,21 @@ class MODAL {
     }   
     
     /** modal do podania danych przez użytkownika (prompt) */
-    async prompt(message, defaultValue = '', title = 'Wprowadź dane') {
+    async prompt(message, defaultValue = '', title) {
+        await this._initLang();
+        const t = this._t();
+        const promptTitle = title ?? t.title_prompt;
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
                 <div class="modal-content">
-                    <div class="modal-titlebar">${title}</div>
+                    <div class="modal-titlebar">${promptTitle}</div>
                     <p>${message}</p>
                     <input type="text" id="prompt-input" value="${defaultValue}">
                     <div class="modal-actions">
-                        <button id="ok-btn" class="modal-btn modal-btn--ok">OK</button>
-                        <button id="cancel-btn" class="modal-btn modal-btn--cancel">Cancel</button>
+                        <button id="ok-btn" class="modal-btn modal-btn--ok">${t.btn_ok}</button>
+                        <button id="cancel-btn" class="modal-btn modal-btn--cancel">${t.btn_cancel}</button>
                     </div>
                 </div>
             `;
