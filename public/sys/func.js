@@ -12,8 +12,8 @@ class FUN {
 
     /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
     _t() {
-        const lang = this.parent?.lang || 'en';
-        return LAUNGE[lang] || LAUNGE['en'];
+        const lang = this.parent?.lang || 'Polski';
+        return LAUNGE[lang] || LAUNGE['Polski'];
     }
 
     /**

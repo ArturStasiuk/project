@@ -86,7 +86,7 @@ class SYS {
         if (finalPath.startsWith('private-tool://')) {
             await this._loadPrivateTool(finalPath);
         } else {
-            await this._loadPublicTool(finalPath);
+           // await this._loadPublicTool(finalPath);
         }
     }
 

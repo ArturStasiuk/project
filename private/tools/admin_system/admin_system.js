@@ -8,7 +8,7 @@ import CONFIG from './config.js';
 class ADMIN_SYSTEM {
     
     constructor() {
-        this.lang = 'en'; // Domyślny język angielski; można zmienić na obsługiwany kod języka (np. 'pl', 'sv')
+        this.lang = 'Polski'; // Domyślny język polski; można zmienić na obsługiwany kod języka (np. 'Polski', 'English', 'Svenska')
         this.modal = modal;
         this.api = api;
         this.view = view;
@@ -21,7 +21,7 @@ class ADMIN_SYSTEM {
         const { message, title } = await this.config.getWelcomeMessage();
         await this.modal.alert(message, title);
         await this.view.addStartMenuItem(await this.config.getMenuItem());
-        await this.view.addStartMenuItem(await this.config.getMeniuItem2());
+
     }
     
 }

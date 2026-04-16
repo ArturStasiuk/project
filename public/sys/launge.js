@@ -1,30 +1,6 @@
 const LAUNGE = {
 
-	en: {
-		icon_login: '🔐',
-		label_login: 'Login',
-		icon_logout: '⏻',
-		label_logout: 'Logout',
-		title_login: 'Login',
-		status_login: 'Enter your email and password',
-		label_email: 'Email',
-		placeholder_email: 'Enter email',
-		label_password: 'Password',
-		placeholder_password: 'Enter password',
-		btn_login: 'Log in',
-		title_logout: 'Logout',
-		status_logout: 'Are you sure you want to log out?',
-		card_title_login: '🔐 Login',
-		card_title_logout: '⏻ Logout',
-		confirm_logout: 'Are you sure you want to log out?',
-		yes: 'Yes',
-		no: 'No',
-		error_login: 'Invalid email or password. Please try again.',
-		success_login: 'Logged in successfully!',
-		error_logout: 'An error occurred while logging out. Please try again.',
-		success_logout: 'Logged out successfully!'
-	},
-	pl: {
+	Polski: {
 		icon_login: '🔐',
 		label_login: 'Zaloguj',
 		icon_logout: '⏻',
@@ -48,7 +24,32 @@ const LAUNGE = {
 		error_logout: 'Wystąpił błąd podczas wylogowywania. Spróbuj ponownie.',
 		success_logout: 'Wylogowano pomyślnie!'
 	},
-	sv: {
+		English: {
+		icon_login: '🔐',
+		label_login: 'Login',
+		icon_logout: '⏻',
+		label_logout: 'Logout',
+		title_login: 'Login',
+		status_login: 'Enter your email and password',
+		label_email: 'Email',
+		placeholder_email: 'Enter email',
+		label_password: 'Password',
+		placeholder_password: 'Enter password',
+		btn_login: 'Log in',
+		title_logout: 'Logout',
+		status_logout: 'Are you sure you want to log out?',
+		card_title_login: '🔐 Login',
+		card_title_logout: '⏻ Logout',
+		confirm_logout: 'Are you sure you want to log out?',
+		yes: 'Yes',
+		no: 'No',
+		error_login: 'Invalid email or password. Please try again.',
+		success_login: 'Logged in successfully!',
+		error_logout: 'An error occurred while logging out. Please try again.',
+		success_logout: 'Logged out successfully!'
+	},
+
+	Svenska: {
 		icon_login: '🔐',
 		label_login: 'Logga in',
 		icon_logout: '⏻',

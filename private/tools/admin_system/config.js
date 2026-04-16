@@ -3,7 +3,7 @@ import LAUNGE from './launge.js';
 class CONFIG {
     constructor(parent) {
         this.parent = parent;
-        this.lang = parent?.lang || 'en';
+        this.lang = parent.lang || 'English';
         this.translations = LAUNGE;
         this.initialize();
     }
@@ -16,23 +16,14 @@ class CONFIG {
    async getMenuItem() {
         const t = this.translations[this.lang] || {};
         return {
-            id: "sm-admin_system",
-            icon: t.icon || '⚙️',
-            label: t.label_admin_system || 'Admin System',
+            id: "zarzadaj_firmami",
+            icon: t.icon || ' 🏬',
+            label: t.label_admin_system || 'Zarządzaj firmami',
             disabled: false,
             onClick: async () => await this.parent.func.openWindow()
         };
    }
-    async getMeniuItem2() {
-        const t = this.translations[this.lang] || {};
-        return {
-            id: "sm-admin_system_2",
-            icon: t.icon2 || '🔧',
-            label: t.label_admin_system_2 || 'Admin System 2',
-            disabled: false,
-            onClick: async () => await this.parent.func.openWindow()
-        };
-    }
+
     async getWelcomeMessage() {
         const t = this.translations[this.lang] || {};
         return {

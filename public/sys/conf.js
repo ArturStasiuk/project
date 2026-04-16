@@ -3,7 +3,7 @@ import LAUNGE from './launge.js';
 class CONFIG {
     constructor(parent) {
         this.parent = parent;
-        this.lang = parent?.lang || 'en';
+        this.lang = parent?.lang || 'Polski';
         this.translations = LAUNGE;
     }
 
@@ -13,7 +13,7 @@ class CONFIG {
      * @returns {object} konfiguracja menu z tablicą pozycji
      */
     async getMenuStart(login) {
-        const t = this.translations[this.lang] || this.translations['en'];
+        const t = this.translations[this.lang] || this.translations['Polski'];
         if (login) {
             return {
                 items: [
@@ -39,7 +39,7 @@ class CONFIG {
      * @returns {object}
      */
     async getWinLogin() {
-        const t = this.translations[this.lang] || this.translations['en'];
+        const t = this.translations[this.lang] || this.translations['Polski'];
         return {
             id: 'win-login',
             title: t.title_login,
@@ -56,7 +56,7 @@ class CONFIG {
      * @returns {object}
      */
     async getContentWinLogin() {
-        const t = this.translations[this.lang] || this.translations['en'];
+        const t = this.translations[this.lang] || this.translations['Polski'];
         return {
             id: 'win-login',
             cardId: 'card-1',
@@ -82,7 +82,7 @@ class CONFIG {
      * @returns {object}
      */
     async getWinLogout() {
-        const t = this.translations[this.lang] || this.translations['en'];
+        const t = this.translations[this.lang] || this.translations['Polski'];
         return {
             id: 'win-logout',
             title: t.title_logout,
@@ -98,7 +98,7 @@ class CONFIG {
      * @returns {object}
      */
     async getContentWinLogout() {
-        const t = this.translations[this.lang] || this.translations['en'];
+        const t = this.translations[this.lang] || this.translations['Polski'];
         return {
             id: 'win-logout',
             cardId: 'card-1',
