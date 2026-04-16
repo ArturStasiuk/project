@@ -46,7 +46,8 @@ class SYS {
      */
     async init() {
         console.log('Inicjalizacja systemu...');
-        this.lang = await this.api.send({ method: "getUserLanguage" });
+        const langResponse = await this.api.send({ method: "getUserLanguage" });
+        this.lang = langResponse?.lang || 'English';
         if (typeof this.con.setLang === 'function') {
             this.con.setLang(this.lang);
         } else {
