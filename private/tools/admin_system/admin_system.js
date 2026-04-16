@@ -2,6 +2,8 @@
 // Ścieżki względne (np. '../../view/modal.js') nie działają w Blob URL —
 // zamiast tego używamy krótkich nazw zdefiniowanych w import map (index.php).
 import modal from 'modal';
+import view from 'view';
+import api from 'api';
 import CONFIG from './config.js';
 class ADMIN_SYSTEM {
     
