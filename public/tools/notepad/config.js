@@ -1,8 +1,17 @@
+import LAUNGE from './launge.js';
+
 class CONFIG {
     constructor(parent) {
         this.parent   = parent;
+        this.lang = parent?.lang || 'en';
+        this.translations = LAUNGE;
         /** Unikalny identyfikator okna notatnika */
         this.idWindow = 'win-notepad';
+    }
+
+    /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
+    _t() {
+        return this.translations[this.lang] || this.translations['en'];
     }
 
     /**
@@ -11,10 +20,11 @@ class CONFIG {
      * @returns {object}
      */
     async getStartMenuItem() {
+        const t = this._t();
         return {
             id:       'sm-notepad',
-            icon:     '📝',
-            label:    'Notatnik',
+            icon:     t.icon,
+            label:    t.label,
             disabled: false,
             onClick:  async () => await this.parent.func.openWindow()
         };
@@ -25,11 +35,12 @@ class CONFIG {
      * @returns {object}
      */
     async getWindowItem() {
+        const t = this._t();
         return {
             id:         this.idWindow,
-            title:      'Notatnik',
-            icon:       '📝',
-            statusText: 'Nowy dokument'
+            title:      t.title,
+            icon:       t.icon,
+            statusText: t.status_new_doc
         };
     }
 
@@ -38,24 +49,24 @@ class CONFIG {
      * @returns {object}
      */
     async getWindowMenu() {
-
+        const t = this._t();
         return {
             id: this.idWindow,
             menus: [
                 {
-                    label: 'Plik',
+                    label: t.menu_file,
                     id:    'notepad-file',
                     items: [
-                        { icon: '📂', label: 'Otwórz', onClick: async () =>{} },
-                        { icon: '💾', label: 'Zapisz', onClick: async () => {} }
+                        { icon: '📂', label: t.menu_open, onClick: async () =>{} },
+                        { icon: '💾', label: t.menu_save, onClick: async () => {} }
                     ]
                 },
                 {
-                    label: 'Opcje',
+                    label: t.menu_options,
                     id:    'notepad-options',
                     items: [
-                        { icon: '⚙️', label: 'Ustawienia', onClick: () => alert('Ustawienia!') },
-                        { icon: '❓', label: 'Pomoc',       onClick: () => alert('Pomoc!') }
+                        { icon: '⚙️', label: t.menu_settings, onClick: () => alert(t.menu_settings) },
+                        { icon: '❓', label: t.menu_help,     onClick: () => alert(t.menu_help) }
                     ]
                 }
             ]
@@ -65,20 +76,22 @@ class CONFIG {
     /**
      * Zwraca zawartość okna notatnika – karta z polem tekstowym.
      * @param {string} [cardId='card-1'] – identyfikator karty
-     * @param {string} [title='📄 Dokument'] – tytuł karty
+     * @param {string} [title] – tytuł karty
      * @param {string} [text] – opcjonalna niestandardowa zawartość HTML
      * @returns {object}
      */
-    async getWindowContent(cardId = 'card-1', title = '📄 Dokument', text) {
+    async getWindowContent(cardId = 'card-1', title, text) {
+        const t = this._t();
+        const cardTitle = title ?? t.card_title_doc;
         const content = text ?? `
             <div class="notepad-editor">
                 <textarea class="notepad-textarea"
-                    placeholder="Wpisz tutaj swoje notatki..."></textarea>
+                    placeholder="${t.placeholder}"></textarea>
             </div>`;
         return {
             id:     this.idWindow,
             cardId,
-            title,
+            title:  cardTitle,
             text:   content
         };
     }

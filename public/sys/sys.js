@@ -10,6 +10,8 @@ class SYS {
         this.api = api;
         this.view = view;
 
+        this.lang = 'en';
+
         this.con = new CONFIG(this);
         this.fun = new FUN(this);
 

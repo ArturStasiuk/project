@@ -8,7 +8,7 @@ import CONFIG from './config.js';
 class ADMIN_SYSTEM {
     
     constructor() {
-        this.lang = 'sv'; // Przykładowa właściwość języka, można rozbudować o obsługę wielu języków
+        this.lang = 'en'; // Domyślny język angielski; można zmienić na obsługiwany kod języka (np. 'pl', 'sv')
         this.modal = modal;
         this.api = api;
         this.view = view;

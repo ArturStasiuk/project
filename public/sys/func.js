@@ -1,4 +1,6 @@
 
+import LAUNGE from './launge.js';
+
 class FUN {
     constructor(parent) {
         this.parent = parent;
@@ -7,6 +9,12 @@ class FUN {
 
     /** Metoda inicjalizacyjna (zarezerwowana na przyszłe rozszerzenia). */
     async init() {}
+
+    /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
+    _t() {
+        const lang = this.parent?.lang || 'en';
+        return LAUNGE[lang] || LAUNGE['en'];
+    }
 
     /**
      * Odświeża menu startowe w pasku zadań na podstawie stanu logowania.
@@ -68,15 +76,16 @@ class FUN {
      * @param {string} password
      */
     async logIn(email, password) {
+        const t = this._t();
         await this.closeWinLogin();
         const odp = await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email, password } });
 
         if (!odp.status) {
-            await this.parent.modal.alert('Nieprawidłowy email lub hasło. Spróbuj ponownie.');
+            await this.parent.modal.alert(t.error_login);
             await this.showWinLogin();
             return;
         }
-        await this.parent.modal.alert('Zalogowano pomyślnie!');
+        await this.parent.modal.alert(t.success_login);
         await this.parent.restart();
     }
 
@@ -84,15 +93,16 @@ class FUN {
      * Wylogowuje użytkownika – wysyła żądanie do API i restartuje aplikację.
      */
     async logOut() {
+        const t = this._t();
         await this.closeWinLogout();
         const odp = await this.parent.api.send({ modules: 'user', method: 'logoutUsers' });
 
         if (!odp.status) {
-            await this.parent.modal.alert('Wystąpił błąd podczas wylogowywania. Spróbuj ponownie.');
+            await this.parent.modal.alert(t.error_logout);
             await this.showWinLogout();
             return;
         }
-        await this.parent.modal.alert('Wylogowano pomyślnie!');
+        await this.parent.modal.alert(t.success_logout);
         await this.parent.restart();
     }
 }
