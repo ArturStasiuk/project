@@ -3,13 +3,16 @@ import LAUNGE from './launge.js';
 class CONFIG {
     constructor(parent) {
         this.parent = parent;
-        this.lang = parent.lang;
+        this.api = parent.api;
         this.translations = LAUNGE;
-        this.initialize();
+        this.lang = null;
     }
     /** Inicjalizacja modułu CONFIG */
-    initialize() {
-        this.t = this.translations[this.lang] || {};
+    async initialize() {
+        const { lang = 'English' } = await this.api.send({ method: "getUserLanguage" }) || {};
+        this.lang = lang;
+        this.t = this.translations[lang] || {};
+        console.log(`Język użytkownika: ${lang}`);
     }
 
     // Zwraca konfigurację pozycji w menu startowym dla narzędzia ADMIN_SYSTEM
