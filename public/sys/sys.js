@@ -47,7 +47,11 @@ class SYS {
     async init() {
         console.log('Inicjalizacja systemu...');
         this.lang = await this.api.send({ method: "getUserLanguage" });
-        this.con.lang = this.lang;
+        if (typeof this.con.setLang === 'function') {
+            this.con.setLang(this.lang);
+        } else {
+            this.con.lang = this.lang;
+        }
         const dat = await this.api.send({ method: 'checkLoggedIn' });
         // ladowanie menu startowego zależnie od stanu logowania
         await this.fun.showMenuStart(dat.loggedIn);
@@ -88,7 +92,7 @@ class SYS {
         if (finalPath.startsWith('private-tool://')) {
             await this._loadPrivateTool(finalPath);
         } else {
-           // await this._loadPublicTool(finalPath);
+            await this._loadPublicTool(finalPath);
         }
     }
 
@@ -235,5 +239,5 @@ class SYS {
 }
 
 const sys = new SYS();
-// window.sys = sys; // Umożliwia dostęp do obiektu SYS z konsoli przeglądarki
+
 export default sys;

@@ -1,6 +1,13 @@
 import LAUNGE from './launge.js';
 
 class CONFIG {
+        /**
+         * Ustawia język dynamicznie po inicjalizacji obiektu
+         * @param {string} lang - kod lub nazwa języka
+         */
+        setLang(lang) {
+            this.lang = lang || 'English';
+        }
     constructor(parent) {
         this.parent = parent;
         this.lang = parent?.lang || 'English';

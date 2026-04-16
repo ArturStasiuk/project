@@ -12,8 +12,8 @@ class FUN {
 
     /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
     _t() {
-        const lang = this.parent?.lang || 'Polski';
-        return LAUNGE[lang] || LAUNGE['Polski'];
+        const lang = this.parent?.lang || 'English';
+        return LAUNGE[lang] || LAUNGE['English'];
     }
 
     /**
@@ -52,6 +52,9 @@ class FUN {
      * Otwiera okno wylogowania i podpina przyciski potwierdzenia / anulowania.
      */
     async showWinLogout() {
+        if (typeof this.parent.con.setLang === 'function') {
+            this.parent.con.setLang(this.parent.lang);
+        }
         await this.parent.view.addWindow(await this.parent.con.getWinLogout());
         await this.parent.view.addWindowCard(await this.parent.con.getContentWinLogout());
 
