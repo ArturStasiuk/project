@@ -1,7 +1,7 @@
 // clasa do wyswietlania okien systemowych modalnych takich jak alert, confirm, prompt itp. oraz do tworzenia własnych okien modalnych
 class MODAL {
     constructor() {
-        
+         
     }
   // prosty alert modalny
   async alert(message, title ="INFO") {

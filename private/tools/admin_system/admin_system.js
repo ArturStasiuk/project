@@ -18,14 +18,10 @@ class ADMIN_SYSTEM {
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     async initialize() {
-        const odp = await this.api.send({ method: "getUserLanguage" });
-        this.lang = odp.lang || 'English';
-        this.config.lang = this.lang;
-        console.log(`Język użytkownika: ${this.lang}`);
+        await this.config.initialize();
         const { message, title } = await this.config.getWelcomeMessage();
         await this.modal.alert(message, title);
         await this.view.addStartMenuItem(await this.config.getMenuItem());
-
     }
     
 }
