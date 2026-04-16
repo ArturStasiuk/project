@@ -1,0 +1,115 @@
+/* Styl kalkulatora inspirowany systemem Windows 11 */
+.calc-wrap {
+    width: 100%;
+    height: calc(100vh - 120px);
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    background: #1c1c1c;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+    user-select: none;
+}
+
+/* Wyświetlacz */
+.calc-display {
+    flex: 0 0 auto;
+    padding: 16px 20px 8px;
+    background: #1c1c1c;
+    text-align: right;
+}
+
+.calc-display-expr {
+    font-size: 14px;
+    color: #888;
+    min-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calc-display-val {
+    font-size: 42px;
+    font-weight: 300;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+/* Siatka przycisków */
+.calc-buttons {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #111;
+    padding: 1px;
+}
+
+/* Przycisk bazowy */
+.calc-btn {
+    background: #2d2d2d;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+    aspect-ratio: 1;
+}
+
+.calc-btn:hover {
+    background: #3a3a3a;
+}
+
+.calc-btn:active {
+    background: #505050;
+}
+
+/* Przycisk szeroki (zajmuje 2 kolumny) */
+.calc-btn-wide {
+    grid-column: span 2;
+    aspect-ratio: auto;
+}
+
+/* Przyciski funkcyjne (C, ±, %) */
+.calc-btn-fn {
+    background: #3a3a3a;
+    color: #fff;
+}
+
+.calc-btn-fn:hover {
+    background: #4a4a4a;
+}
+
+/* Przyciski operatorów */
+.calc-btn-op {
+    background: #444;
+    color: #f8a100;
+    font-weight: 600;
+}
+
+.calc-btn-op:hover {
+    background: #555;
+}
+
+/* Przycisk równa się */
+.calc-btn-eq {
+    background: #f8a100;
+    color: #fff;
+    font-weight: 600;
+}
+
+.calc-btn-eq:hover {
+    background: #ffb62b;
+}
+
+.calc-btn-eq:active {
+    background: #d48800;
+}
