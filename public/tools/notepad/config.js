@@ -1,17 +1,30 @@
 import LAUNGE from './launge.js';
+import api from '../../../api/api.js';
 
 class CONFIG {
     constructor(parent) {
         this.parent   = parent;
-        this.lang = parent?.lang || 'en';
+        this.api      = api;
+        this.lang     = 'English';
         this.translations = LAUNGE;
         /** Unikalny identyfikator okna notatnika */
         this.idWindow = 'win-notepad';
     }
 
+    /** Inicjalizacja modułu CONFIG – pobiera język użytkownika z API. */
+    async initialize() {
+        try {
+            const { lang = 'English' } = await this.api.send({ method: 'getUserLanguage' }) || {};
+            this.lang = lang;
+        } catch (e) {
+            console.error('NOTEPAD CONFIG: błąd pobierania języka użytkownika:', e);
+            this.lang = 'English';
+        }
+    }
+
     /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
     _t() {
-        return this.translations[this.lang] || this.translations['en'];
+        return this.translations[this.lang] || this.translations['English'];
     }
 
     /**

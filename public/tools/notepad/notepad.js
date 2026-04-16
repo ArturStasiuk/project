@@ -2,6 +2,7 @@ import CONFIG   from './config.js';
 import FUNCTION from './function.js';
 import view from '../../view/app.js';
 import modal from '../../view/modal.js';
+import api from '../../../api/api.js';
 // ladowanie styli CSS dla notatnika
 const link = document.createElement('link');
 link.rel = 'stylesheet';
@@ -18,7 +19,7 @@ document.head.appendChild(link);
 class NOTEPAD {
     constructor() {
         this.dirFilesLocalStorage = 'art-com/projekt/notepad-files';
-        this.lang = 'sv';
+        this.api   = api;
         this.modal = modal;
         this.view = view;
         this.conf = new CONFIG(this);
@@ -27,11 +28,13 @@ class NOTEPAD {
     }
 
     /**
-     * Inicjalizacja narzędzia: dodaje pozycję w menu startowym.
+     * Inicjalizacja narzędzia: pobiera język z API, a następnie dodaje
+     * pozycję w menu startowym.
      * Wywoływana automatycznie po załadowaniu skryptu.
      */
     async init() {
         console.log('NOTEPAD: init()');
+        await this.conf.initialize();
         await this.func.addStartMenuItem();
     /**    await this.modal.alert('Notatnik został zainicjalizowany!');
      await this.modal.confirm('Czy chcesz otworzyć notatnik?').then((result) => {
