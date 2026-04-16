@@ -39,8 +39,9 @@ class METHOD
         $connect_db = new CONNECT();
         $pdo = $connect_db->connect($config_db->getConfig());
 
-        return  $acessTools->getAccessToolsByUserId($pdo , $session->getKey('id_users'));
-       // return $tools->getAllTools((bool)$param);
+        $accessTools = $acessTools->getAccessToolsByUserId($pdo , $session->getKey('id_users'));
+        return $tools->getAllTools((bool)$param, $accessTools);
+
     }
 
     /**

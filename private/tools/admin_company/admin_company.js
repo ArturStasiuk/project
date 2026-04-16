@@ -14,7 +14,7 @@ class ADMIN_COMPANY{
     /** Inicjalizacja modułu ADMIN_COMPANY */
     initialize() {
 
-        
+      modal.alert('ADMIN_COMPANY initialized', 'Initialization complete');  
     }
 
 }

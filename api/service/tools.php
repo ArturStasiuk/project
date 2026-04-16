@@ -7,7 +7,7 @@ class TOOLS{
      * @param bool $includePrivate Czy dołączyć narzędzia prywatne
      * @return array
      */
-    public function getAllTools(bool $includePrivate = false): array
+    public function getAllTools(bool $includePrivate = false, array $accessTools = []): array
     {
         $toolsPaths = [];
         // Publiczne narzędzia
@@ -27,14 +27,9 @@ class TOOLS{
                 }
             }
         }
+
         // Prywatne narzędzia
-        if ($includePrivate) {
-            // tu bedzie trzeba zrobic sprawdzanie ma dostemp do prywatnych narzędzi 
-
-
-
-
-            
+        if ($includePrivate && is_array($accessTools)) {
             $privateDir = __DIR__ . '/../../private/tools';
             if (is_dir($privateDir)) {
                 $dirs = scandir($privateDir);
@@ -42,10 +37,20 @@ class TOOLS{
                     if ($dir !== '.' && $dir !== '..') {
                         $subDirPath = $privateDir . '/' . $dir;
                         if (is_dir($subDirPath)) {
-                            $jsFile = $subDirPath . '/' . $dir . '.js';
-                            if (file_exists($jsFile)) {
-                                $relativePath = 'private-tool://' . $dir;
-                                $toolsPaths[] = $relativePath;
+                            // Sprawdź dostęp na podstawie $accessTools
+                            foreach ($accessTools as $tool) {
+                                if (
+                                    isset($tool['tools_name'], $tool['access_tools']) &&
+                                    $tool['tools_name'] === $dir &&
+                                    (int)$tool['access_tools'] === 1
+                                ) {
+                                    $jsFile = $subDirPath . '/' . $dir . '.js';
+                                    if (file_exists($jsFile)) {
+                                        $relativePath = 'private-tool://' . $dir;
+                                        $toolsPaths[] = $relativePath;
+                                    }
+                                    break;
+                                }
                             }
                         }
                     }

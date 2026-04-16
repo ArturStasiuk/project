@@ -13,7 +13,7 @@ class ADMIN_SYSTEM {
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     initialize() {
-
+        modal.alert('ADMIN_SYSTEM initialized', 'Initialization complete');
     }
     
 }
