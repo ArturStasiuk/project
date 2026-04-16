@@ -16,7 +16,8 @@ class ADMIN_SYSTEM {
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     async initialize() {
-        await this.config.initialize();
+        // Przekazanie języka do config (możesz ustawić na podstawie this.lang lub domyślnie)
+        this.config.setLang(this.lang || 'English');
         const { message, title } = await this.config.getWelcomeMessage();
         await this.modal.alert(message, title);
         await this.view.addStartMenuItem(await this.config.getMenuItem());

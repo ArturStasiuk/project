@@ -11,15 +11,9 @@ class CONFIG {
         this.idWindow = 'win-notepad';
     }
 
-    /** Inicjalizacja modułu CONFIG – pobiera język użytkownika z API. */
-    async initialize() {
-        try {
-            const { lang = 'English' } = await this.api.send({ method: 'getUserLanguage' }) || {};
-            this.lang = lang;
-        } catch (e) {
-            console.error('NOTEPAD CONFIG: błąd pobierania języka użytkownika:', e);
-            this.lang = 'English';
-        }
+    /** Ustawia język użytkownika przekazany z SYS */
+    setLang(lang) {
+        this.lang = lang || 'English';
     }
 
     /** Zwraca obiekt tłumaczeń dla aktualnego języka. */

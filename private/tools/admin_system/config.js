@@ -8,11 +8,10 @@ class CONFIG {
         this.lang = null;
     }
     /** Inicjalizacja modułu CONFIG */
-    async initialize() {
-        const { lang = 'English' } = await this.api.send({ method: "getUserLanguage" }) || {};
-        this.lang = lang;
-        this.t = this.translations[lang] || {};
-        console.log(`Język użytkownika: ${lang}`);
+    setLang(lang) {
+        this.lang = lang || 'English';
+        this.t = this.translations[this.lang] || {};
+        console.log(`Język użytkownika: ${this.lang}`);
     }
 
     // Zwraca konfigurację pozycji w menu startowym dla narzędzia ADMIN_SYSTEM
