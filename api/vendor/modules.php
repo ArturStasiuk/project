@@ -1,4 +1,5 @@
 <?php
+// includowanie klas dla modolow ,
 // Ten plik jest odpowiedzialny za dostarczanie klas MODULES i METHOD do głównego vendor.php
 // Dzięki temu możemy trzymać te klasy w osobnych plikach, co poprawiaczytelność i organizację kodu.
 class MODULES
@@ -43,4 +44,28 @@ class MODULES
         ];
     }
 
+    /**
+     * modules company - wszystko co zwiazane z firma
+     */
+    private function modules_company(): array
+    {   
+        
+
+        include_once __DIR__ . '/../data_base/access_tables.php';
+        include_once __DIR__ . '/../data_base/company.php';
+         include_once __DIR__ . '/method.php';
+        
+        return [
+            'method' => new METHOD(),
+            'access_tables' => new ACCESS_TABLES(),
+            'table_company' => new COMPANY()
+
+            
+           
+            
+,
+        ];
+   
+
+    }
 }

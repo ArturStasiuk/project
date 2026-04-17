@@ -8,6 +8,8 @@ class CONFIG {
         this.api = parent.api;
         this.lang = 'English';
         this.t = LAUNGE[this.lang] || {};
+        this.idMemiuItem = "icon_zarzadaj_firmami";
+        this.idWindow = "window_zarzadaj_firmami";
     }
     /** Inicjalizacja modułu CONFIG */
     async initialize() {
@@ -21,18 +23,42 @@ class CONFIG {
     // Zwraca konfigurację pozycji w menu startowym dla narzędzia ADMIN_SYSTEM
    async getMenuItem() {
         return {
-            id: "zarzadaj_firmami",
-            icon: this.t.icon || ' 🏬',
-            label: this.t.label_admin_system || 'Zarządzaj firmami',
+            id: this.idMemiuItem,
+            icon: this.t.icon ,
+            label: this.t.label_zarzadzaj_firmami ,
             disabled: false,
-            onClick: async () => await this.parent.func.openWindow()
+            onClick: async () => await this.parent.open_Window_ZarzadzajFirmami()
         };
    }
-
+    /** okno powitalne */
     async getWelcomeMessage() {
         return {
-            message: this.t.welcome || 'Welcome to the admin panel!',
-            title: this.t.title_welcome || 'Welcome'
+            message: this.t.welcome ,
+            title: this.t.title_welcome 
+        };
+    }
+    /** konfiguracja okna */
+    async get_Window_ZarzadzajFirmami() {
+        return {
+            id: this.idWindow,
+            icon: this.t.icon,
+            title: this.t.label_zarzadzaj_firmami,
+            width: 600,
+            height: 400,
+
+        };
+    }
+    /** meniu dla window zarzadzaj firmami */
+    async getMenu_Window_ZarzadzajFirmami() {
+        return {
+            id: this.idWindow, // id musi być taki sam jak id okna, do którego menu ma być przypisane
+            menuId: 'menu:'+ this.idWindow,
+            label: this.t.menu_label_zarzadzaj_firmami,
+            icon: "💾",
+            items: [
+                { icon: '📂', label: this.t.menu_open, onClick: async () => { } },
+                { icon: '💾', label: this.t.menu_save, onClick: async () => { } }
+            ]
         };
     }
 

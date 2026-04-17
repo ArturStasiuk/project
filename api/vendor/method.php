@@ -148,5 +148,15 @@ class METHOD
 
         return ['status' => true, 'content' => file_get_contents($fileReal)];
     }
-
+    /**
+     * pobranie polaczenia PDO do bazy danych z config_db.php
+     */
+    private function getDatabaseConect(mixed $param = null): array
+    {
+        include_once __DIR__ . '/../config/config_db.php';
+        include_once __DIR__ . '/../connect/connect_db.php';
+        $config_db  = new CONFIG_DB();
+        $connect_db = new CONNECT();
+        return ['status' => true, 'pdo' => $connect_db->connect($config_db->getConfig())];
+    }
 }

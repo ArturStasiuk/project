@@ -22,6 +22,19 @@ class ADMIN_SYSTEM {
         await this.view.addStartMenuItem(await this.config.getMenuItem());
     }
     
+    /** otwieranie okna o pdanym id */
+    async open_Window_ZarzadzajFirmami() { 
+        await this.view.addWindow(await this.config.get_Window_ZarzadzajFirmami());
+        /** dodanie meniu do okna  */
+        await this.view.addMeniuWindow(await this.config.getMenu_Window_ZarzadzajFirmami());
+        await this.api.send({ modules: 'modules_company', method: 'getAllCompanyData', param: {parametr1: 'value1'} });
+    }
+
+
+
+
+
+
 }
 
 const adminSystem = new ADMIN_SYSTEM();

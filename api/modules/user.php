@@ -1,19 +1,19 @@
 <?php // logowanie wylogowywanie rejestracja itd. - wszystko co zwiazane z uzytkownikami
 class USER  // 
 {
-    private $pdo;
-    private $session;
-    private $users;
-   // private $access_tables;
-    private $company_users;
-    private $company;
-    private $params;
+    private $pdo;// dostep do bazy danych
+    private $session;// dostep do sesji
+    private $users;// dostep do tabeli users
+    private $access_tables;// dostep do tabeli access_tables
+    private $company_users;// dostep do tabeli company_users
+    private $company;// dostep do tabeli company
+    private $params;//  parametry przekazane z vendor.php
 
     public function __construct($pdo, $session, $users, $access_tables,    $company_users, $company, $params) {
         $this->pdo = $pdo;
         $this->session = $session;
         $this->users = $users;
-       // $this->access_tables = $access_tables;
+        $this->access_tables = $access_tables;
         $this->company_users = $company_users;
         $this->company = $company;
         $this->params = $params;
@@ -64,7 +64,7 @@ class USER  //
         $this->session->setKey('last_name', $userData['last_name']);
         $this->session->setKey('email', $userData['email']);
         $this->session->setKey('active', $userData['active']);
-        $this->session->setKey('lang', $userData['lang'] ?? 'Polski');
+        $this->session->setKey('lang', $userData['lang'] ?? 'English');
         // pobranie id_company z tabeli company_users dla zalogowanego uzytkownika jezeli istnieje 
         $companyId = $this->company_users->getCompanyIdUsers($this->pdo, $userData['id']);
         if ($companyId['status']) {
@@ -140,7 +140,26 @@ class USER  //
         $this->session->destroy();
         return ['status' => true, 'message' => 'User logged out successfully'];
     }
-
+    
+    /**  pobranie uprawnien do tabeli dla danego uzytkownika opo id_users 
+     * i nazwy tabeli przekazanej jako parametr "table_name"  */
+    public function getUserPermissionsTables($id_users, $table_name){
+        
+        // sprawdzenie czy w sesji jest id_users oraz czy przekazano id_users i table_name jako parametry
+        if(!$this->session->getKey('id_users') || empty($id_users) || empty($table_name)){
+            return ['status' => false, 'message' => 'User is not logged in or missing id_users/table_name parameter'];
+        }
+     
+        // sprawdzenie czy zalogowany uzytkownik ma uprawnienia do pobrania danych z tabeli o nazwie przekazanej jako parametr
+  
+        // pobranie uprawnien do tabeli dla danego uzytkownika opo id_users i nazwy tabeli przekazanej jako parametr "table_name"
+        $permissions = $this->access_tables->getUserPermissionsTables($this->pdo, $id_users, $table_name);
+        if ($permissions !== false) {
+            return ['status' => true, 'permissions' => $permissions];
+        }
+        return ['status' => false, 'message' => 'Error getting user permissions'];
+   
+    }
 
    
     // sprawdzenie czy uzytkownik jest zalogowany
