@@ -1,8 +1,11 @@
-import modal from '../public/view/modal.js';
 class API {
 
+    setModal(modalInstance) {
+        this.modal = modalInstance;
+    }
+
     constructor() {
-        this.modal = modal;
+        this.modal = null;
         this.infoModules = { name: 'API', version: '0.1', author: 'Artur', description: 'API for data base connection' };
         // 
         this.response = null;
