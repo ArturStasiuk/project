@@ -43,7 +43,7 @@
 <script type="module">
     import api from '../api/api.js';
     
-
+    //const Lang = await api.send({ method: "getUserLanguage" });
 
     import sys from '../public/sys/sys.js';
 
