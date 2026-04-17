@@ -8,12 +8,10 @@ import CONFIG from './config.js';
 class ADMIN_SYSTEM {
     
     constructor() {
-        this.lang = null; // Domyślny język polski; można zmienić na obsługiwany kod języka (np. 'Polski', 'English', 'Svenska')
         this.modal = modal;
         this.api = api;
         this.view = view;
         this.config = new CONFIG(this);
-
         this.initialize();
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */

@@ -15,7 +15,7 @@ class CONFIG {
         const odp = await this.api.send({ method: "getUserLanguage" });
         this.lang = odp.lang || 'English';
         this.t = LAUNGE[this.lang] || {};
-        console.log(`Język użytkownika: ${this.lang}`);
+       // console.log(`Język użytkownika: ${this.lang}`);
     }
 
     // Zwraca konfigurację pozycji w menu startowym dla narzędzia ADMIN_SYSTEM

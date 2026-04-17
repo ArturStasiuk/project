@@ -2,17 +2,23 @@ import LAUNGE from './launge.js';
 
 class CONFIG {
     constructor(parent) {
-        this.parent   = parent;
-        this.lang = parent?.lang || 'en';
-        this.translations = LAUNGE;
-        /** Unikalny identyfikator okna notatnika */
+        this.parent = parent;
+        this.api = parent.api;
+        this.lang = 'English';
+        this.t = LAUNGE[this.lang] || {};
         this.idWindow = 'win-notepad';
+
+    }
+    /** Inicjalizacja modułu CONFIG */
+    async initialize() {
+        // Pobiera język użytkownika przez API i ustawia tłumaczenia
+        const odp = await this.api.send({ method: "getUserLanguage" });
+        this.lang = odp.lang || 'English';
+        this.t = LAUNGE[this.lang] || {};
+    
     }
 
-    /** Zwraca obiekt tłumaczeń dla aktualnego języka. */
-    _t() {
-        return this.translations[this.lang] || this.translations['en'];
-    }
+
 
     /**
      * Zwraca konfigurację pozycji w menu startowym.
@@ -20,13 +26,12 @@ class CONFIG {
      * @returns {object}
      */
     async getStartMenuItem() {
-        const t = this._t();
         return {
             id:       'sm-notepad',
-            icon:     t.icon,
-            label:    t.label,
+            icon:     this.t.icon,
+            label:    this.t.label,
             disabled: false,
-            onClick:  async () => await this.parent.func.openWindow()
+           // onClick:  async () => await this.parent.func.openWindow()
         };
     }
 
@@ -35,12 +40,12 @@ class CONFIG {
      * @returns {object}
      */
     async getWindowItem() {
-        const t = this._t();
+  
         return {
             id:         this.idWindow,
-            title:      t.title,
-            icon:       t.icon,
-            statusText: t.status_new_doc
+            title:      this.t.title,
+            icon:       this.t.icon,
+            statusText: this.t.status_new_doc
         };
     }
 
@@ -49,24 +54,24 @@ class CONFIG {
      * @returns {object}
      */
     async getWindowMenu() {
-        const t = this._t();
+  
         return {
             id: this.idWindow,
             menus: [
                 {
-                    label: t.menu_file,
+                    label: this.t.menu_file,
                     id:    'notepad-file',
                     items: [
-                        { icon: '📂', label: t.menu_open, onClick: async () =>{} },
-                        { icon: '💾', label: t.menu_save, onClick: async () => {} }
+                        { icon: '📂', label: this.t.menu_open, onClick: async () =>{} },
+                        { icon: '💾', label: this.t.menu_save, onClick: async () => {} }
                     ]
                 },
                 {
-                    label: t.menu_options,
+                    label: this.t.menu_options,
                     id:    'notepad-options',
                     items: [
-                        { icon: '⚙️', label: t.menu_settings, onClick: () => alert(t.menu_settings) },
-                        { icon: '❓', label: t.menu_help,     onClick: () => alert(t.menu_help) }
+                        { icon: '⚙️', label: this.t.menu_settings, onClick: () => alert(this.t.menu_settings) },
+                        { icon: '❓', label: this.t.menu_help,     onClick: () => alert(this.t.menu_help) }
                     ]
                 }
             ]
@@ -81,12 +86,12 @@ class CONFIG {
      * @returns {object}
      */
     async getWindowContent(cardId = 'card-1', title, text) {
-        const t = this._t();
-        const cardTitle = title ?? t.card_title_doc;
+      
+        const cardTitle = title ?? this.t.card_title_doc;
         const content = text ?? `
             <div class="notepad-editor">
                 <textarea class="notepad-textarea"
-                    placeholder="${t.placeholder}"></textarea>
+                    placeholder="${this.t.placeholder}"></textarea>
             </div>`;
         return {
             id:     this.idWindow,
