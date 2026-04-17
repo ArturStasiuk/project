@@ -31,7 +31,7 @@ class CONFIG {
             icon:     this.t.icon,
             label:    this.t.label,
             disabled: false,
-           // onClick:  async () => await this.parent.func.openWindow()
+            onClick:  async () => await this.parent.func.openWindow()
         };
     }
 
