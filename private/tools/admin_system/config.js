@@ -57,8 +57,10 @@ class CONFIG {
             label: this.t.menu_label_zarzadzaj_firmami,
             icon: "💾",
             items: [
-                { icon: '📂', label: this.t.menu_open, onClick: async () => { } },
-                { icon: '💾', label: this.t.menu_save, onClick: async () => { } }
+                { icon: '📂', label: this.t.menu_otworz, onClick: async () => { } },
+                { icon: '➕', label: this.t.menu_zapisz, onClick: async () => { } },
+                { icon: '✏️', label: this.t.menu_edytuj, onClick: async () => { } },
+                 { icon: '🗑️', label: this.t.menu_usun, onClick: async () => { } }
             ]
         };
     }

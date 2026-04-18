@@ -5,15 +5,17 @@ const LAUNGE = {
     welcome: "Witamy w panelu administracyjnym!",
     title_welcome: "Witamy",
     error_generic: "Wystąpił błąd.",
-    save: "Zapisz",
-    cancel: "Anuluj",
-		// menu okna zarzadaj firmami
+    zapisz: "Zapisz",
+	anuluj: "Anuluj",
+// menu okna zarzadaj firmami
 	menu_label_zarzadzaj_firmami: "Przeglądaj firmy",
-	menu_open: "Otwórz",
-		menu_save: "Zapisz",
-		// bledy 
-		alert: "Alert!",
-		brak_dostempu_do_modulu: "Brak dostępu do modułu. Skontaktuj się z administratorem."
+	menu_otworz: "Przegladaj firmy",
+	menu_zapisz: "Dodaj nową firmę",
+	menu_edytuj: "Edytuj firmę",
+	menu_usun: "Usuń firmę",
+// alerty i komunikaty
+	alert: "Alert!",
+	brak_dostempu_do_modulu: "Brak dostępu do modułu. Skontaktuj się z administratorem."
 
   },
 
@@ -23,14 +25,17 @@ const LAUNGE = {
 	welcome: "Welcome to the admin panel!",
 	title_welcome: "Welcome",
 	error_generic: "An error occurred.",
-	save: "Save",
-	  cancel: "Cancel",
-		// menu okna zarzadzaj firmami
+	zapisz: "Save",
+	anuluj: "Cancel",
+// menu okna zarzadzaj firmami
 	menu_label_zarzadzaj_firmami: "Browse companies",
-	menu_open: "Open",
-	  menu_save: "Save",
-	  alert: "Alert!",
-	  brak_dostempu_do_modulu: "No access to the module. Please contact the administrator."
+	menu_otworz: "Browse companies",
+	menu_zapisz: "Add new company",
+	menu_edytuj: "Edit company",
+	menu_usun: "Delete company",
+// alerty i komunikaty
+	alert: "Alert!",
+	brak_dostempu_do_modulu: "No access to the module. Please contact the administrator."
 	},
 
   Svenska: {
@@ -39,12 +44,15 @@ const LAUNGE = {
 	welcome: "Välkommen till administrationspanelen!",
 	title_welcome: "Välkommen",
 	error_generic: "Ett fel har inträffat.",
-	save: "Spara",
-	  cancel: "Avbryt",
-		// menu okna zarzadzaj firmami
+	zapisz: "Spara",
+	anuluj: "Avbryt",
+// menu okna zarzadzaj firmami
 	menu_label_zarzadzaj_firmami: "Bläddra bland företag",
-	menu_open: "Öppna",
-	  menu_save: "Spara",
+	menu_otworz: "Bläddra bland företag",
+	menu_zapisz: "Lägg till nytt företag",
+	menu_edytuj: "Redigera företag",
+	menu_usun: "Ta bort företag",
+// alerty i komunikaty
 	alert: "Varning!",
 	brak_dostempu_do_modulu: "Ingen åtkomst till modulen. Kontakta administratören."
 	}
