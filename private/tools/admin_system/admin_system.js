@@ -18,21 +18,26 @@ class ADMIN_SYSTEM {
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
     async initialize() {
+        // inicjalizacja konfiguracji 
         await this.config.initialize();
-        
-      // const { message, title } = await this.config.getWelcomeMessage();
-        //await this.modal.alert(message, title);
         await this.view.addStartMenuItem(await this.config.getMenuItem());
     }
     
     /** otwieranie okna o pdanym id */
     async open_Window_ZarzadzajFirmami() { 
-        await this.method.isAccess();
-        await this.view.addWindow(await this.config.get_Window_ZarzadzajFirmami());
-        /** dodanie meniu do okna  */
+        // sprawdzenie dostempu do tabeli company, jesli brak dostepu to nie otwieramy okna
+        if (!await this.method.isAccessOpenWindow()) {
+            const info = await this.config.getInfoWindow('alert', 'brak_dostempu_do_modulu');
+            await this.modal.alert(info.title,info.message);
+            return;
+        }
+        // otwarcie okna
+         await this.view.addWindow(await this.config.get_Window_ZarzadzajFirmami());
+        /** dodanie glownego meniu do okna  */
         await this.view.addMeniuWindow(await this.config.getMenu_Window_ZarzadzajFirmami());
         
-        const odp = await this.api.send({ modules: 'modules_company', method: 'getAllCompanyData', param: {} }); 
+       // await this.method.getCompanyData(); 
+        
        
     }
 

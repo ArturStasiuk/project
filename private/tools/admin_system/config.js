@@ -33,8 +33,9 @@ class CONFIG {
     /** okno powitalne */
     async getWelcomeMessage() {
         return {
-            message: this.t.welcome ,
-            title: this.t.title_welcome 
+            title: this.t.title_welcome ,
+            message: this.t.welcome 
+            
         };
     }
     /** konfiguracja okna */
@@ -61,7 +62,13 @@ class CONFIG {
             ]
         };
     }
-
+    //okno informacyjne 
+    async getInfoWindow(title, message, useTranslation = true) {
+        return {
+            title: useTranslation ? (this.t[title] || title) : title,
+            message: useTranslation ? (this.t[message] || message) : message
+        };
+    }
 
 }
 

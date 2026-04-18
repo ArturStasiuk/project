@@ -19,7 +19,7 @@ class MODAL {
 
 
     // prosty alert modalny
-    async alert(message, title) {
+    async alert(title, message) {
         const t = this.t;
         return new Promise((resolve) => {
             const modal = document.createElement('div');
@@ -42,7 +42,7 @@ class MODAL {
     }
 
     // prosty confirm modalny z dwoma przyciskami Yes i No, zwraca true dla Yes i false dla No
-    async confirm(message, title) {
+    async confirm(title,message) {
         const t = this.t;
         return new Promise((resolve) => {
             const modal = document.createElement('div');

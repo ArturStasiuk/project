@@ -10,7 +10,10 @@ const LAUNGE = {
 		// menu okna zarzadaj firmami
 	menu_label_zarzadzaj_firmami: "Przeglądaj firmy",
 	menu_open: "Otwórz",
-	menu_save: "Zapisz"
+		menu_save: "Zapisz",
+		// bledy 
+		alert: "Alert!",
+		brak_dostempu_do_modulu: "Brak dostępu do modułu. Skontaktuj się z administratorem."
 
   },
 
@@ -25,7 +28,9 @@ const LAUNGE = {
 		// menu okna zarzadzaj firmami
 	menu_label_zarzadzaj_firmami: "Browse companies",
 	menu_open: "Open",
-	menu_save: "Save"
+	  menu_save: "Save",
+	  alert: "Alert!",
+	  brak_dostempu_do_modulu: "No access to the module. Please contact the administrator."
 	},
 
   Svenska: {
@@ -39,7 +44,9 @@ const LAUNGE = {
 		// menu okna zarzadzaj firmami
 	menu_label_zarzadzaj_firmami: "Bläddra bland företag",
 	menu_open: "Öppna",
-	menu_save: "Spara"
+	  menu_save: "Spara",
+	alert: "Varning!",
+	brak_dostempu_do_modulu: "Ingen åtkomst till modulen. Kontakta administratören."
 	}
 };
 
