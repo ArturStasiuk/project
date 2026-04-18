@@ -1,5 +1,6 @@
 
 
+
 import LAUNGE from './launge.js';
 
 class CONFIG {
@@ -10,7 +11,10 @@ class CONFIG {
         this.t = LAUNGE[this.lang] || {};
         this.idMemiuItem = "icon_zarzadaj_firmami";
         this.idWindow = "window_zarzadaj_firmami";
+
     }
+
+
     /** Inicjalizacja modułu CONFIG */
     async initialize() {
         // Pobiera język użytkownika przez API i ustawia tłumaczenia
@@ -51,16 +55,28 @@ class CONFIG {
     }
     /** meniu dla window zarzadzaj firmami */
     async getMenu_Window_ZarzadzajFirmami() {
+        const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajFirmami();
         return {
             id: this.idWindow, // id musi być taki sam jak id okna, do którego menu ma być przypisane
             menuId: 'menu:'+ this.idWindow,
             label: this.t.menu_label_zarzadzaj_firmami,
-            icon: "💾",
             items: [
-                { icon: '📂', label: this.t.menu_otworz, onClick: async () => { } },
-                { icon: '➕', label: this.t.menu_zapisz, onClick: async () => { } },
-                { icon: '✏️', label: this.t.menu_edytuj, onClick: async () => { } },
-                 { icon: '🗑️', label: this.t.menu_usun, onClick: async () => { } }
+                {
+                    icon: '📂', label: this.t.menu_otworz,
+                    disabled: !opcjeMeniu.read, onClick: async () => { }
+                },
+                {
+                    icon: '➕', label: this.t.menu_zapisz,
+                    disabled: !opcjeMeniu.create, onClick: async () => { }
+                },
+                {
+                    icon: '✏️', label: this.t.menu_edytuj,
+                    disabled: !opcjeMeniu.update, onClick: async () => { }
+                },
+                {
+                    icon: '🗑️', label: this.t.menu_usun,
+                    disabled: !opcjeMeniu.delete, onClick: async () => { }
+                }
             ]
         };
     }
