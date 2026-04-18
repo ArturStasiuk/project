@@ -17,6 +17,7 @@ class ACCESS_TABLES{
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
             return [
+                'status' => true,
                 'access_table' => (bool)$row['access_table'],
                 'add_record' => (bool)$row['add_record'],
                 'read_record' => (bool)$row['read_record'],
@@ -25,6 +26,7 @@ class ACCESS_TABLES{
             ];
         } else {
             return [
+                'status' => false,
                 'access_table' => false,
                 'add_record' => false,
                 'read_record' => false,

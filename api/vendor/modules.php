@@ -51,19 +51,14 @@ class MODULES
     {   
         
 
-        include_once __DIR__ . '/../data_base/access_tables.php';
+        // dostemp do tabeli company 
         include_once __DIR__ . '/../data_base/company.php';
-         include_once __DIR__ . '/method.php';
+        // dostep do klasy METHOD i jej metod pomocniczych
+        include_once __DIR__ . '/method.php';
         
         return [
             'method' => new METHOD(),
-            'access_tables' => new ACCESS_TABLES(),
-            'table_company' => new COMPANY()
-
-            
-           
-            
-,
+            'table_company' => new COMPANY(),
         ];
    
 

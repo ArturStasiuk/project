@@ -11,7 +11,17 @@ class METHOD
         // jeśli niektóre metody potrzebują param, możesz go przekazywać:
         return $this->$methodName($param);
     }
-
+     /**
+     * pobranie polaczenia PDO do bazy danych z config_db.php
+     */
+    public function getDatabaseConect(mixed $param = null): array
+    {
+        include_once __DIR__ . '/../config/config_db.php';
+        include_once __DIR__ . '/../connect/connect_db.php';
+        $config_db  = new CONFIG_DB();
+        $connect_db = new CONNECT();
+        return ['status' => true, 'pdo' => $connect_db->connect($config_db->getConfig())];
+    }
     /**
      * sprawdza czy uzytkownik jest zalogowany
      */
@@ -30,7 +40,36 @@ class METHOD
         $lang = $session->getKey('lang') ?? 'English';
         return ['lang' => $lang];
     }
+    /**
+     * pobranie dostempu do akcji na tabeli zalogowanego uzytkownika 
+     */
+    public function gestAccessTtables($param = null): array{
+        // pobranie id_users z sesji
+       //czy przekazano parametry z tabelami do sprawdzenia, jeśli nie to zwróć błąd
+        if (empty($param) || !is_array($param)) {
+            return ['status' => false, 'message' => 'No tables specified'];
+        }
+        include_once __DIR__ . '/../service/session.php';
+        $session = new SESSION();
+        $id_users = $session->getKey('id_users');
+        if (!$id_users) {
+            return ['status' => false, 'message' => 'User not logged in'];
+        }
+        $pod = $this->getDatabaseConect();
+        if (!$pod['status']) {
+            return ['status' => false, 'message' => 'Database connection failed'];
+        }
+        $pdo = $pod['pdo'];
+        include_once __DIR__ . '/../data_base/access_tables.php';
+        $accessTables = new ACCESS_TABLES();
+        return $accessTables->getUserPermissionsTables($pdo, $id_users, $param['tables']);
+        
 
+    }
+
+
+
+    //=====================================================================
     // pobranie sciezek do modolow public function getModulesPaths(mixed $param = null): array
     private function getAllTools(mixed $param = null): array
     {
@@ -148,15 +187,5 @@ class METHOD
 
         return ['status' => true, 'content' => file_get_contents($fileReal)];
     }
-    /**
-     * pobranie polaczenia PDO do bazy danych z config_db.php
-     */
-    private function getDatabaseConect(mixed $param = null): array
-    {
-        include_once __DIR__ . '/../config/config_db.php';
-        include_once __DIR__ . '/../connect/connect_db.php';
-        $config_db  = new CONFIG_DB();
-        $connect_db = new CONNECT();
-        return ['status' => true, 'pdo' => $connect_db->connect($config_db->getConfig())];
-    }
+
 }

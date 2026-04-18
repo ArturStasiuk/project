@@ -2,27 +2,42 @@
 /** odpowaida za obsluge tabeli company  */
 class MODULES_COMPANY {
 
-    private $access_tables;// dostep do tabeli access_tables
+ 
     private $company;// dostep do tabeli company
     private $param;//  parametry przekazane z vendor.php
     private $method;// dostep do klasy METHOD
     
-    public function __construct( $method,$access_tables, $company, $param = null)
+    public function __construct( $method, $company, $param = null)
     {
         $this->method = $method;
-        $this->access_tables = $access_tables;
-        $this->company = $company;
+        $this->company = $company;//
         $this->param = $param;
-   
+    }
         
 
         
-    }
+
   // pobranie z tabeli company danych firm   
    public function getAllCompanyData() {
+    if (! $this->dostemp_do_pobrania_danych()){
+     return ['status'=> false , 'message'=>'brak dostempu do pobierania daych'];
+    }
+    else{
+     return $this->company->getAllCompanyData($this->method->getDatabaseConect()['pdo']) ;    
+    }
+    return false ;
+   }
 
-       $companyData = $this->company->getAllCompanyData( $this->param);
-       return $companyData;
+
+
+   // metody pomocnicze 
+   private function dostemp_do_pobrania_danych() {
+    
+    $acces = $this->method->gestAccessTtables(['tables' => 'company']) ;
+    if (!$acces['status'] || !$acces['access_table'] || !$acces ['read_record']) {
+        return false;
+    }
+    return true ;
    }
 
 }
