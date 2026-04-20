@@ -5,7 +5,7 @@ class METHOD{
     
     /** czy jest dostemp do modulu */
     async isAccessOpenWindow() {
-        const odp = await this.accessTable();
+        const odp = await this.parent.api.getAccessTables('company');
         return odp.access_table;
     }
     /** pobranie danych firm */
@@ -15,7 +15,7 @@ class METHOD{
     }
 
     async accessMenu_Window_ZarzadzajFirmami() {
-        const odp = await this.accessTable();
+        const odp = await this.parent.api.getAccessTables('company');
         return {
             "read": !!odp.read_record,
             "create": !!odp.add_record,
@@ -24,11 +24,6 @@ class METHOD{
         };
     }
 
-    /** sprawdza dostęp do tabeli company */
-    async accessTable() {
-        const odp = await this.parent.api.send({ method:'gestAccessTtables', param: { tables: 'company' } });
 
-        return odp
-    }
 }
 export default METHOD;

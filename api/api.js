@@ -14,13 +14,16 @@ class API {
 
 
     }
-
+    /** Wysyła dane do modulow badz method */
     async send(data) {
-
         this.response = await this.sendRequest(this.vendorPath, data);
         return this.response;
     }
-
+    /** pobiera dostęp zalogowanego użytkownika do tabel */
+    async getAccessTables(tables = null) {
+        return await this.sendRequest(this.vendorPath, { method: 'getAccessTables', param: { tables: tables } });
+        
+    }
 
     //================================================
     /**  uniwersalna funkcja POST do wysyłania danych do katalogu z modułami, np. users.php, products.php itp , sprawdza czy plik istnieje przed wysłaniem żądania, jeśli nie istnieje zwraca błąd, jeśli istnieje wysyła dane i zwraca odpowiedź z serwera*/

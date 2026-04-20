@@ -42,8 +42,9 @@ class METHOD
     }
     /**
      * pobranie dostempu do akcji na tabeli zalogowanego uzytkownika 
-     */
-    public function gestAccessTtables($param = null): array{
+      *poprawiono nazwe
+    */
+    public function getAccessTables($param = null): array{
         // pobranie id_users z sesji
        //czy przekazano parametry z tabelami do sprawdzenia, jeśli nie to zwróć błąd
         if (empty($param) || !is_array($param)) {
