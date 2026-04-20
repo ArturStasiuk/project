@@ -19,7 +19,7 @@ class API {
         this.response = await this.sendRequest(this.vendorPath, data);
         return this.response;
     }
-    /** pobiera dostęp zalogowanego użytkownika do tabel */
+    /** pobiera dostęp zalogowanego użytkownika do danych tabeli */
     async getAccessTables(tables = null) {
         return await this.sendRequest(this.vendorPath, { method: 'getAccessTables', param: { tables: tables } });
         
