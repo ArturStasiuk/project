@@ -23,7 +23,7 @@ class ADMIN_SYSTEM {
         await this.view.addStartMenuItem(await this.config.getMenuItem());
     }
     
-    /** otwieranie okna o pdanym id */
+    /** otwieranie glownego okna o pdanym id */
     async open_Window_ZarzadzajFirmami() { 
         // sprawdzenie dostempu do tabeli company, jesli brak dostepu to nie otwieramy okna
         if (!await this.method.isAccessOpenWindow()) {
@@ -41,6 +41,12 @@ class ADMIN_SYSTEM {
        
     }
 
+    /** otworzenie przegladania firm */
+    async przegladajFirmy() {
+        const content = await this.config.getContent_PrzegladajFirmy(await this.method.getCompanyData());
+        await this.view.addWindowCard({ id: this.config.idWindow, content });
+        console.log(content);
+    }
 
 
 

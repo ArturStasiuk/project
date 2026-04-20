@@ -32,8 +32,7 @@ class MODULES_COMPANY {
 
    // metody pomocnicze 
    private function dostemp_do_pobrania_danych() {
-    
-    $acces = $this->method->getAccessTables(['tables' => 'company']) ;
+     $acces = $this->method->getAccessTables(['tables' => 'company']) ;
     if (!$acces['status'] || !$acces['access_table'] || !$acces ['read_record']) {
         return false;
     }
