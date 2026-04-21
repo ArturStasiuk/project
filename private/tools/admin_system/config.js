@@ -101,7 +101,7 @@ class CONFIG {
             'name','type','active','country','city','address'
         ];
         let html = `<div style=\"overflow-x:auto;width:100%;max-width:100%;\"><table class=\"company-table\" style=\"${tableStyle}\"><thead><tr>`;
-        html += headers.map(h => `<th style=\"${thStyle}\">${h}</th>`).join('');
+        html += headers.map(h => `<th style=\"${thStyle}\">${this.t[h] || h}</th>`).join('');
         html += `</tr></thead><tbody>`;
         html += data.map(firm => {
             return `<tr id=\"firm-row-${firm.id}\" data-id=\"${firm.id}\">\n` +
