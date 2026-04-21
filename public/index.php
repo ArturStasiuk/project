@@ -24,7 +24,8 @@
         "imports": {
             "modal": "./view/modal.js",
             "view":  "./view/app.js",
-            "api":   "../api/api.js"
+            "api":   "../api/api.js",
+            "handlers": "./sys/handlers.js"
         }
     }
     </script>

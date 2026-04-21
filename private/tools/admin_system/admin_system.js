@@ -4,11 +4,13 @@
 import modal from 'modal';
 import view from 'view';
 import api from 'api';
+import handlers from 'handlers';
 import CONFIG from './config.js';
 import METHOD from './method.js';
 class ADMIN_SYSTEM {
     
     constructor() {
+        this.zdarzenia = handlers;
         this.method = new METHOD(this);
         this.modal = modal;
         this.api = api;
@@ -52,7 +54,9 @@ class ADMIN_SYSTEM {
                 title: 'Lista firm', // wyswietlany tytul card
                 text: content // zawartosc html dla card
             });
-            await this.method.zaznaczanieWierszaTabeli();
+            await this.zdarzenia.handleTableRowClick("company-table", (rowData) => {
+                console.log(rowData);
+            });
         }
 
 
