@@ -91,7 +91,7 @@ class CONFIG {
         };
     }
     
-    /** content dla firm wformie divow */
+    /** content dla przegladania firm w formie tabeli */
     async getContent_PrzegladajFirmy(data) { 
         if (!Array.isArray(data)) return '';
         const tableStyle = `width:100%;border-collapse:collapse;margin-bottom:16px;`;

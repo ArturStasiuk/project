@@ -47,10 +47,10 @@ class ADMIN_SYSTEM {
             const data = Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : []);
             const content = await this.config.getContent_PrzegladajFirmy(data);
             await this.view.addWindowCard({
-                id: this.config.idWindow,
-                cardId: 'przeglad-firm',
-                title: 'Lista firm',
-                text: content
+                id: this.config.idWindow,// id okna do ktorego dodajemy card
+                cardId: 'przeglad-firm',// unikalny id dla card
+                title: 'Lista firm', // wyswietlany tytul card
+                text: content // zawartosc html dla card
             });
 
         }
