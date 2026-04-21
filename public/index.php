@@ -9,6 +9,7 @@
     <title>myAppProject</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modal.css">
+  
 
     <!--
         Import map: mapuje krótkie nazwy modułów na ich publiczne URL-e.

@@ -42,11 +42,18 @@ class ADMIN_SYSTEM {
     }
 
     /** otworzenie przegladania firm */
-    async przegladajFirmy() {
-        const content = await this.config.getContent_PrzegladajFirmy(await this.method.getCompanyData());
-        await this.view.addWindowCard({ id: this.config.idWindow, content });
-        console.log(content);
-    }
+        async przegladajFirmy() {
+            const response = await this.method.getCompanyData();
+            const data = Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : []);
+            const content = await this.config.getContent_PrzegladajFirmy(data);
+            await this.view.addWindowCard({
+                id: this.config.idWindow,
+                cardId: 'przeglad-firm',
+                title: 'Lista firm',
+                text: content
+            });
+            console.log(content);
+        }
 
 
 

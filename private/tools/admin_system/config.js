@@ -98,21 +98,22 @@ class CONFIG {
             return `
                 <div class="company-card" data-id="${firm.id}">
                     <h3>${firm.name || ''}</h3>
-                    <p><strong>ID:</strong> ${firm.id}</p>
-                    <p><strong>${this.t.type || 'Typ'}:</strong> ${firm.type || '-'}</p>
-                    <p><strong>${this.t.active || 'Aktywna'}:</strong> ${firm.active ? '✔️' : '❌'}</p>
-                    <p><strong>NIP:</strong> ${firm.tax_id || '-'}</p>
-                    <p><strong>REGON:</strong> ${firm.regon || '-'}</p>
-                    <p><strong>KRS:</strong> ${firm.krs || '-'}</p>
-                    <p><strong>${this.t.address || 'Adres'}:</strong> ${firm.address || '-'}</p>
-                    <p><strong>${this.t.city || 'Miasto'}:</strong> ${firm.city || '-'}</p>
-                    <p><strong>${this.t.postal_code || 'Kod pocztowy'}:</strong> ${firm.postal_code || '-'}</p>
-                    <p><strong>${this.t.country || 'Kraj'}:</strong> ${firm.country || '-'}</p>
-                    <p><strong>${this.t.phone || 'Telefon'}:</strong> ${firm.phone || '-'}</p>
-                    <p><strong>${this.t.email || 'Email'}:</strong> ${firm.email || '-'}</p>
-                    <p><strong>${this.t.website || 'Strona www'}:</strong> ${firm.website || '-'}</p>
-                    <p><strong>${this.t.created_at || 'Utworzono'}:</strong> ${firm.created_at || '-'}</p>
-                    <p><strong>${this.t.updated_at || 'Zaktualizowano'}:</strong> ${firm.updated_at || '-'}</p>
+                    <p><strong>id:</strong> ${firm.id}</p>
+                    <p><strong>name:</strong> ${firm.name || '-'}</p>
+                    <p><strong>type:</strong> ${firm.type || '-'}</p>
+                    <p><strong>active:</strong> ${firm.active ? '✔️' : '❌'}</p>
+                    <p><strong>tax_id:</strong> ${firm.tax_id || '-'}</p>
+                    <p><strong>regon:</strong> ${firm.regon || '-'}</p>
+                    <p><strong>krs:</strong> ${firm.krs || '-'}</p>
+                    <p><strong>address:</strong> ${firm.address || '-'}</p>
+                    <p><strong>city:</strong> ${firm.city || '-'}</p>
+                    <p><strong>postal_code:</strong> ${firm.postal_code || '-'}</p>
+                    <p><strong>country:</strong> ${firm.country || '-'}</p>
+                    <p><strong>phone:</strong> ${firm.phone || '-'}</p>
+                    <p><strong>email:</strong> ${firm.email || '-'}</p>
+                    <p><strong>website:</strong> ${firm.website || '-'}</p>
+                    <p><strong>created_at:</strong> ${firm.created_at || '-'}</p>
+                    <p><strong>updated_at:</strong> ${firm.updated_at || '-'}</p>
                 </div>
             `;
         }).join('\n');
