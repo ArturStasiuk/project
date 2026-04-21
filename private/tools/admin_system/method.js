@@ -24,9 +24,13 @@ class METHOD {
         };
     }
 
-    /** zaznaczanie wiersza tabeli o id company_table  */
-    async zaznaczanieWierszaTabeli() {
-        const table = document.getElementById('company-table');
+    /**
+     * Uniwersalna metoda do odczytywania danych z klikniętego wiersza tabeli.
+     * Pobiera wartości z komórek oraz wszystkie atrybuty data-* z wiersza.
+     * Działa dla dowolnej tabeli z nagłówkami (th) i komórkami (td).
+     */
+    async zaznaczanieWierszaTabeli(id_tabeli = 'company-table') {
+        const table = document.getElementById(id_tabeli);
         if (!table) return;
         const tbody = table.querySelector('tbody');
         if (!tbody) return;
@@ -34,24 +38,31 @@ class METHOD {
         // Usuwamy poprzedni handler, jeśli istnieje
         if (tbody._rowClickHandler) tbody.removeEventListener('click', tbody._rowClickHandler);
 
-        // Delegacja zdarzenia na tbody (działa zawsze)
+        // Pobierz nagłówki kolumn
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+
+        // Delegacja zdarzenia na tbody
         tbody._rowClickHandler = function(e) {
             let tr = e.target;
             while (tr && tr.tagName !== 'TR') tr = tr.parentElement;
             if (tr && tr.classList && tr.classList.contains('selectable-row')) {
-                // Pobierz dane z wiersza
-                const id = tr.dataset.id;
-                const tds = tr.querySelectorAll('td');
-                const data = {
-                    id,
-                    name: tds[0]?.textContent.trim(),
-                    type: tds[1]?.textContent.trim(),
-                    active: tds[2]?.textContent.trim(),
-                    country: tds[3]?.textContent.trim(),
-                    city: tds[4]?.textContent.trim(),
-                    address: tds[5]?.textContent.trim()
-                };
-                console.log('Dane firmy:', data);
+                // Dane z komórek
+                const tds = Array.from(tr.querySelectorAll('td'));
+                const rowData = {};
+                headers.forEach((header, i) => {
+                    rowData[header] = tds[i]?.textContent.trim();
+                });
+                // Dane z data-*
+                const dataAttrs = {};
+                for (const attr of tr.attributes) {
+                    if (attr.name.startsWith('data-')) {
+                        const key = attr.name.slice(5);
+                        dataAttrs[key] = attr.value;
+                    }
+                }
+                // Połącz dane
+                const result = { ...rowData, ...dataAttrs };
+                console.log('Dane wiersza:', result);
             }
         };
         tbody.addEventListener('click', tbody._rowClickHandler);
