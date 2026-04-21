@@ -36,13 +36,30 @@ function handleTableRowClick(id_tabeli, callback) {
                 }
             }
             // Połącz dane
-            const result = { ...rowData, ...dataAttrs };
+            const result = { ...rowData, ...dataAttrs, tableId: id_tabeli };
             if (typeof callback === 'function') callback(result);
         }
     };
     tbody.addEventListener('click', tbody._rowClickHandler);
 }
+/** usuniecie handlera kliknięcia w wiersz tabeli */
+function removeTableRowClickHandler(id_tabeli) {
+    const table = document.getElementById(id_tabeli);
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+    if (tbody._rowClickHandler) {
+        tbody.removeEventListener('click', tbody._rowClickHandler);
+        delete tbody._rowClickHandler;
+    }
+}
+
+
+
+
+
 
 export default {
-    handleTableRowClick
+    handleTableRowClick,
+    removeTableRowClickHandler
 };

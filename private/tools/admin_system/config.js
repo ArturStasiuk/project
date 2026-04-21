@@ -69,7 +69,7 @@ class CONFIG {
                 },
                 {
                     icon: '➕', label: this.t.menu_zapisz,
-                    disabled: !opcjeMeniu.create, onClick: async () => { }
+                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.dodajFirme()}
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
@@ -94,8 +94,8 @@ class CONFIG {
     /** content dla przegladania firm w formie tabeli 
      * Tabela ma teraz id="company-table", a każdy wiersz posiada klasę .* selectable-row, id w formacie firm-row-{id} oraz data-id z id firmy. Dzięki temu możesz łatwo napisać kod JS do zaznaczania wiersza i odczytywania id firmy z data-id.
     */
-    async getContent_PrzegladajFirmy(data) { 
-        if (!Array.isArray(data)) return '';
+    async getContent_PrzegladajFirmy(data) {
+        if (!Array.isArray(data)) data = [];
         const tableStyle = `width:100%;border-collapse:collapse;margin-bottom:16px;`;
         const thStyle = `background:#f5f7fa;border:1px solid #ccc;padding:6px 8px;text-align:left;`;
         const tdStyle = `border:1px solid #ccc;padding:6px 8px;`;
@@ -116,9 +116,63 @@ class CONFIG {
             `</tr>`;
         }).join('');
         html += `</tbody></table></div>`;
-        return html;
+        return {
+            id: this.idWindow,
+            cardId: 'przeglad-firm',
+            title: this.t.lista_firm || 'Lista firm',
+            text: html
+        };
     }
 
+    /** content dla dodawania nowej firmy */
+    async getContent_DodajFirme() {
+        const t = this.t;
+        const html = `
+        <form id="add-company-form" style="max-width:520px;margin:auto;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="grid-column:1/3"><label>${t.name}*<br>
+                    <input type="text" name="name" maxlength="255" required placeholder="${t.name}"></label></div>
+                <div><label>${t.type}*<br>
+                    <input type="text" name="type" maxlength="100" required placeholder="${t.type}"></label></div>
+                <div><label>${t.active}<br>
+                    <select name="active">
+                        <option value="1">✔️ ${t.active}</option>
+                        <option value="0">❌</option>
+                    </select></label></div>
+                <div><label>${t.tax_id}<br>
+                    <input type="text" name="tax_id" maxlength="50" placeholder="${t.tax_id}"></label></div>
+                <div><label>${t.regon}<br>
+                    <input type="text" name="regon" maxlength="50" placeholder="${t.regon}"></label></div>
+                <div><label>${t.krs}<br>
+                    <input type="text" name="krs" maxlength="50" placeholder="${t.krs}"></label></div>
+                <div style="grid-column:1/3"><label>${t.address}<br>
+                    <input type="text" name="address" maxlength="255" placeholder="${t.address}"></label></div>
+                <div><label>${t.city}<br>
+                    <input type="text" name="city" maxlength="100" placeholder="${t.city}"></label></div>
+                <div><label>${t.postal_code}<br>
+                    <input type="text" name="postal_code" maxlength="20" placeholder="${t.postal_code}"></label></div>
+                <div><label>${t.country}<br>
+                    <input type="text" name="country" maxlength="100" placeholder="${t.country}"></label></div>
+                <div><label>${t.phone}<br>
+                    <input type="text" name="phone" maxlength="50" placeholder="${t.phone}"></label></div>
+                <div><label>${t.email}<br>
+                    <input type="email" name="email" maxlength="100" placeholder="${t.email}"></label></div>
+                <div style="grid-column:1/3"><label>${t.website}<br>
+                    <input type="url" name="website" maxlength="100" placeholder="${t.website}"></label></div>
+            </div>
+            <div style="margin-top:18px;text-align:right;">
+                <button type="submit">${t.zapisz}</button>
+                <button type="button" style="margin-left:8px;">${t.anuluj}</button>
+            </div>
+        </form>
+        `;
+        return {
+            id: this.idWindow,
+            cardId: 'dodaj-firme',
+            title: t.menu_zapisz || 'Dodaj firmę',
+            text: html
+        };
+    }
 
 
 

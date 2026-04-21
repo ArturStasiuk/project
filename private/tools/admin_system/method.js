@@ -13,7 +13,7 @@ class METHOD {
         const odp = await this.parent.api.send({ modules: 'modules_company', method:'getAllCompanyData', param: {data} });
         return odp.data;
     }
-
+     // dostemp meniu w oknie zarzadzaj firmami
     async accessMenu_Window_ZarzadzajFirmami() {
         const odp = await this.parent.api.getAccessTables('company');
         return {
@@ -23,6 +23,8 @@ class METHOD {
             "delete": !!odp.delete_record
         };
     }
+
+    
 
 
 

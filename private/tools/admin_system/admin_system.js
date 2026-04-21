@@ -45,19 +45,21 @@ class ADMIN_SYSTEM {
 
     /** otworzenie przegladania firm */
         async przegladajFirmy() {
-            const response = await this.method.getCompanyData();
-            const data = Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : []);
-            const content = await this.config.getContent_PrzegladajFirmy(data);
-            await this.view.addWindowCard({
-                id: this.config.idWindow,// id okna do ktorego dodajemy card
-                cardId: 'przeglad-firm',// unikalny id dla card
-                title: 'Lista firm', // wyswietlany tytul card
-                text: content // zawartosc html dla card
-            });
-            await this.zdarzenia.handleTableRowClick("company-table", (rowData) => {
+        const response = await this.method.getCompanyData();
+        const data = Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : []);
+        const config = await this.config.getContent_PrzegladajFirmy(data);
+        await this.view.addWindowCard(config);
+            // wywolanie handlera klikniecia w wiersz tabeli, callback zwraca dane z wiersza oraz data-id firmy
+            await this.zdarzenia.handleTableRowClick("company-table", (rowData) => { // tu odczytanie danych kliknietego wiersza w tabeli
                 console.log(rowData);
             });
         }
+    
+    /** dodaj firme */
+    async dodajFirme() {
+        const config = await this.config.getContent_DodajFirme();
+        await this.view.addWindowCard(config);
+    }
 
 
 
