@@ -44,7 +44,8 @@ class ADMIN_SYSTEM {
     }
 
     /** otworzenie przegladania firm */
-        async przegladajFirmy() {
+    async przegladajFirmy() {
+        await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
         const response = await this.method.getCompanyData();
         const data = Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : []);
         const config = await this.config.getContent_PrzegladajFirmy(data);
@@ -57,6 +58,7 @@ class ADMIN_SYSTEM {
     
     /** dodaj firme */
     async dodajFirme() {
+        await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
         const config = await this.config.getContent_DodajFirme();
         await this.view.addWindowCard(config);
     }

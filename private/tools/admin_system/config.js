@@ -73,11 +73,11 @@ class CONFIG {
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
-                    disabled: !opcjeMeniu.update, onClick: async () => { }
+                    disabled: true, onClick: async () => { }
                 },
                 {
                     icon: '🗑️', label: this.t.menu_usun,
-                    disabled: !opcjeMeniu.delete, onClick: async () => { }
+                    disabled: true, onClick: async () => { }
                 }
             ]
         };
