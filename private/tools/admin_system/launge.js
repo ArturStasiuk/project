@@ -15,7 +15,25 @@ const LAUNGE = {
 	menu_usun: "Usuń firmę",
 // alerty i komunikaty
 	alert: "Alert!",
-	brak_dostempu_do_modulu: "Brak dostępu do modułu. Skontaktuj się z administratorem."
+		brak_dostempu_do_modulu: "Brak dostępu do modułu. Skontaktuj się z administratorem.",
+		// content dla przegladania firm w formie tabeli
+		lista_firm: "Lista firm",
+		name: "Nazwa firmy",
+		type: "Typ firmy",
+		active: "Aktywna",
+		tax_id: "NIP",
+		regon: "REGON",
+		krs: "KRS",
+		address: "Adres",
+		city: "Miasto",
+		postal_code: "Kod pocztowy",
+		country: "Kraj",
+		phone: "Telefon",
+		email: "Email",
+		website: "Strona www",
+		created_at: "Data utworzenia",
+		updated_at: "Data aktualizacji"
+
 
   },
 
@@ -35,7 +53,25 @@ const LAUNGE = {
 	menu_usun: "Delete company",
 // alerty i komunikaty
 	alert: "Alert!",
-	brak_dostempu_do_modulu: "No access to the module. Please contact the administrator."
+	  brak_dostempu_do_modulu: "No access to the module. Please contact the administrator.",
+	  // content dla przegladania firm w formie tabeli
+	    lista_firm: "Company list",
+		name: "Company Name",
+		type: "Company Type",
+		active: "Active",
+		tax_id: "Tax ID",
+		regon: "REGON",
+		krs: "KRS",
+		address: "Address",
+		city: "City",
+		postal_code: "Postal Code",
+		country: "Country",
+		phone: "Phone",
+		email: "Email",
+		website: "Website",
+	    created_at: "Created At",
+		updated_at: "Updated At"
+		
 	},
 
   Svenska: {
@@ -54,8 +90,27 @@ const LAUNGE = {
 	menu_usun: "Ta bort företag",
 // alerty i komunikaty
 	alert: "Varning!",
-	brak_dostempu_do_modulu: "Ingen åtkomst till modulen. Kontakta administratören."
-	}
+	  brak_dostempu_do_modulu: "Ingen åtkomst till modulen. Kontakta administratören.",
+	  // content dla przegladania firm w formie tabeli
+	    lista_firm: "Företagslista",
+		name: "Företagsnamn",
+		type: "Företagstyp",
+		active: "Aktiv",
+		tax_id: "Skatte-ID",
+		regon: "REGON",
+		krs: "KRS",
+		address: "Adress",
+		city: "Stad",
+		postal_code: "Postnummer",
+		country: "Land",
+		phone: "Telefon",
+		email: "E-post",
+		website: "Webbplats",
+	    created_at: "Skapad den",
+		updated_at: "Uppdaterad den"
+		
+  }
+  
 };
 
 export default LAUNGE;
