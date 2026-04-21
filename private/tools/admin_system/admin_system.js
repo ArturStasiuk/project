@@ -52,7 +52,8 @@ class ADMIN_SYSTEM {
         await this.view.addWindowCard(config);
             // wywolanie handlera klikniecia w wiersz tabeli, callback zwraca dane z wiersza oraz data-id firmy
             await this.zdarzenia.handleTableRowClick("company-table", (rowData) => { // tu odczytanie danych kliknietego wiersza w tabeli
-                console.log(rowData);
+               // console.log(rowData);
+                 this.szczegolyFirmy(rowData);
             });
         }
     
@@ -63,6 +64,12 @@ class ADMIN_SYSTEM {
         await this.view.addWindowCard(config);
     }
 
+    /**szczegoly firmy */
+    async szczegolyFirmy(firma) {
+        console.log(firma);
+        await this.method.getCompanyDataById(1);
+
+    }
 
 
 

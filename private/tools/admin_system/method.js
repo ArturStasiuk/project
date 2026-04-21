@@ -13,7 +13,7 @@ class METHOD {
         const odp = await this.parent.api.send({ modules: 'modules_company', method:'getAllCompanyData', param: {data} });
         return odp.data;
     }
-     // dostemp meniu w oknie zarzadzaj firmami
+     /** pobranie  dostepu meniu w oknie zarzadzaj firmami */
     async accessMenu_Window_ZarzadzajFirmami() {
         const odp = await this.parent.api.getAccessTables('company');
         return {
@@ -23,7 +23,11 @@ class METHOD {
             "delete": !!odp.delete_record
         };
     }
-
+    /** pobranie danych firmy po ID */
+    async getCompanyDataById(id) {
+        const odp = await this.parent.api.send({ modules: 'modules_company', method:'getCompanyDataById', param: { id_company: id } });
+        return odp.data;
+    }
     
 
 
