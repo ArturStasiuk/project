@@ -61,7 +61,8 @@ class CONFIG {
         return {
             id: this.idWindow, // id musi być taki sam jak id okna, do którego menu ma być przypisane
             menuId: 'menu:'+ this.idWindow,
-            label: this.t.menu_label_zarzadzaj_firmami,
+            label:'📂 ' + this.t.menu_label_zarzadzaj_firmami,
+
             items: [
                 {
                     icon: '📂', label: this.t.menu_otworz,
@@ -96,17 +97,56 @@ class CONFIG {
     */
     async getContent_PrzegladajFirmy(data) {
         if (!Array.isArray(data)) data = [];
-        const tableStyle = `width:100%;border-collapse:collapse;margin-bottom:16px;`;
-        const thStyle = `background:#f5f7fa;border:1px solid #ccc;padding:6px 8px;text-align:left;`;
-        const tdStyle = `border:1px solid #ccc;padding:6px 8px;`;
+        // Style inspirowane modal.css i formularzem
+        const wrapperStyle = [
+            'background: rgba(243,243,243,0.97)',
+            'border-radius: 12px',
+            'box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(25,118,210,0.08)',
+            'padding: 28px 32px 24px 32px',
+            'max-width: 820px',
+            'margin: 32px auto',
+            'font-family: \'Segoe UI Variable\', \'Segoe UI\', Arial, sans-serif',
+            'color: #222',
+            'border: 1px solid rgba(180,200,230,0.18)',
+            'overflow-x: auto',
+            'width: 100%'
+        ].join(';');
+        const tableStyle = [
+            'width: 100%',
+            'border-collapse: separate',
+            'border-spacing: 0',
+            'background: transparent',
+            'margin-bottom: 0',
+            'font-size: 1.04rem',
+            'box-shadow: none'
+        ].join(';');
+        const thStyle = [
+            'background: #f5f7fa',
+            'border-bottom: 2px solid #b4c7e7',
+            'padding: 10px 12px',
+            'text-align: left',
+            'font-weight: 600',
+            'color: #1976d2',
+            'letter-spacing: 0.01em',
+            'font-size: 1.04rem'
+        ].join(';');
+        const tdStyle = [
+            'border-bottom: 1px solid #e0e7ef',
+            'padding: 9px 12px',
+            'background: #fff',
+            'font-size: 1.01rem',
+            'color: #222'
+        ].join(';');
+        const trHover = 'this.style.background=\'#eaf1fb\'';
+        const trOut = 'this.style.background=\'#fff\'';
         const headers = [
             'name','type','active','country','city','address'
         ];
-        let html = `<div style=\"overflow-x:auto;width:100%;max-width:100%;\"><table id=\"company-table\" class=\"company-table\" style=\"${tableStyle}\"><thead><tr>`;
+        let html = `<div style=\"${wrapperStyle}\"><table id=\"company-table\" class=\"company-table\" style=\"${tableStyle}\"><thead><tr>`;
         html += headers.map(h => `<th style=\"${thStyle}\">${this.t[h] || h}</th>`).join('');
         html += `</tr></thead><tbody>`;
         html += data.map(firm => {
-            return `<tr class=\"selectable-row\" id=\"firm-row-${firm.id}\" data-id=\"${firm.id}\" style=\"cursor:pointer;\">\n` +
+            return `<tr class=\"selectable-row\" id=\"firm-row-${firm.id}\" data-id=\"${firm.id}\" style=\"cursor:pointer;transition:background 0.15s;\" onmouseover=\"${trHover}\" onmouseout=\"${trOut}\">\n` +
                 `<td style=\"${tdStyle}\">${firm.name || '-'}</td>` +
                 `<td style=\"${tdStyle}\">${firm.type || '-'}</td>` +
                 `<td style=\"${tdStyle}\">${firm.active ? '✔️' : '❌'}</td>` +
@@ -127,42 +167,105 @@ class CONFIG {
     /** content dla dodawania nowej firmy */
     async getContent_DodajFirme() {
         const t = this.t;
+        // Style inspirowane modal.css, ale inline
+        const formStyle = [
+            'background: rgba(243,243,243,0.97)',
+            'border-radius: 12px',
+            'box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(25,118,210,0.08)',
+            'padding: 28px 32px 24px 32px',
+            'max-width: 520px',
+            'margin: 32px auto',
+            'font-family: \'Segoe UI Variable\', \'Segoe UI\', Arial, sans-serif',
+            'color: #222',
+            'border: 1px solid rgba(180,200,230,0.18)',
+            'display: flex',
+            'flex-direction: column',
+            'align-items: stretch',
+            'overflow: hidden'
+        ].join(';');
+        const gridStyle = [
+            'display: grid',
+            'grid-template-columns: 1fr 1fr',
+            'gap: 14px',
+            'margin-bottom: 18px'
+        ].join(';');
+        const labelStyle = [
+            'font-size: 1.04rem',
+            'font-weight: 500',
+            'color: #222',
+            'margin-bottom: 2px',
+            'display: block'
+        ].join(';');
+        const inputStyle = [
+            'width: 100%',
+            'padding: 0.55em 0.9em',
+            'border-radius: 6px',
+            'border: 1px solid #b4c7e7',
+            'background: #f5f7fa',
+            'font-size: 1rem',
+            'margin-top: 2px',
+            'margin-bottom: 0',
+            'box-sizing: border-box',
+            'transition: border 0.15s, box-shadow 0.15s',
+            'outline: none'
+        ].join(';');
+        const selectStyle = inputStyle;
+        const buttonStyle = [
+            'padding: 0.6em 2.2em',
+            'border-radius: 6px',
+            'background: linear-gradient(180deg, #eaf1fb 0%, #d2e3fc 100%)',
+            'color: #222',
+            'border: 1px solid #b4c7e7',
+            'font-size: 1rem',
+            'font-family: inherit',
+            'cursor: pointer',
+            'transition: background 0.15s, border 0.15s, color 0.15s',
+            'box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08)',
+            'margin-right: 12px',
+            'outline: none'
+        ].join(';');
+        const buttonStyleNo = [
+            buttonStyle,
+            'background: linear-gradient(180deg, #fbeaea 0%, #fcd2d2 100%)',
+            'color: #d32f2f',
+            'border: 1px solid #d32f2f'
+        ].join(';');
         const html = `
-        <form id="add-company-form" style="max-width:520px;margin:auto;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div style="grid-column:1/3"><label>${t.name}*<br>
-                    <input type="text" name="name" maxlength="255" required placeholder="${t.name}"></label></div>
-                <div><label>${t.type}*<br>
-                    <input type="text" name="type" maxlength="100" required placeholder="${t.type}"></label></div>
-                <div><label>${t.active}<br>
-                    <select name="active">
+        <form id="add-company-form" style="${formStyle}">
+            <div style="${gridStyle}">
+                <div style="grid-column:1/3"><label style="${labelStyle}">${t.name}*<br>
+                    <input type="text" name="name" maxlength="255" required placeholder="${t.name}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.type}*<br>
+                    <input type="text" name="type" maxlength="100" required placeholder="${t.type}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.active}<br>
+                    <select name="active" style="${selectStyle}">
                         <option value="1">✔️ ${t.active}</option>
                         <option value="0">❌</option>
                     </select></label></div>
-                <div><label>${t.tax_id}<br>
-                    <input type="text" name="tax_id" maxlength="50" placeholder="${t.tax_id}"></label></div>
-                <div><label>${t.regon}<br>
-                    <input type="text" name="regon" maxlength="50" placeholder="${t.regon}"></label></div>
-                <div><label>${t.krs}<br>
-                    <input type="text" name="krs" maxlength="50" placeholder="${t.krs}"></label></div>
-                <div style="grid-column:1/3"><label>${t.address}<br>
-                    <input type="text" name="address" maxlength="255" placeholder="${t.address}"></label></div>
-                <div><label>${t.city}<br>
-                    <input type="text" name="city" maxlength="100" placeholder="${t.city}"></label></div>
-                <div><label>${t.postal_code}<br>
-                    <input type="text" name="postal_code" maxlength="20" placeholder="${t.postal_code}"></label></div>
-                <div><label>${t.country}<br>
-                    <input type="text" name="country" maxlength="100" placeholder="${t.country}"></label></div>
-                <div><label>${t.phone}<br>
-                    <input type="text" name="phone" maxlength="50" placeholder="${t.phone}"></label></div>
-                <div><label>${t.email}<br>
-                    <input type="email" name="email" maxlength="100" placeholder="${t.email}"></label></div>
-                <div style="grid-column:1/3"><label>${t.website}<br>
-                    <input type="url" name="website" maxlength="100" placeholder="${t.website}"></label></div>
+                <div><label style="${labelStyle}">${t.tax_id}<br>
+                    <input type="text" name="tax_id" maxlength="50" placeholder="${t.tax_id}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.regon}<br>
+                    <input type="text" name="regon" maxlength="50" placeholder="${t.regon}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.krs}<br>
+                    <input type="text" name="krs" maxlength="50" placeholder="${t.krs}" style="${inputStyle}"></label></div>
+                <div style="grid-column:1/3"><label style="${labelStyle}">${t.address}<br>
+                    <input type="text" name="address" maxlength="255" placeholder="${t.address}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.city}<br>
+                    <input type="text" name="city" maxlength="100" placeholder="${t.city}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.postal_code}<br>
+                    <input type="text" name="postal_code" maxlength="20" placeholder="${t.postal_code}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.country}<br>
+                    <input type="text" name="country" maxlength="100" placeholder="${t.country}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.phone}<br>
+                    <input type="text" name="phone" maxlength="50" placeholder="${t.phone}" style="${inputStyle}"></label></div>
+                <div><label style="${labelStyle}">${t.email}<br>
+                    <input type="email" name="email" maxlength="100" placeholder="${t.email}" style="${inputStyle}"></label></div>
+                <div style="grid-column:1/3"><label style="${labelStyle}">${t.website}<br>
+                    <input type="url" name="website" maxlength="100" placeholder="${t.website}" style="${inputStyle}"></label></div>
             </div>
             <div style="margin-top:18px;text-align:right;">
-                <button type="submit">${t.zapisz}</button>
-                <button type="button" style="margin-left:8px;">${t.anuluj}</button>
+                <button type="submit" style="${buttonStyle}">${t.zapisz}</button>
+                <button type="button" style="${buttonStyleNo};margin-left:8px;">${t.anuluj}</button>
             </div>
         </form>
         `;
@@ -174,6 +277,7 @@ class CONFIG {
         };
     }
 
+    
 
 
 }
