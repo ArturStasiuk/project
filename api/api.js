@@ -22,8 +22,7 @@ class API {
     /** pobiera dostęp zalogowanego użytkownika do danych tabeli */
     async getAccessTables(tables = null) {
         return await this.sendRequest(this.vendorPath, { method: 'getAccessTables', param: { tables: tables } });
-        
-    }
+   }
 
     //================================================
     /**  uniwersalna funkcja POST do wysyłania danych do katalogu z modułami, np. users.php, products.php itp , sprawdza czy plik istnieje przed wysłaniem żądania, jeśli nie istnieje zwraca błąd, jeśli istnieje wysyła dane i zwraca odpowiedź z serwera*/

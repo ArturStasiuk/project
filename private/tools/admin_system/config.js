@@ -91,7 +91,9 @@ class CONFIG {
         };
     }
     
-    /** content dla przegladania firm w formie tabeli */
+    /** content dla przegladania firm w formie tabeli 
+     * Tabela ma teraz id="company-table", a każdy wiersz posiada klasę .* selectable-row, id w formacie firm-row-{id} oraz data-id z id firmy. Dzięki temu możesz łatwo napisać kod JS do zaznaczania wiersza i odczytywania id firmy z data-id.
+    */
     async getContent_PrzegladajFirmy(data) { 
         if (!Array.isArray(data)) return '';
         const tableStyle = `width:100%;border-collapse:collapse;margin-bottom:16px;`;
@@ -100,11 +102,11 @@ class CONFIG {
         const headers = [
             'name','type','active','country','city','address'
         ];
-        let html = `<div style=\"overflow-x:auto;width:100%;max-width:100%;\"><table class=\"company-table\" style=\"${tableStyle}\"><thead><tr>`;
+        let html = `<div style=\"overflow-x:auto;width:100%;max-width:100%;\"><table id=\"company-table\" class=\"company-table\" style=\"${tableStyle}\"><thead><tr>`;
         html += headers.map(h => `<th style=\"${thStyle}\">${this.t[h] || h}</th>`).join('');
         html += `</tr></thead><tbody>`;
         html += data.map(firm => {
-            return `<tr id=\"firm-row-${firm.id}\" data-id=\"${firm.id}\">\n` +
+            return `<tr class=\"selectable-row\" id=\"firm-row-${firm.id}\" data-id=\"${firm.id}\" style=\"cursor:pointer;\">\n` +
                 `<td style=\"${tdStyle}\">${firm.name || '-'}</td>` +
                 `<td style=\"${tdStyle}\">${firm.type || '-'}</td>` +
                 `<td style=\"${tdStyle}\">${firm.active ? '✔️' : '❌'}</td>` +

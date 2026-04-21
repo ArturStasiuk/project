@@ -1,4 +1,4 @@
-class METHOD{
+class METHOD {
         constructor(parent) {
             this.parent = parent;
         }
@@ -24,6 +24,38 @@ class METHOD{
         };
     }
 
+    /** zaznaczanie wiersza tabeli o id company_table  */
+    async zaznaczanieWierszaTabeli() {
+        const table = document.getElementById('company-table');
+        if (!table) return;
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        // Usuwamy poprzedni handler, jeśli istnieje
+        if (tbody._rowClickHandler) tbody.removeEventListener('click', tbody._rowClickHandler);
+
+        // Delegacja zdarzenia na tbody (działa zawsze)
+        tbody._rowClickHandler = function(e) {
+            let tr = e.target;
+            while (tr && tr.tagName !== 'TR') tr = tr.parentElement;
+            if (tr && tr.classList && tr.classList.contains('selectable-row')) {
+                // Pobierz dane z wiersza
+                const id = tr.dataset.id;
+                const tds = tr.querySelectorAll('td');
+                const data = {
+                    id,
+                    name: tds[0]?.textContent.trim(),
+                    type: tds[1]?.textContent.trim(),
+                    active: tds[2]?.textContent.trim(),
+                    country: tds[3]?.textContent.trim(),
+                    city: tds[4]?.textContent.trim(),
+                    address: tds[5]?.textContent.trim()
+                };
+                console.log('Dane firmy:', data);
+            }
+        };
+        tbody.addEventListener('click', tbody._rowClickHandler);
+    }
 
 }
 export default METHOD;

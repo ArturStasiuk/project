@@ -52,7 +52,7 @@ class ADMIN_SYSTEM {
                 title: 'Lista firm', // wyswietlany tytul card
                 text: content // zawartosc html dla card
             });
-
+            await this.method.zaznaczanieWierszaTabeli();
         }
 
 
