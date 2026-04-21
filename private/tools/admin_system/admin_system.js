@@ -52,7 +52,7 @@ class ADMIN_SYSTEM {
                 title: 'Lista firm',
                 text: content
             });
-            console.log(content);
+
         }
 
 
