@@ -41,7 +41,7 @@ class METHOD
         return ['lang' => $lang];
     }
     /**
-     * pobranie dostempu do akcji na tabeli zalogowanego uzytkownika 
+     * pobranie dostempu do akcji na tabelach dla  zalogowanego uzytkownika 
       *poprawiono nazwe
     */
     public function getAccessTables($param = null): array{

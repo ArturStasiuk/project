@@ -67,7 +67,8 @@ class ADMIN_SYSTEM {
     /**szczegoly firmy */
     async szczegolyFirmy(firma) {
         console.log(firma);
-        await this.method.getCompanyDataById(1);
+        await this.method.getCompanyDataById(firma.id); // pobranie danych firmy po id
+        await this.method.getUsersByCompanyId(firma.id); // pobranie danych uzytkownikow firmy po id firmy
 
     }
 

@@ -79,9 +79,15 @@ class USERS  //
       return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  
-
-
+  /** pobranie danych uzytkownikow po id_company z tabeli users na podstawie tabeli company_users */
+  public function getUsersByCompanyId($pdo, $companyId){
+      $stmt = $pdo->prepare("SELECT u.id, u.role, u.name, u.last_name, u.email, u.active, u.lang 
+                             FROM users u
+                             INNER JOIN company_users cu ON u.id = cu.id_users
+                             WHERE cu.id_company = :company_id");
+      $stmt->execute(['company_id' => $companyId]);
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 
 
 

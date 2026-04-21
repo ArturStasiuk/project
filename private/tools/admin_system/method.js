@@ -28,7 +28,12 @@ class METHOD {
         const odp = await this.parent.api.send({ modules: 'modules_company', method:'getCompanyDataById', param: { id_company: id } });
         return odp.data;
     }
-    
+    /** pobranie danych uzytkownikow firmy po ID firmy */
+    async getUsersByCompanyId(id) {
+        const odp = await this.parent.api.send({ modules: 'modules_company', method:'getUsersByCompanyId', param: { id_company: id } });
+        return odp.data;
+    }
+
 
 
 
