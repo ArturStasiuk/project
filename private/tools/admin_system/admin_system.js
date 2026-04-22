@@ -66,10 +66,12 @@ class ADMIN_SYSTEM {
 
     /**szczegoly firmy */
     async szczegolyFirmy(firma) {
-        console.log(firma);
-        await this.method.getCompanyDataById(firma.id); // pobranie danych firmy po id
-        await this.method.getUsersByCompanyId(firma.id); // pobranie danych uzytkownikow firmy po id firmy
-
+       // console.log(firma);
+       await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
+       const firmaData = await this.method.getCompanyDataById(firma.id); // pobranie danych firmy po id
+       const usersData = await this.method.getUsersByCompanyId(firma.id); // pobranie danych uzytkownikow firmy po id firmy
+       const config = await this.config.getContent_SzczegolyFirmy(firmaData, usersData);
+       await this.view.addWindowCard(config);
     }
 
 

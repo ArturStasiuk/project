@@ -276,9 +276,104 @@ class CONFIG {
             text: html
         };
     }
-
     
-
+    /** content dla szczegolow firmy i uzytkownikow */
+    async getContent_SzczegolyFirmy(firmaData, usersData) {
+        const t = this.t;
+        const company = firmaData && typeof firmaData === 'object' ? firmaData : {};
+        if (!Array.isArray(usersData)) usersData = [];
+        const formatValue = (value) => (value === null || value === undefined || value === '' ? '-' : value);
+        const detailRows = [
+            ['name', formatValue(company.name)],
+            ['type', formatValue(company.type)],
+            ['active', company.active === 1 || company.active === true ? '✔️' : '❌'],
+            ['tax_id', formatValue(company.tax_id)],
+            ['regon', formatValue(company.regon)],
+            ['krs', formatValue(company.krs)],
+            ['address', formatValue(company.address)],
+            ['city', formatValue(company.city)],
+            ['postal_code', formatValue(company.postal_code)],
+            ['country', formatValue(company.country)],
+            ['phone', formatValue(company.phone)],
+            ['email', formatValue(company.email)],
+            ['website', formatValue(company.website)],
+            ['created_at', formatValue(company.created_at)],
+            ['updated_at', formatValue(company.updated_at)]
+        ];
+        const wrapperStyle = [
+            'background: rgba(243,243,243,0.97)',
+            'border-radius: 12px',
+            'box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(25,118,210,0.08)',
+            'padding: 28px 32px 24px 32px',
+            'max-width: 900px',
+            'margin: 32px auto',
+            'font-family: \'Segoe UI Variable\', \'Segoe UI\', Arial, sans-serif',
+            'color: #222',
+            'border: 1px solid rgba(180,200,230,0.18)',
+            'overflow-x: auto',
+            'width: 100%'
+        ].join(';');
+        const sectionTitleStyle = [
+            'font-size: 1.08rem',
+            'font-weight: 700',
+            'margin-bottom: 14px',
+            'color: #1769aa'
+        ].join(';');
+        const tableStyle = [
+            'width: 100%',
+            'border-collapse: collapse',
+            'margin-bottom: 22px',
+            'font-size: 0.98rem'
+        ].join(';');
+        const thStyle = [
+            'text-align: left',
+            'padding: 10px 12px',
+            'font-weight: 700',
+            'background: #f5f7fa',
+            'border-bottom: 2px solid #c8d5ea',
+            'color: #1b4f7a'
+        ].join(';');
+        const tdStyle = [
+            'padding: 10px 12px',
+            'border-bottom: 1px solid #e4ebf3',
+            'background: #fff',
+            'color: #222'
+        ].join(';');
+        const companyRowsHtml = detailRows.map(([key, value]) => {
+            return `<tr><th style="${thStyle}">${t[key] || key}</th><td style="${tdStyle}">${value}</td></tr>`;
+        }).join('');
+        const userTableHeader = ['name', 'email', 'role', 'active', 'lang'];
+        const userRows = usersData.map(user => {
+            const fullName = [user.name, user.last_name].filter(Boolean).join(' ') || '-';
+            return `<tr><td style="${tdStyle}">${fullName}</td><td style="${tdStyle}">${formatValue(user.email)}</td><td style="${tdStyle}">${formatValue(user.role)}</td><td style="${tdStyle}">${user.active === 1 || user.active === true ? '✔️' : '❌'}</td><td style="${tdStyle}">${formatValue(user.lang)}</td></tr>`;
+        }).join('');
+        const usersSection = usersData.length > 0 ? `
+            <div style="margin-top: 26px;">
+                <div style="${sectionTitleStyle}">${t.users_list || 'Users'}</div>
+                <table style="${tableStyle}">
+                    <thead><tr>${userTableHeader.map(col => `<th style="${thStyle}">${t['user_' + col] || col}</th>`).join('')}</tr></thead>
+                    <tbody>${userRows}</tbody>
+                </table>
+            </div>` : `
+            <div style="margin-top: 26px;font-size:0.98rem;color:#444;">
+                ${t.no_users || 'No users found for this company.'}
+            </div>`;
+        const html = `
+            <div style="${wrapperStyle}">
+                <div style="${sectionTitleStyle}">${t.company_details || 'Company details'}</div>
+                <table style="${tableStyle}">
+                    <tbody>${companyRowsHtml}</tbody>
+                </table>
+                ${usersSection}
+            </div>
+        `;
+        return {
+            id: this.idWindow,
+            cardId: 'szczegoly-firmy',
+            title: `${t.company_details || 'Company details'}${company.name ? ': ' + company.name : ''}`,
+            text: html
+        };
+    }
 
 }
 

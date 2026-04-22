@@ -54,7 +54,8 @@ class MODULES_COMPANY {
      return ['status'=> false , 'message'=>'brak dostempu do pobierania daych'];
     }
     else{
-     return $this->users->getUsersByCompanyId($this->method->getDatabaseConect()['pdo'], $id_company) ;    
+     $users = $this->users->getUsersByCompanyId($this->method->getDatabaseConect()['pdo'], $id_company);
+     return ['status' => true, 'data' => $users];    
     }
     return false ;
    }
