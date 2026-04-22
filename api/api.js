@@ -68,6 +68,7 @@ class API {
             return { status: 'error', error: `Błąd sprawdzania istnienia modułu: ${url}` };
         }
         try {
+            console.log("wysyłam dane do:", url, "z danymi:", data);
             await this.modal.loading();
             this.response = await fetch(url, {
                 method: 'POST',
@@ -81,8 +82,10 @@ class API {
             let result;
             try {
                 result = JSON.parse(text);
+                console.log("Odpowiedź z serwera:", result);
             } catch {
                 result = text;
+                
             }
             if (result === undefined || result === null || result === '') {
                 await this.modal.loading();
