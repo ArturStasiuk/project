@@ -69,7 +69,7 @@ class USER  //
         $companyId = $this->company_users->getCompanyIdUsers($this->pdo, $userData['id']);
         if ($companyId['status']) {
             $this->session->setKey('company_id', $companyId['data']);
-            $companyData = $this->company->getCompanyData($this->pdo, $companyId['data']);
+            $companyData = $this->company->getCompanyDataById($this->pdo, $companyId['data']);
             if ($companyData['status']) {
                 $this->session->setKey('company_name', $companyData['data']['name']);
             } else {
