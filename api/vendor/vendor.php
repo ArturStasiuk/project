@@ -23,7 +23,7 @@ class VENDOR
     public function handleRequest(): void
     {
         if (!$this->isPost()) {
-            echo json_encode(['status' => 'false', 'message' => null]);
+            echo json_encode(['status' => false, 'message' => null]);
             return;
         }
 
@@ -58,14 +58,14 @@ class VENDOR
         $moduleFile = __DIR__ . '/../modules/' . $modulesName . '.php';
 
         if (!file_exists($moduleFile)) {
-            echo json_encode(['status' => 'false', 'message' => 'Module file not found']);
+            echo json_encode(['status' => false, 'message' => 'Module file not found']);
             return;
         }
 
         include_once $moduleFile;
 
         if (!class_exists($modulesName)) {
-            echo json_encode(['status' => 'false', 'message' => 'Class not found']);
+            echo json_encode(['status' => false, 'message' => 'Class not found']);
             return;
         }
 
@@ -82,12 +82,12 @@ class VENDOR
         }
 
         if (!$methodName) {
-            echo json_encode(['status' => 'false', 'message' => 'Method not specified']);
+            echo json_encode(['status' => false, 'message' => 'Method not specified']);
             return;
         }
 
         if (!method_exists($moduleInstance, $methodName)) {
-            echo json_encode(['status' => 'false', 'message' => 'Method not found']);
+            echo json_encode(['status' => false, 'message' => 'Method not found']);
             return;
         }
 

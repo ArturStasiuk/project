@@ -1,52 +1,81 @@
 <?php
+/**
+ * Klasa SESSION – zarządza sesją PHP użytkownika.
+ * Umożliwia ustawianie, pobieranie i usuwanie kluczy sesji
+ * oraz zniszczenie całej sesji (np. przy wylogowaniu).
+ */
 class SESSION {
-   // public $logIn;
-   // id_users / id zalogowanego uzytkownika
 
+    /**
+     * Konstruktor – uruchamia sesję natychmiast po utworzeniu obiektu.
+     */
     public function __construct()
     {
-      session_start();
-      // $this->logIn = null; 
+        session_start();
     }
-    // uruchomienie sesji
+
+    /**
+     * Uruchamia sesję, jeśli nie jest jeszcze aktywna.
+     */
     public function start()
-     {
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
 
-    // sprawdzenie czy sesja jest aktywna
+    /**
+     * Sprawdza, czy sesja jest aktualnie aktywna.
+     * @return bool
+     */
     public function isActive()
-     {
+    {
         return session_status() === PHP_SESSION_ACTIVE;
     }
 
-    // ustawienie klucza w sesji
+    /**
+     * Ustawia wartość klucza w sesji.
+     * @param string $key   Nazwa klucza.
+     * @param mixed  $value Wartość do zapisania.
+     */
     public function setKey($key, $value)
-     {
+    {
         $_SESSION[$key] = $value;
     }
-    // pobranie klucza z sesji
+
+    /**
+     * Pobiera wartość klucza z sesji.
+     * @param string $key Nazwa klucza.
+     * @return mixed|null Wartość lub null, jeśli klucz nie istnieje.
+     */
     public function getKey($key)
-     {
+    {
         return $_SESSION[$key] ?? null;
     }
-    // usunięcie klucza z sesji
+
+    /**
+     * Usuwa klucz z sesji.
+     * @param string $key Nazwa klucza do usunięcia.
+     */
     public function deleteKey($key)
-     {
+    {
         unset($_SESSION[$key]);
     }
-    // pobranie danych całej sesji
+
+    /**
+     * Zwraca całą tablicę $_SESSION.
+     * @return array
+     */
     public function getSession()
-     {
+    {
         return $_SESSION;
     }
-    // zniszczenie sesji
+
+    /**
+     * Niszczy aktywną sesję (np. przy wylogowaniu użytkownika).
+     */
     public function destroy()
     {
         session_destroy();
-       
     }
-
 }

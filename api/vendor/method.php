@@ -12,9 +12,11 @@ class METHOD
         return $this->$methodName($param);
     }
      /**
-     * pobranie polaczenia PDO do bazy danych z config_db.php
+     * Zwraca połączenie PDO do bazy danych skonfigurowane w config_db.php.
+     * @param mixed $param Nieużywany – zachowany dla spójności interfejsu call().
+     * @return array ['status' => true, 'pdo' => PDO]
      */
-    public function getDatabaseConect(mixed $param = null): array
+    public function getDatabaseConnect(mixed $param = null): array
     {
         include_once __DIR__ . '/../config/config_db.php';
         include_once __DIR__ . '/../connect/connect_db.php';
@@ -41,12 +43,12 @@ class METHOD
         return ['lang' => $lang];
     }
     /**
-     * pobranie dostempu do akcji na tabelach dla  zalogowanego uzytkownika 
-      *poprawiono nazwe
-    */
+     * Zwraca uprawnienia zalogowanego użytkownika do akcji (odczyt, zapis itp.) na wskazanej tabeli.
+     * @param array|null $param Tablica z kluczem 'tables' – nazwa tabeli do sprawdzenia.
+     * @return array Wynik z polami status, access_table, read_record, add_record itd.
+     */
     public function getAccessTables($param = null): array{
-        // pobranie id_users z sesji
-       //czy przekazano parametry z tabelami do sprawdzenia, jeśli nie to zwróć błąd
+        // Sprawdzenie, czy przekazano parametry z tabelami do sprawdzenia
         if (empty($param) || !is_array($param)) {
             return ['status' => false, 'message' => 'No tables specified'];
         }
@@ -56,11 +58,11 @@ class METHOD
         if (!$id_users) {
             return ['status' => false, 'message' => 'User not logged in'];
         }
-        $pod = $this->getDatabaseConect();
-        if (!$pod['status']) {
+        $dbResult = $this->getDatabaseConnect();
+        if (!$dbResult["status"]) {
             return ['status' => false, 'message' => 'Database connection failed'];
         }
-        $pdo = $pod['pdo'];
+        $pdo = $dbResult['pdo'];
         include_once __DIR__ . '/../data_base/access_tables.php';
         $accessTables = new ACCESS_TABLES();
         return $accessTables->getUserPermissionsTables($pdo, $id_users, $param['tables']);

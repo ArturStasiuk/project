@@ -8,7 +8,7 @@ import CONFIG from './config.js';
 class ADMIN_COMPANY{
 
     constructor() {
-        this.lang = 'en';
+        this.lang = 'English';
         this.modal = modal;
         this.api = api;
         this.view = view;

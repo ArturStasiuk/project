@@ -35,8 +35,8 @@ class SYS {
             // Zwolnij URL po załadowaniu
             URL.revokeObjectURL(url);
         };
-        script.onerror = (e) => {
-            alert('Błąd ładowania kodu modułu przez Blob URL', e);
+        script.onerror = async (e) => {
+            await this.modal.alert('Błąd ładowania kodu modułu przez Blob URL');
         };
         document.head.appendChild(script);
     }
@@ -222,8 +222,8 @@ class SYS {
                 this._loadedScripts.add(finalPath);
                 resolve();
             };
-            script.onerror = (e) => {
-                alert(`Błąd ładowania modułu: ${finalPath}`, e);
+            script.onerror = async (e) => {
+                await this.modal.alert(`Błąd ładowania modułu: ${finalPath}`);
                 reject(e);
             };
             document.head.appendChild(script);

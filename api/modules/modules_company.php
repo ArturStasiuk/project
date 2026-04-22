@@ -1,5 +1,5 @@
 <?php 
-/** odpowaida za obsluge tabeli company  */
+/** Obsługuje operacje na tabeli company (firmy). Wymaga dostępu do tabel company i users. */
 class MODULES_COMPANY {
 
  
@@ -21,13 +21,12 @@ class MODULES_COMPANY {
 
   // pobranie z tabeli company danych firm   
    public function getAllCompanyData() {
-    if (! $this->dostemp_do_pobrania_danych('company')){
-     return ['status'=> false , 'message'=>'brak dostempu do pobierania daych'];
+    if (! $this->checkReadAccess('company')){
+     return ['status'=> false , 'message'=>'Brak dostępu do pobierania danych'];
     }
     else{
-     return $this->company->getAllCompanyData($this->method->getDatabaseConect()['pdo']) ;    
+     return $this->company->getAllCompanyData($this->method->getDatabaseConnect()['pdo']) ;    
     }
-    return false ;
    }
   // pobranie z tabeli company  danych firmy o podanym id_company
    public function getCompanyDataById() {
@@ -35,13 +34,12 @@ class MODULES_COMPANY {
      if ($id_company === null) {
          return ['status' => false, 'message' => 'ID firmy nie został przekazany'];
      }  
-    if (! $this->dostemp_do_pobrania_danych('company')){
-     return ['status'=> false , 'message'=>'brak dostempu do pobierania daych'];
+    if (! $this->checkReadAccess('company')){
+     return ['status'=> false , 'message'=>'Brak dostępu do pobierania danych'];
     }
     else{
-     return $this->company->getCompanyDataById($this->method->getDatabaseConect()['pdo'], $id_company) ;    
+     return $this->company->getCompanyDataById($this->method->getDatabaseConnect()['pdo'], $id_company) ;    
     }
-    return false ;
    }
 
    // pobranie danych uzytkownikow po id_company z tabeli users na podstawie tabeli company_users
@@ -50,19 +48,18 @@ class MODULES_COMPANY {
     if ($id_company === null) {
         return ['status' => false, 'message' => 'ID firmy nie został przekazany'];
     }
-    if (! $this->dostemp_do_pobrania_danych('users')){
-     return ['status'=> false , 'message'=>'brak dostempu do pobierania daych'];
+    if (! $this->checkReadAccess('users')){
+     return ['status'=> false , 'message'=>'Brak dostępu do pobierania danych'];
     }
     else{
-     $users = $this->users->getUsersByCompanyId($this->method->getDatabaseConect()['pdo'], $id_company);
+     $users = $this->users->getUsersByCompanyId($this->method->getDatabaseConnect()['pdo'], $id_company);
      return ['status' => true, 'data' => $users];    
     }
-    return false ;
    }
 
 
-   // metody pomocnicze dostemp do pobrania danych z tabeli company
-   private function dostemp_do_pobrania_danych($table) {
+   // Metoda pomocnicza – sprawdza dostęp użytkownika do odczytu wskazanej tabeli.
+   private function checkReadAccess($table) {
      $acces = $this->method->getAccessTables(['tables' => $table]) ;
     if (!$acces['status'] || !$acces['access_table'] || !$acces ['read_record']) {
         return false;
