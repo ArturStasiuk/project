@@ -21,24 +21,24 @@ class CONFIG {
         const odp = await this.api.send({ method: "getUserLanguage" });
         this.lang = odp.lang || 'English';
         this.t = LAUNGE[this.lang] || {};
-       // console.log(`Język użytkownika: ${this.lang}`);
+        // console.log(`Język użytkownika: ${this.lang}`);
     }
 
     // Zwraca konfigurację pozycji w menu startowym dla narzędzia ADMIN_SYSTEM
-   async getMenuItem() {
+    async getMenuItem() {
         return {
             id: this.idMemiuItem,
-            icon: this.t.icon ,
-            label: this.t.label_zarzadzaj_firmami ,
+            icon: this.t.icon,
+            label: this.t.label_zarzadzaj_firmami,
             disabled: false,
             onClick: async () => await this.parent.open_Window_ZarzadzajFirmami()
         };
-   }
+    }
     /** okno powitalne */
     async getWelcomeMessage() {
         return {
-            title: this.t.title_welcome ,
-            message: this.t.welcome 
+            title: this.t.title_welcome,
+            message: this.t.welcome
             
         };
     }
@@ -60,8 +60,8 @@ class CONFIG {
         const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajFirmami();
         return {
             id: this.idWindow, // id musi być taki sam jak id okna, do którego menu ma być przypisane
-            menuId: 'menu:'+ this.idWindow,
-            label:'📂 ' + this.t.menu_label_zarzadzaj_firmami,
+            menuId: 'menu:' + this.idWindow,
+            label: '📂 ' + this.t.menu_label_zarzadzaj_firmami,
 
             items: [
                 {
@@ -70,7 +70,7 @@ class CONFIG {
                 },
                 {
                     icon: '➕', label: this.t.menu_zapisz,
-                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.dodajFirme()}
+                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.dodajFirme() }
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
@@ -83,6 +83,38 @@ class CONFIG {
             ]
         };
     }
+
+    /** meniu po wybraniu szczegowow firmy */
+    async getMenu_Window_SzczegolyFirmy() {
+        const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajFirmami();
+        return {
+            id: this.idWindow, // id musi być taki sam jak id okna, do którego menu ma być przypisane
+            menuId: 'menu:' + this.idWindow,
+            label: '📂 ' + this.t.menu_label_zarzadzaj_firmami,
+
+            items: [
+                {
+                    icon: '📂', label: this.t.menu_otworz,
+                    disabled: !opcjeMeniu.read, onClick: async () => { await this.parent.przegladajFirmy() }
+                },
+                {
+                    icon: '➕', label: this.t.menu_zapisz,
+                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.dodajFirme() }
+                },
+                {
+                    icon: '✏️', label: this.t.menu_edytuj,
+                    disabled: !opcjeMeniu.update, onClick: async () => { }
+                },
+                {
+                    icon: '🗑️', label: this.t.menu_usun,
+                    disabled: !opcjeMeniu.delete, onClick: async () => { }
+                }
+            ]
+        };    
+    }
+
+
+
 
     //okno informacyjne 
     async getInfoWindow(title, message, useTranslation = true) {
@@ -374,7 +406,8 @@ class CONFIG {
             text: html
         };
     }
-
+  
+     
 }
 
 export default CONFIG;

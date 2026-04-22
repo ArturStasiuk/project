@@ -7,14 +7,15 @@ import api from 'api';
 import handlers from 'handlers';
 import CONFIG from './config.js';
 import METHOD from './method.js';
+
 class ADMIN_SYSTEM {
     
     constructor() {
+        this.view = view;
         this.zdarzenia = handlers;
         this.method = new METHOD(this);
         this.modal = modal;
         this.api = api;
-        this.view = view;
         this.config = new CONFIG(this);
         this.initialize();
     }
@@ -46,23 +47,21 @@ class ADMIN_SYSTEM {
     /** otworzenie przegladania firm */
     async przegladajFirmy() {
         await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
+        /** wstawienie glownego meniu  */
+            await this.view.addMeniuWindow(await this.config.getMenu_Window_ZarzadzajFirmami());
         const response = await this.method.getCompanyData();
         const data = Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : []);
         const config = await this.config.getContent_PrzegladajFirmy(data);
         await this.view.addWindowCard(config);
-            // wywolanie handlera klikniecia w wiersz tabeli, callback zwraca dane z wiersza oraz data-id firmy
+        // wywolanie handlera klikniecia w wiersz tabeli, callback zwraca dane z wiersza oraz data-id firmy
+       
             await this.zdarzenia.handleTableRowClick("company-table", (rowData) => { // tu odczytanie danych kliknietego wiersza w tabeli
                // console.log(rowData);
                  this.szczegolyFirmy(rowData);
             });
         }
     
-    /** dodaj firme */
-    async dodajFirme() {
-        await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
-        const config = await this.config.getContent_DodajFirme();
-        await this.view.addWindowCard(config);
-    }
+
 
     /**szczegoly firmy */
     async szczegolyFirmy(firma) {
@@ -71,10 +70,18 @@ class ADMIN_SYSTEM {
        const firmaData = await this.method.getCompanyDataById(firma.id); // pobranie danych firmy po id
        const usersData = await this.method.getUsersByCompanyId(firma.id); // pobranie danych uzytkownikow firmy po id firmy
        const config = await this.config.getContent_SzczegolyFirmy(firmaData, usersData);
-       await this.view.addWindowCard(config);
+        await this.view.addWindowCard(config);
+        /** zmiana meniu w oknie  */
+        await this.view.addMeniuWindow(await this.config.getMenu_Window_SzczegolyFirmy());
     }
 
+    /** dodaj firme */
+    async dodajFirme() {
+        await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
+        const config = await this.config.getContent_DodajFirme();
+        await this.view.addWindowCard(config);
 
+    }
 
 
 }

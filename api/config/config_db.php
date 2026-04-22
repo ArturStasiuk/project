@@ -2,7 +2,7 @@
 class CONFIG_DB {
 	private $host = 'localhost';
 	private $user = 'root';
-	private $password = '';
+	private $password = 'azv470047azv';
 	private $database = 'project';
     public function __construct()
         {
