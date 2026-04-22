@@ -78,6 +78,8 @@ class ADMIN_SYSTEM {
     /** dodaj firme */
     async dodajFirme() {
         await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
+        /** dodanie meniu do okna */
+        await this.view.addMeniuWindow(await this.config.getMeniu_window_DodajFirme());
         const config = await this.config.getContent_DodajFirme();
         await this.view.addWindowCard(config);
 

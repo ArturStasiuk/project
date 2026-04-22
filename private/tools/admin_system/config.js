@@ -112,7 +112,35 @@ class CONFIG {
             ]
         };    
     }
+    /** meniu dodaj nowa firme */
+    async getMeniu_window_DodajFirme() {
+        const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajFirmami();
+        return {
+            id: this.idWindow, // id musi być taki sam jak id okna, do którego menu ma być przypisane
+            menuId: 'menu:' + this.idWindow,
+            label: '📂 ' + this.t.menu_label_zarzadzaj_firmami,
 
+            items: [
+                {
+                    icon: '📂', label: this.t.menu_otworz,
+                    disabled: !opcjeMeniu.read, onClick: async () => { await this.parent.przegladajFirmy() }
+                },
+                {
+                    icon: '➕', label: this.t.menu_zapisz,
+                    disabled: true, onClick: async () => { await this.parent.dodajFirme() }
+                },
+                {
+                    icon: '✏️', label: this.t.menu_edytuj,
+                    disabled: true, onClick: async () => { }
+                },
+                {
+                    icon: '🗑️', label: this.t.menu_usun,
+                    disabled: true, onClick: async () => { }
+                }
+            ]
+        };
+    }
+                    
 
 
 
