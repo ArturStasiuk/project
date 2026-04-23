@@ -35,7 +35,8 @@ class ADMIN_SYSTEM {
             return;
         }
         // otwarcie okna
-         await this.view.addWindow(await this.config.get_Window_ZarzadzajFirmami());
+        await this.view.addWindow(await this.config.get_Window_ZarzadzajFirmami());
+        await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
         /** dodanie glownego meniu do okna  */
         await this.view.addMeniuWindow(await this.config.getMenu_Window_ZarzadzajFirmami());
         
@@ -82,9 +83,27 @@ class ADMIN_SYSTEM {
         await this.view.addMeniuWindow(await this.config.getMeniu_window_DodajFirme());
         const config = await this.config.getContent_DodajFirme();
         await this.view.addWindowCard(config);
+        /** nasluchiwanie klikniecia przycisku zapisz i anuluj, callback zwraca id kliknietego przycisku */
+        await this.zdarzenia.handleButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"], async (buttonId) => {
+
+            if (buttonId === "buttonAddCompany") { 
+                await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
+                // pobranie danych z formularza po id formularza
+                const formData = await this.zdarzenia.getFormData("formularz-dodaj-firme"); 
+                /** dodanie nowej firmy */
+
+                return;
+            }
+            else if (buttonId === "buttonCancelAddCompany") {
+
+                    await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
+               await this.open_Window_ZarzadzajFirmami(); // powrót do przeglądania firm po kliknięciu anuluj
+                return;
+            }
+
+        }); 
 
     }
-
 
 }
 

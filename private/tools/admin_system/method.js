@@ -23,7 +23,7 @@ class METHOD {
             "delete": !!odp.delete_record
         };
     }
-    /* pobranie dostempu meniu 
+
     /** pobranie danych firmy po ID */
     async getCompanyDataById(id) {
         const odp = await this.parent.api.send({ modules: 'modules_company', method:'getCompanyDataById', param: { id_company: id } });
@@ -34,7 +34,10 @@ class METHOD {
         const odp = await this.parent.api.send({ modules: 'modules_company', method:'getUsersByCompanyId', param: { id_company: id } });
         return odp.data;
     }
-
+    /** walidacja danych firmi i zapis do bazy danych  */
+    async validateAndSaveCompanyData(companyData) { 
+        
+    }
 
 
 

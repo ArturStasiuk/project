@@ -291,7 +291,7 @@ class CONFIG {
             'border: 1px solid #d32f2f'
         ].join(';');
         const html = `
-        <form id="add-company-form" style="${formStyle}">
+        <form id="formularz-dodaj-firme" style="${formStyle}">
             <div style="${gridStyle}">
                 <div style="grid-column:1/3"><label style="${labelStyle}">${t.name}*<br>
                     <input type="text" name="name" maxlength="255" required placeholder="${t.name}" style="${inputStyle}"></label></div>
@@ -322,10 +322,10 @@ class CONFIG {
                     <input type="email" name="email" maxlength="100" placeholder="${t.email}" style="${inputStyle}"></label></div>
                 <div style="grid-column:1/3"><label style="${labelStyle}">${t.website}<br>
                     <input type="url" name="website" maxlength="100" placeholder="${t.website}" style="${inputStyle}"></label></div>
-            </div>
+            </div> 
             <div style="margin-top:18px;text-align:right;">
-                <button type="submit" style="${buttonStyle}">${t.zapisz}</button>
-                <button type="button" style="${buttonStyleNo};margin-left:8px;">${t.anuluj}</button>
+                <button id="buttonAddCompany" type="button" style="${buttonStyle}">${t.zapisz}</button>
+                <button id="buttonCancelAddCompany" type="button" style="${buttonStyleNo};margin-left:8px;">${t.anuluj}</button>
             </div>
         </form>
         `;

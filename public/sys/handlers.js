@@ -54,12 +54,49 @@ function removeTableRowClickHandler(id_tabeli) {
     }
 }
 
+/** odczytywanie danych z formularza o podanym id */
+function getFormData(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return null;
+    const formData = new FormData(form);
+    const data = {};
+    for (const [key, value] of formData.entries()) {
+        data[key] = value;
+    }
+    return data;
+}
 
-
-
+/** uniwersalna funkcja do nasluchiwania klikniecia przyciskow o podanym id 
+ * i zwrucenie ktory przycisk zostal klikniety, callback zwraca id kliknietego przycisku
+ 'przyjmuje tablce z id przyciskow do nasluchiwania i callback'  --- IGNORE ---
+ przykad wywolania :    
+ */
+ function handleButtonClicks(buttonIds, callback) {
+    buttonIds.forEach(id => {
+        const button = document.getElementById(id);
+        if (button) {
+            button.addEventListener('click', () => {
+                if (typeof callback === 'function') callback(id);
+            });
+        }
+    });
+ }
+ /** funkcja do usuwania nasluchiwania klikniec przyciskow o podanym id */
+ function removeButtonClicks(buttonIds) {
+    buttonIds.forEach(id => {
+        const button = document.getElementById(id);
+        if (button) {
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+        }
+    });
+ }
 
 
 export default {
     handleTableRowClick,
-    removeTableRowClickHandler
+    removeTableRowClickHandler,
+    handleButtonClicks,
+    removeButtonClicks,
+    getFormData
 };
