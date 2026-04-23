@@ -57,7 +57,8 @@ class ADMIN_SYSTEM {
         // wywolanie handlera klikniecia w wiersz tabeli, callback zwraca dane z wiersza oraz data-id firmy
        
             await this.zdarzenia.handleTableRowClick("company-table", (rowData) => { // tu odczytanie danych kliknietego wiersza w tabeli
-               // console.log(rowData);
+            // usuniecie nasluchiwania 
+            this.zdarzenia.removeTableRowClickHandler("company-table");
                  this.szczegolyFirmy(rowData);
             });
         }
@@ -87,23 +88,39 @@ class ADMIN_SYSTEM {
         await this.zdarzenia.handleButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"], async (buttonId) => {
 
             if (buttonId === "buttonAddCompany") { 
-                await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
-                // pobranie danych z formularza po id formularza
-                const formData = await this.zdarzenia.getFormData("formularz-dodaj-firme"); 
-                /** dodanie nowej firmy */
-
-                return;
+                await this.zapiszFirme();
             }
             else if (buttonId === "buttonCancelAddCompany") {
-
-                    await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
-               await this.open_Window_ZarzadzajFirmami(); // powrót do przeglądania firm po kliknięciu anuluj
-                return;
+                await this.anulujZapisFirmy();
             }
 
         }); 
 
     }
+    /** dodawanie firmy  */
+    async zapiszFirme() {
+
+        // pobranie danych z formularza po id formularza
+        const formData = await this.zdarzenia.getFormData("formularz-dodaj-firme"); 
+        /** walidacja danych */
+        const validation = await this.method.validateAndSaveCompanyData(formData);
+        if (!validation.status) {
+            // obsługa błędów walidacji: form pozostaje otwarty,
+            // czekamy na kolejne kliknięcie "Zapisz" lub "Anuluj"
+            console.log(validation.errors);
+            return;
+        }
+
+        await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
+        console.log("Dane firmy zostały zapisane:", validation.data);
+    }
+
+    /** anulowanie dodawania firmy i powrót do przeglądania firm */
+    async anulujZapisFirmy() {
+        await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
+        await this.open_Window_ZarzadzajFirmami(); // powrót do przeglądania firm po kliknięciu anuluj
+    }
+   
 
 }
 
