@@ -1,23 +1,32 @@
 <?php
-/**
- * Klasa SESSION – zarządza sesją PHP użytkownika.
- * Umożliwia ustawianie, pobieranie i usuwanie kluczy sesji
- * oraz zniszczenie całej sesji (np. przy wylogowaniu).
- */
-class SESSION {
 
+declare(strict_types=1);
+
+namespace App\Service;
+
+/**
+ * Session – zarządza sesją PHP użytkownika.
+ *
+ * Umożliwia bezpieczne ustawianie, pobieranie i usuwanie kluczy sesji
+ * oraz zniszczenie całej sesji (np. przy wylogowaniu).
+ *
+ * Sesja jest uruchamiana automatycznie w konstruktorze tylko wtedy,
+ * gdy nie jest jeszcze aktywna.
+ */
+class Session
+{
     /**
-     * Konstruktor – uruchamia sesję natychmiast po utworzeniu obiektu.
+     * Konstruktor – uruchamia sesję, jeśli nie jest jeszcze aktywna.
      */
     public function __construct()
     {
-        session_start();
+        $this->start();
     }
 
     /**
-     * Uruchamia sesję, jeśli nie jest jeszcze aktywna.
+     * Uruchamia sesję, jeśli jest w stanie PHP_SESSION_NONE.
      */
-    public function start()
+    public function start(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -26,47 +35,50 @@ class SESSION {
 
     /**
      * Sprawdza, czy sesja jest aktualnie aktywna.
-     * @return bool
      */
-    public function isActive()
+    public function isActive(): bool
     {
         return session_status() === PHP_SESSION_ACTIVE;
     }
 
     /**
      * Ustawia wartość klucza w sesji.
+     *
      * @param string $key   Nazwa klucza.
      * @param mixed  $value Wartość do zapisania.
      */
-    public function setKey($key, $value)
+    public function setKey(string $key, mixed $value): void
     {
         $_SESSION[$key] = $value;
     }
 
     /**
      * Pobiera wartość klucza z sesji.
+     *
      * @param string $key Nazwa klucza.
      * @return mixed|null Wartość lub null, jeśli klucz nie istnieje.
      */
-    public function getKey($key)
+    public function getKey(string $key): mixed
     {
         return $_SESSION[$key] ?? null;
     }
 
     /**
      * Usuwa klucz z sesji.
+     *
      * @param string $key Nazwa klucza do usunięcia.
      */
-    public function deleteKey($key)
+    public function deleteKey(string $key): void
     {
         unset($_SESSION[$key]);
     }
 
     /**
      * Zwraca całą tablicę $_SESSION.
-     * @return array
+     *
+     * @return array<string, mixed>
      */
-    public function getSession()
+    public function getSession(): array
     {
         return $_SESSION;
     }
@@ -74,7 +86,7 @@ class SESSION {
     /**
      * Niszczy aktywną sesję (np. przy wylogowaniu użytkownika).
      */
-    public function destroy()
+    public function destroy(): void
     {
         session_destroy();
     }
