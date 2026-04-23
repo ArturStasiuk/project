@@ -78,7 +78,7 @@ class ADMIN_SYSTEM {
     }
 
     /** dodaj firme */
-    async dodajFirme() {
+    async formularzDodajFirme() {
         await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
         /** dodanie meniu do okna */
         await this.view.addMeniuWindow(await this.config.getMeniu_window_DodajFirme());
@@ -105,9 +105,11 @@ class ADMIN_SYSTEM {
         /** walidacja danych */
         const validation = await this.method.validateAndSaveCompanyData(formData);
         if (!validation.status) {
-            // obsługa błędów walidacji: form pozostaje otwarty,
+            // obsługa błędów walidacji: formularz pozostaje otwarty,
             // czekamy na kolejne kliknięcie "Zapisz" lub "Anuluj"
-            console.log(validation.errors);
+            const errorsText = Object.values(validation.errors).join('\n');
+            const title = this.config?.t?.alert || 'Alert!';
+            await this.modal.alert(title, errorsText);
             return;
         }
 

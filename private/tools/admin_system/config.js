@@ -70,7 +70,7 @@ class CONFIG {
                 },
                 {
                     icon: '➕', label: this.t.menu_zapisz,
-                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.dodajFirme() }
+                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.formularzDodajFirme() }
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
@@ -99,7 +99,7 @@ class CONFIG {
                 },
                 {
                     icon: '➕', label: this.t.menu_zapisz,
-                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.dodajFirme() }
+                    disabled: !opcjeMeniu.create, onClick: async () => { await this.parent.formularzDodajFirme() }
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
@@ -127,7 +127,7 @@ class CONFIG {
                 },
                 {
                     icon: '➕', label: this.t.menu_zapisz,
-                    disabled: true, onClick: async () => { await this.parent.dodajFirme() }
+                    disabled: true, onClick: async () => { await this.parent.formularzDodajFirme() }
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
