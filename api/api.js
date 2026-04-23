@@ -24,8 +24,8 @@ class API {
         this.modal = null;
         this.infoModules = { name: 'API', version: '0.1', author: 'Artur', description: 'API for data base connection' };
         this.response = null;
-        /** Ścieżka do głównego entry-pointu PHP (vendor.php bez rozszerzenia). */
-        this.vendorPath = '../api/vendor/vendor';
+        /** Ścieżka do głównego entry-pointu PHP (index.php bez rozszerzenia). */
+        this.vendorPath = '../api/index';
     }
 
     /**
