@@ -57,7 +57,7 @@ class User
             return ['status' => false, 'message' => 'No valid email address'];
         }
         if (!$this->checkPasswordLength()) {
-            return ['status' => false, 'message' => 'Password must be at least 4 characters long'];
+            return ['status' => false, 'message' => 'Password must be at least 8 characters long'];
         }
 
         if (!$this->users->checkUserExistsByEmail($this->pdo, $this->params['email'])) {
@@ -112,7 +112,7 @@ class User
             return ['status' => false, 'message' => 'No valid email address'];
         }
         if (!$this->checkPasswordLength()) {
-            return ['status' => false, 'message' => 'Password must be at least 4 characters long'];
+            return ['status' => false, 'message' => 'Password must be at least 8 characters long'];
         }
         if ($this->users->checkUserExistsByEmail($this->pdo, $this->params['email'])) {
             return ['status' => false, 'message' => 'User with this email already exists'];
@@ -193,6 +193,6 @@ class User
 
     private function checkPasswordLength(): bool
     {
-        return strlen($this->params['password']) >= 4;
+        return strlen($this->params['password']) >= 8;
     }
 }
