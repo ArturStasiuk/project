@@ -435,6 +435,10 @@ class CONFIG {
         };
     }
   
+    /** kontent dla edycji firmy     */
+    async getContent_EdytujFirme(firmaData) {
+     }
+
      
 }
 

@@ -129,7 +129,7 @@ class ADMIN_SYSTEM {
         await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
         await this.open_Window_ZarzadzajFirmami(); // powrót do przeglądania firm po kliknięciu anuluj
     }
-   
+
 
 }
 
