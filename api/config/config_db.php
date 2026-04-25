@@ -10,7 +10,7 @@ class CONFIG_DB {
     private $host     = 'localhost';
     private $user     = 'root';
     /** @var string Hasło do bazy danych – w produkcji przenieść do zmiennych środowiskowych. */
-    private $password = 'azv470047azv';
+    private $password = '';
     private $database = 'project';
 
     public function __construct()
