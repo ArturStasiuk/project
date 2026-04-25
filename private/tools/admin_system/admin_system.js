@@ -112,9 +112,13 @@ class ADMIN_SYSTEM {
             await this.modal.alert(title, errorsText);
             return;
         }
+        await this.method.saveCompanyData(validation.data); // zapis danych firmy do bazy danych
+
+
+        /** */
 
         await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
-        console.log("Dane firmy zostały zapisane:", validation.data);
+        //console.log("Dane firmy zostały zapisane:", validation.data);
     }
 
     /** anulowanie dodawania firmy i powrót do przeglądania firm */

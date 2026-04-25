@@ -34,6 +34,13 @@ class METHOD {
         const odp = await this.parent.api.send({ modules: 'modules_company', method:'getUsersByCompanyId', param: { id_company: id } });
         return odp.data;
     }
+     
+    /** zapis danych firmy do bazy danych */
+    async saveCompanyData(companyData) {
+        const odp = await this.parent.api.send({ modules: 'modules_company', method:'saveCompanyData', param: { companyData } });
+        return odp.data;
+    }
+
     /** walidacja danych firmi i zapis do bazy danych  */
     async validateAndSaveCompanyData(companyData) {
         const data = companyData && typeof companyData === 'object' ? { ...companyData } : {};
