@@ -7,6 +7,7 @@ import api from 'api';
 import handlers from 'handlers';
 import CONFIG from './config.js';
 import METHOD from './method.js';
+import EDYCJA_FIRMY from './edytuj.js';
 
 class ADMIN_SYSTEM {
     
@@ -17,6 +18,7 @@ class ADMIN_SYSTEM {
         this.modal = modal;
         this.api = api;
         this.config = new CONFIG(this);
+        this.edytuj = new EDYCJA_FIRMY(this);
         this.initialize();
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
@@ -134,11 +136,20 @@ class ADMIN_SYSTEM {
     // edytuj dane firmy 
     async edytujFirme(){
         console.log('Wywołano funkcję edytujFirme');
-        const row = document.querySelector('#company-table tr.selectable-row');
-         const companyId = row?.dataset.id;
+        let companyId = null;
+
+        const hiddenInput = document.querySelector('input[name="company_id"]');
+        if (hiddenInput && hiddenInput.value) {
+            companyId = hiddenInput.value;
+        } else {
+            const row = document.querySelector('#company-table tr.selectable-row');
+            companyId = row?.dataset.id;
+        }
+
         if (!companyId) return;
-        const edytuj = new EDYTUJ_FIRME(companyId);
-        await edytuj.open();
+
+        
+        await this.edytuj.open(companyId);
     }
 
 

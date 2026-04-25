@@ -422,6 +422,7 @@ class CONFIG {
             </div>`;
         const html = `
             <div style="${wrapperStyle}">
+                <input type="hidden" name="company_id" value="${company.id || ''}">
                 <div style="${sectionTitleStyle}">${t.company_details || 'Company details'}</div>
                 <table style="${tableStyle}">
                     <tbody>${companyRowsHtml}</tbody>
@@ -437,9 +438,7 @@ class CONFIG {
         };
     }
   
-    /** kontent dla edycji firmy     */
-    async getContent_EdytujFirme(firmaData) {
-     }
+
 
      
 }
