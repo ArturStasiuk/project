@@ -22,7 +22,7 @@ class MODULES_COMPANY {
   // pobranie z tabeli company danych firm   
    public function getAllCompanyData() {
     if (! $this->checkReadAccess('company')){
-     return ['status'=> false , 'message'=>'Brak dostępu do pobierania danych'];
+     return ['status'=> false , 'message'=>'Access denied to read company data'];
     }
     else{
      return $this->company->getAllCompanyData($this->method->getDatabaseConnect()['pdo']) ;    
@@ -32,10 +32,10 @@ class MODULES_COMPANY {
    public function getCompanyDataById() {
      $id_company = $this->param['id_company'] ?? null;
      if ($id_company === null) {
-         return ['status' => false, 'message' => 'ID firmy nie został przekazany'];
+         return ['status' => false, 'message' => 'Company ID was not provided'];
      }  
     if (! $this->checkReadAccess('company')){
-     return ['status'=> false , 'message'=>'Brak dostępu do pobierania danych'];
+     return ['status'=> false , 'message'=>'Access denied to read company data'];
     }
     else{
      return $this->company->getCompanyDataById($this->method->getDatabaseConnect()['pdo'], $id_company) ;    
@@ -49,7 +49,7 @@ class MODULES_COMPANY {
         return ['status' => false, 'message' => 'ID firmy nie został przekazany'];
     }
     if (! $this->checkReadAccess('users')){
-     return ['status'=> false , 'message'=>'Brak dostępu do pobierania danych'];
+     return ['status'=> false , 'message'=>'Access denied to read users data'];
     }
     else{
      $users = $this->users->getUsersByCompanyId($this->method->getDatabaseConnect()['pdo'], $id_company);
@@ -62,11 +62,11 @@ class MODULES_COMPANY {
      //  sprawdzenie czy przekazaon dane firmy w param 
         $companyData = $this->param['companyData'] ?? null;
         if ($companyData === null) {
-            return ['status' => false, 'message' => 'Dane firmy nie zostały przekazane'];
+            return ['status' => false, 'message' => 'Company data was not provided'];
         }
      // sprawdzenie dostepu do zapisu danych w tabeli company
      if (! $this->checkWriteAccess('company')){
-         return ['status'=> false , 'message'=>'Brak dostępu do zapisu danych'];
+         return ['status'=> false , 'message'=>'Access denied to write company data'];
         }
     // pobranie danych firmy z parametru
    
@@ -127,109 +127,109 @@ class MODULES_COMPANY {
     $website = trim($companyData['website'] ?? '');
 
     if ($name === '') {
-        return ['status' => false, 'message' => 'Nazwa firmy nie może być pusta'];
+        return ['status' => false, 'message' => 'Company name cannot be empty'];
     }
     if (mb_strlen($name) > 255) {
-        return ['status' => false, 'message' => 'Nazwa firmy nie może przekraczać 255 znaków'];
+        return ['status' => false, 'message' => 'Company name cannot exceed 255 characters'];
     }
     if ($this->companyFieldExists($pdo, 'name', $name, $excludeId)) {
-        return ['status' => false, 'message' => 'Firma o takiej nazwie już istnieje'];
+        return ['status' => false, 'message' => 'A company with this name already exists'];
     }
 
     if ($type === '') {
-        return ['status' => false, 'message' => 'Typ firmy nie może być pusty'];
+        return ['status' => false, 'message' => 'Company type cannot be empty'];
     }
     if (mb_strlen($type) > 100) {
-        return ['status' => false, 'message' => 'Typ firmy nie może przekraczać 100 znaków'];
+        return ['status' => false, 'message' => 'Company type cannot exceed 100 characters'];
     }
 
     if ($active !== null) {
         if (!in_array($active, [0, 1, '0', '1'], true)) {
-            return ['status' => false, 'message' => 'Pole aktywne musi mieć wartość 0 lub 1'];
+            return ['status' => false, 'message' => 'Active field must be 0 or 1'];
         }
     }
 
     if ($taxId !== '') {
         if (mb_strlen($taxId) > 50) {
-            return ['status' => false, 'message' => 'NIP nie może przekraczać 50 znaków'];
+            return ['status' => false, 'message' => 'Tax ID cannot exceed 50 characters'];
         }
         $cleanTaxId = preg_replace('/[^0-9]/', '', $taxId);
         if (!in_array(strlen($cleanTaxId), [10, 12, 14], true)) {
-            return ['status' => false, 'message' => 'NIP musi zawierać 10, 12 lub 14 cyfr'];
+            return ['status' => false, 'message' => 'Tax ID must contain 10, 12 or 14 digits'];
         }
         if ($this->companyFieldExists($pdo, 'tax_id', $taxId, $excludeId)) {
-            return ['status' => false, 'message' => 'NIP jest już używany'];
+            return ['status' => false, 'message' => 'Tax ID is already in use'];
         }
     }
 
     if ($regon !== '') {
         if (mb_strlen($regon) > 50) {
-            return ['status' => false, 'message' => 'REGON nie może przekraczać 50 znaków'];
+            return ['status' => false, 'message' => 'REGON cannot exceed 50 characters'];
         }
         if (!preg_match('/^(?:[0-9]{9}|[0-9]{14})$/', $regon)) {
-            return ['status' => false, 'message' => 'REGON musi mieć 9 lub 14 cyfr'];
+            return ['status' => false, 'message' => 'REGON must have 9 or 14 digits'];
         }
         if ($this->companyFieldExists($pdo, 'regon', $regon, $excludeId)) {
-            return ['status' => false, 'message' => 'REGON jest już używany'];
+            return ['status' => false, 'message' => 'REGON is already in use'];
         }
     }
 
     if ($krs !== '') {
         if (mb_strlen($krs) > 50) {
-            return ['status' => false, 'message' => 'KRS nie może przekraczać 50 znaków'];
+            return ['status' => false, 'message' => 'KRS cannot exceed 50 characters'];
         }
         if (!preg_match('/^[0-9]{10}$/', preg_replace('/[^0-9]/', '', $krs))) {
-            return ['status' => false, 'message' => 'KRS musi mieć 10 cyfr'];
+            return ['status' => false, 'message' => 'KRS must have 10 digits'];
         }
         if ($this->companyFieldExists($pdo, 'krs', $krs, $excludeId)) {
-            return ['status' => false, 'message' => 'KRS jest już używany'];
+            return ['status' => false, 'message' => 'KRS is already in use'];
         }
     }
 
     if ($address !== '' && mb_strlen($address) > 255) {
-        return ['status' => false, 'message' => 'Adres nie może przekraczać 255 znaków'];
+        return ['status' => false, 'message' => 'Address cannot exceed 255 characters'];
     }
     if ($city !== '' && mb_strlen($city) > 100) {
-        return ['status' => false, 'message' => 'Miasto nie może przekraczać 100 znaków'];
+        return ['status' => false, 'message' => 'City cannot exceed 100 characters'];
     }
     if ($postalCode !== '' && mb_strlen($postalCode) > 20) {
-        return ['status' => false, 'message' => 'Kod pocztowy nie może przekraczać 20 znaków'];
+        return ['status' => false, 'message' => 'Postal code cannot exceed 20 characters'];
     }
     if ($postalCode !== '' && !preg_match('/^[A-Za-z0-9\- ]+$/', $postalCode)) {
-        return ['status' => false, 'message' => 'Kod pocztowy zawiera niedozwolone znaki'];
+        return ['status' => false, 'message' => 'Postal code contains invalid characters'];
     }
     if ($country !== '' && mb_strlen($country) > 100) {
-        return ['status' => false, 'message' => 'Kraj nie może przekraczać 100 znaków'];
+        return ['status' => false, 'message' => 'Country cannot exceed 100 characters'];
     }
     if ($phone !== '' && mb_strlen($phone) > 50) {
-        return ['status' => false, 'message' => 'Telefon nie może przekraczać 50 znaków'];
+        return ['status' => false, 'message' => 'Phone cannot exceed 50 characters'];
     }
     if ($phone !== '' && !preg_match('/^[0-9+\-() ]+$/', $phone)) {
-        return ['status' => false, 'message' => 'Telefon zawiera niedozwolone znaki'];
+        return ['status' => false, 'message' => 'Phone contains invalid characters'];
     }
 
     if ($email !== '') {
         if (mb_strlen($email) > 100) {
-            return ['status' => false, 'message' => 'Email nie może przekraczać 100 znaków'];
+            return ['status' => false, 'message' => 'Email cannot exceed 100 characters'];
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['status' => false, 'message' => 'Nieprawidłowy format adresu email'];
+            return ['status' => false, 'message' => 'Invalid email format'];
         }
         if ($this->companyFieldExists($pdo, 'email', $email, $excludeId)) {
-            return ['status' => false, 'message' => 'Email jest już używany'];
+            return ['status' => false, 'message' => 'Email is already in use'];
         }
     }
 
     if ($website !== '') {
         if (mb_strlen($website) > 100) {
-            return ['status' => false, 'message' => 'Website nie może przekraczać 100 znaków'];
+            return ['status' => false, 'message' => 'Website cannot exceed 100 characters'];
         }
         $websiteToValidate = $website;
         if (!preg_match('/^https?:\/\//i', $websiteToValidate)) {
             $websiteToValidate = 'http://' . $websiteToValidate;
         }
         if (!filter_var($websiteToValidate, FILTER_VALIDATE_URL)) {
-            return ['status' => false, 'message' => 'Nieprawidłowy format adresu strony internetowej'];
+            return ['status' => false, 'message' => 'Invalid website URL'];
         }
     }
 
