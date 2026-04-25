@@ -112,13 +112,16 @@ class ADMIN_SYSTEM {
             await this.modal.alert(title, errorsText);
             return;
         }
-        await this.method.saveCompanyData(validation.data); // zapis danych firmy do bazy danych
-
-
-        /** */
+       const saveResult = await this.method.saveCompanyData(validation.data); // zapis danych firmy do bazy danych
+        if (!saveResult || saveResult.status !== true) {
+            const title = this.config?.t?.alert || 'Alert!';
+            await this.modal.alert(title, (saveResult && saveResult.message) || 'An error occurred while saving company data.');
+            return;
+        }
+        await this.modal.alert(this.config?.t?.success || 'Success!', this.config?.t?.company_saved_successfully || 'Company data saved successfully.');
 
         await this.zdarzenia.removeButtonClicks(["buttonAddCompany", "buttonCancelAddCompany"]);
-        //console.log("Dane firmy zostały zapisane:", validation.data);
+        await this.przegladajFirmy(); // przejście do przeglądania firm po pomyślnym zapisaniu nowej firmy
     }
 
     /** anulowanie dodawania firmy i powrót do przeglądania firm */

@@ -38,7 +38,10 @@ class METHOD {
     /** zapis danych firmy do bazy danych */
     async saveCompanyData(companyData) {
         const odp = await this.parent.api.send({ modules: 'modules_company', method:'saveCompanyData', param: { companyData } });
-        return odp.data;
+        if (!odp || typeof odp !== 'object') {
+            return { status: false, message: typeof odp === 'string' ? odp : 'Invalid response from server' };
+        }
+        return odp;
     }
 
     /** walidacja danych firmi i zapis do bazy danych  */

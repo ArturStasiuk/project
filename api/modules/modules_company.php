@@ -46,7 +46,7 @@ class MODULES_COMPANY {
    public function getUsersByCompanyId() {
     $id_company = $this->param['id_company'] ?? null;
     if ($id_company === null) {
-        return ['status' => false, 'message' => 'ID firmy nie został przekazany'];
+        return ['status' => false, 'message' => 'Company ID was not provided'];
     }
     if (! $this->checkReadAccess('users')){
      return ['status'=> false , 'message'=>'Access denied to read users data'];
