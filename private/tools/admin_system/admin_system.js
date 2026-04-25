@@ -131,6 +131,17 @@ class ADMIN_SYSTEM {
     }
 
 
+    // edytuj dane firmy 
+    async edytujFirme(){
+        console.log('Wywołano funkcję edytujFirme');
+        const row = document.querySelector('#company-table tr.selectable-row');
+         const companyId = row?.dataset.id;
+        if (!companyId) return;
+        const edytuj = new EDYTUJ_FIRME(companyId);
+        await edytuj.open();
+    }
+
+
 }
 
 const adminSystem = new ADMIN_SYSTEM();

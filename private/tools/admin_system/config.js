@@ -103,7 +103,7 @@ class CONFIG {
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
-                    disabled: !opcjeMeniu.update, onClick: async () => { }
+                    disabled: !opcjeMeniu.update, onClick: async () => {  await this.parent.edytujFirme()}
                 },
                 {
                     icon: '🗑️', label: this.t.menu_usun,
@@ -131,7 +131,9 @@ class CONFIG {
                 },
                 {
                     icon: '✏️', label: this.t.menu_edytuj,
-                    disabled: true, onClick: async () => { }
+                    disabled: true, onClick: async () => { 
+                       
+                    }
                 },
                 {
                     icon: '🗑️', label: this.t.menu_usun,

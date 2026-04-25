@@ -1,5 +1,6 @@
 class METHOD {
         constructor(parent) {
+
             this.parent = parent;
         }
     

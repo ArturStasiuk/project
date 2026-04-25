@@ -6,7 +6,10 @@ class EDYCJA_FIRMY extends ADMIN_SYSTEM {
         this.idCompany = id_company;
     }
     
-
+    /** otworzenie okna edycji firmy */
+    async open() {
+     console.log('Otwieranie okna edycji firmy o ID:', this.idCompany);
+    }
 
 
 
