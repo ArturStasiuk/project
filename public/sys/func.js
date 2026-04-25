@@ -84,11 +84,11 @@ class FUN {
         const odp = await this.parent.api.send({ modules: 'user', method: 'loginUsers', param: { email, password } });
 
         if (!odp.status) {
-            await this.parent.modal.alert(t.error_login);
+            await this.parent.modal.alert(t.error, t.error_login);
             await this.showWinLogin();
             return;
         }
-        await this.parent.modal.alert(t.success_login);
+        await this.parent.modal.alert(t.success, t.success_login);
         await this.parent.restart();
     }
 
@@ -101,11 +101,11 @@ class FUN {
         const odp = await this.parent.api.send({ modules: 'user', method: 'logoutUsers' });
 
         if (!odp.status) {
-            await this.parent.modal.alert(t.error_logout);
+            await this.parent.modal.alert(t.error, t.error_logout);
             await this.showWinLogout();
             return;
         }
-        await this.parent.modal.alert(t.success_logout);
+        await this.parent.modal.alert(t.success, t.success_logout);
         await this.parent.restart();
     }
 }
