@@ -13,9 +13,9 @@ class CONFIG_DB {
     private $password = '';
     private $database = 'project';
 
-    public function __construct()
-    {
-    }
+    public function __construct() 
+    {}
+    
 
     /**
      * Zwraca tablicę z parametrami połączenia.
