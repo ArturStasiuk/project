@@ -135,9 +135,7 @@ class ADMIN_SYSTEM {
 
     // edytuj dane firmy 
     async edytujFirme(){
-        console.log('Wywołano funkcję edytujFirme');
         let companyId = null;
-
         const hiddenInput = document.querySelector('input[name="company_id"]');
         if (hiddenInput && hiddenInput.value) {
             companyId = hiddenInput.value;
@@ -149,7 +147,8 @@ class ADMIN_SYSTEM {
         if (!companyId) return;
 
         
-        await this.edytuj.open(companyId);
+        const edycjaFirmy = new EDYCJA_FIRMY(this, companyId);
+        await edycjaFirmy.open();
     }
 
 
