@@ -67,6 +67,7 @@ class EDYCJA_FIRMY {
         return;
       }
       const winConfig = await this.configWindows();
+      await this.usunHandlery();
       await this.admin.view.removeWindow({ id: winConfig.id });
     }
    
