@@ -2,7 +2,8 @@ class EDYCJA_FIRMY {
     constructor(parent, id_company = null) {
         this.admin = parent;
         this.idCompany = id_company;
-        this.nameCompany = '"nazwa firmy"';
+        this.nameCompany = null;
+        this.daneFirmy = null;
     }
     
     /** otworzenie okna edycji firmy */
@@ -10,23 +11,38 @@ class EDYCJA_FIRMY {
         if (id_company) {
             this.idCompany = id_company;
         }
+        this.daneFirmy = await this.pobiezDaneFirmy();
         await this.showWindows();
     }
 
     async showWindows() {
-        await this.admin.view.addWindow(this.configWindows());
+        await this.admin.view.addWindow(await this.configWindows());
     }
 
 
 
 
+    async pobiezDaneFirmy() {
+        if (!this.idCompany) {
+            return null;
+        }
+        try {
+         const data = await this.admin.method.getCompanyDataById(this.idCompany);
+         return data;
+        }
+        catch (error) {
+            console.error("Error fetching company data:", error);
+            return null;
+        }
+    }
 
-
-    configWindows() {
+    async configWindows() {
+        const defaultTitle = this.admin?.config?.t?.menu_edytuj || 'Edytuj firmę';
+        const companyTitle = this.daneFirmy?.name ? `${defaultTitle}: ${this.daneFirmy.name}` : defaultTitle;
         return {
             id: 'edytuj_firme_' + (this.idCompany || 'unknown'),
             icon: '✏️',
-            title: (this.admin?.config?.t?.label_zarzadzaj_firmami || 'Edytuj firmę') + (this.nameCompany ? `: ${this.nameCompany}` : ''),
+            title: companyTitle,
             width: 400,
             height: 200
         };
