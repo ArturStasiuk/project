@@ -4,7 +4,26 @@ class EDYCJA_FIRMY {
         this.idCompany = id_company;
         this.nameCompany = null;
         this.daneFirmy = null;
-        
+    }
+
+    getWindowId() {
+        return 'edytuj_firme_' + (this.idCompany || 'unknown');
+    }
+
+    getCardId() {
+        return 'edytuj-firme_' + (this.idCompany || 'unknown');
+    }
+
+    getFormId() {
+        return 'formularz-edytuj-firme_' + (this.idCompany || 'unknown');
+    }
+
+    getSaveButtonId() {
+        return 'buttonSaveEditedCompany_' + (this.idCompany || 'unknown');
+    }
+
+    getCancelButtonId() {
+        return 'buttonCancelEditCompany_' + (this.idCompany || 'unknown');
     }
     
     /** otworzenie okna edycji firmy */
@@ -22,12 +41,14 @@ class EDYCJA_FIRMY {
         await this.admin.view.addWindow(await this.configWindows());
         await this.admin.view.addWindowCard(await this.configContent());
         // dodanie haldera dla przycikow
-        await this.admin.zdarzenia.handleButtonClicks(['buttonSaveEditedCompany', 'buttonCancelEditCompany'], async (id) => {
-            if (id === 'buttonSaveEditedCompany') {
+        await this.admin.zdarzenia.handleButtonClicks([
+            this.getSaveButtonId(),
+            this.getCancelButtonId()
+        ], async (id) => {
+            if (id === this.getSaveButtonId()) {
                 await this.saveChanges();
             }
-            else if (id === 'buttonCancelEditCompany') {
-                
+            else if (id === this.getCancelButtonId()) {
                 await this.closeWindow();
             }
         });
@@ -49,6 +70,12 @@ class EDYCJA_FIRMY {
       await this.admin.view.removeWindow({ id: winConfig.id });
     }
    
+    async usunHandlery() {
+        await this.admin.zdarzenia.removeButtonClicks([
+            this.getSaveButtonId(),
+            this.getCancelButtonId()
+        ]);
+    }
 
     async pobiezDaneFirmy() {
         if (!this.idCompany) {
@@ -68,7 +95,7 @@ class EDYCJA_FIRMY {
         const defaultTitle = this.admin?.config?.t?.menu_edytuj || 'Edytuj firmę';
         const companyTitle = this.daneFirmy?.name ? `${defaultTitle}: ${this.daneFirmy.name}` : defaultTitle;
         return {
-            id: 'edytuj_firme_' + (this.idCompany || 'unknown'),
+            id: this.getWindowId(),
             icon: '✏️',
             title: companyTitle,
             width: 640,
@@ -143,8 +170,11 @@ class EDYCJA_FIRMY {
             'border: 1px solid #d32f2f'
         ].join(';');
 
+        const formId = this.getFormId();
+        const saveButtonId = this.getSaveButtonId();
+        const cancelButtonId = this.getCancelButtonId();
         const html = `
-        <form id="formularz-edytuj-firme" style="${formStyle}">
+        <form id="${formId}" style="${formStyle}">
             <input type="hidden" name="company_id" value="${company.id || ''}">
             <div style="${gridStyle}">
                 <div style="grid-column:1/3"><label style="${labelStyle}">${t.name || 'Nazwa firmy'}*<br>
@@ -178,14 +208,14 @@ class EDYCJA_FIRMY {
                     <input type="url" name="website" maxlength="100" placeholder="${t.website || 'Strona www'}" value="${value('website')}" style="${inputStyle}"></label></div>
             </div>
             <div style="margin-top:18px;text-align:right;">
-                <button id="buttonSaveEditedCompany" type="button" style="${buttonStyle}">${t.zapisz || 'Zapisz'}</button>
-                <button id="buttonCancelEditCompany" type="button" style="${buttonStyleNo};margin-left:8px;">${t.anuluj || 'Anuluj'}</button>
+                <button id="${saveButtonId}" type="button" style="${buttonStyle}">${t.zapisz || 'Zapisz'}</button>
+                <button id="${cancelButtonId}" type="button" style="${buttonStyleNo};margin-left:8px;">${t.anuluj || 'Anuluj'}</button>
             </div>
         </form>
         `;
         return {
-            id: 'edytuj_firme_' + (this.idCompany || 'unknown'),
-            cardId: 'edytuj-firme',
+            id: this.getWindowId(),
+            cardId: this.getCardId(),
             title: t.menu_edytuj || 'Edytuj firmę',
             text: html
         };
