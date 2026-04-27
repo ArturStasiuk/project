@@ -78,7 +78,9 @@ class MODULES_COMPANY {
     // pobranie danych firmy z parametru
    
    // walidacja danych firmy
-   $validationResult = $this->validateCompanyData($companyData);
+   $validationResult = $isUpdate
+       ? $this->validateCompanyDataForUpdate($companyData)
+       : $this->validateCompanyData($companyData);
    if (!$validationResult['status']) {
        return ['status' => false, 'message' => $validationResult['message'] ];
    }
@@ -269,8 +271,23 @@ class MODULES_COMPANY {
 
     return ['status' => true];
    }
-  /** walidacja danych przed aktualizacja danych firmy w bazie danych
-  */
+  /** walidacja danych przed aktualizacją danych firmy w bazie danych
+   * pomijając sprawdzanie rekordu o id firmy w bazie danych, ponieważ ten rekord jest aktualizowany
+   * i może zawierać te same dane co przed aktualizacją
+   * sprawdź unikalność nazwy firmy, tax_id, regon, krs i email w bazie danych z wyjątkiem rekordu
+   * o id firmy, która jest aktualizowana
+   * sprawdź format email i website
+   * sprawdź długość poszczególnych pól
+   * sprawdź czy pole active zawiera tylko 0 lub 1
+   * zwróć odpowiedni komunikat o błędzie w przypadku nieprawidłowych danych
+   * zwróć status true w przypadku poprawnych danych
+   */
+   private function validateCompanyDataForUpdate($companyData) {
+    if (!isset($companyData['id']) || !is_numeric($companyData['id'])) {
+        return ['status' => false, 'message' => 'Company ID is required for update'];
+    }
+    return $this->validateCompanyData($companyData);
+   }
    private function companyFieldExists($pdo, $field, $value, $excludeId = null) {
     return $this->company->companyExists($pdo, $field, $value, $excludeId);
    }
