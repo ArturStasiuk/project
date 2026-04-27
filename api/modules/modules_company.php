@@ -93,6 +93,13 @@ class MODULES_COMPANY {
     return $saveResult;
    }
 
+   // metoda do udate_record - aktualizacja danych firmy w bazie danych
+   public function update_record() {
+      if (! $this->checkUpdateAccess('company')){
+        return ['status'=> false , 'message'=>'Access denied to update company data'];
+       }
+     // walidacjia danych firmy 
+   }
 
 
 
@@ -118,6 +125,7 @@ class MODULES_COMPANY {
     return true ;
    }
 
+
    private function checkUpdateAccess($table) {
     $acces = $this->method->getAccessTables(['tables' => $table]) ;
    if (!$acces['status'] || !$acces['access_table'] || !$acces ['update_record']) {
@@ -126,7 +134,14 @@ class MODULES_COMPANY {
     return true ;
    }
 
-   // metoda do walidacji danych firmy 
+   /**  metoda do walidacji danych firmy przed zapisem do bazy danych
+    * sprawdz unikalnosc nazwy firmy, tax_id, regon, krs i email w bazie danych
+     * sprawdz format email i website
+      * sprawdz dlugosc poszczegolnych pol
+       * sprawdz czy pola active zawiera tylko 0 lub 1
+         * zwroc odpowiedni komunikat o bledzie w przypadku nieprawidlowych danych
+          * zwroc status true w przypadku poprawnych danych
+   */  
    private function validateCompanyData($companyData) {
     $pdo = $this->method->getDatabaseConnect()['pdo'];
     $excludeId = isset($companyData['id']) && is_numeric($companyData['id']) ? (int)$companyData['id'] : null;
@@ -254,7 +269,8 @@ class MODULES_COMPANY {
 
     return ['status' => true];
    }
-
+  /** walidacja danych przed aktualizacja danych firmy w bazie danych
+  */
    private function companyFieldExists($pdo, $field, $value, $excludeId = null) {
     return $this->company->companyExists($pdo, $field, $value, $excludeId);
    }

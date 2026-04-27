@@ -68,7 +68,14 @@ class EDYCJA_FIRMY {
             return;
         }
         // zapis danych firmy do bazy danych
-        console.log('Zapisane dane firmy:', validation.data);
+        const saveResult = await this.admin.api.send({modules:'modules_company', method:'update_record',param:{formData: validation.data}});
+        if (!saveResult || !saveResult.status) {
+            const title = this.admin.config?.t?.alert || 'Alert!';
+            const message = saveResult?.message || this.admin.config?.t?.error_generic || 'An error occurred.';
+            await this.admin.modal.alert(title, message);
+            return;
+        }
+        // zamknięcie okna po udanym zapisie
     }
 
     async closeWindow() {
