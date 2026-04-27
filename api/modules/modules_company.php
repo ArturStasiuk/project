@@ -64,10 +64,17 @@ class MODULES_COMPANY {
         if ($companyData === null) {
             return ['status' => false, 'message' => 'Company data was not provided'];
         }
-     // sprawdzenie dostepu do zapisu danych w tabeli company
-     if (! $this->checkWriteAccess('company')){
-         return ['status'=> false , 'message'=>'Access denied to write company data'];
-        }
+     // ustalenie trybu: dodawanie czy aktualizacja
+     $isUpdate = isset($companyData['id']) && is_numeric($companyData['id']);
+     if ($isUpdate) {
+         if (! $this->checkUpdateAccess('company')){
+             return ['status'=> false , 'message'=>'Access denied to update company data'];
+         }
+     } else {
+         if (! $this->checkWriteAccess('company')){
+             return ['status'=> false , 'message'=>'Access denied to write company data'];
+         }
+     }
     // pobranie danych firmy z parametru
    
    // walidacja danych firmy
@@ -77,7 +84,11 @@ class MODULES_COMPANY {
    }
 
    // zapis danych firmy do bazy danych
-    $saveResult = $this->company->addCompany($this->method->getDatabaseConnect()['pdo'], $companyData);
+   if ($isUpdate) {
+       $saveResult = $this->company->updateCompany($this->method->getDatabaseConnect()['pdo'], $companyData);
+   } else {
+       $saveResult = $this->company->addCompany($this->method->getDatabaseConnect()['pdo'], $companyData);
+   }
    // zwrocenie odpowiedzi o powodzeniu lub niepowodzeniu operacji
     return $saveResult;
    }
@@ -102,6 +113,14 @@ class MODULES_COMPANY {
    private function checkWriteAccess($table) {
     $acces = $this->method->getAccessTables(['tables' => $table]) ;
    if (!$acces['status'] || !$acces['access_table'] || !$acces ['add_record']) {
+       return false;    
+    }
+    return true ;
+   }
+
+   private function checkUpdateAccess($table) {
+    $acces = $this->method->getAccessTables(['tables' => $table]) ;
+   if (!$acces['status'] || !$acces['access_table'] || !$acces ['update_record']) {
        return false;    
     }
     return true ;

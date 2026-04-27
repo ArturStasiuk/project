@@ -55,13 +55,26 @@ class EDYCJA_FIRMY {
     }
     
     async saveChanges() {
-        alert("Zapisz zmiany - funkcja do zaimplementowania");
+        // pobranie danych z formularza
+        const formData = await this.admin.zdarzenia.getFormData(this.getFormId());
+        // walidacja danych
+        const validation = await this.admin.method.validateAndSaveCompanyData(formData);
+        if (!validation.status) {
+            // obsługa błędów walidacji: formularz pozostaje otwarty,
+            // czekamy na kolejne kliknięcie "Zapisz" lub "Anuluj"
+            const errorsText = Object.values(validation.errors).join('\n');
+            const title = this.admin.config?.t?.alert || 'Alert!';
+            await this.admin.modal.alert(title, errorsText);
+            return;
+        }
+        // zapis danych firmy do bazy danych
+        console.log('Zapisane dane firmy:', validation.data);
     }
 
     async closeWindow() {
       const confirmed = await this.admin.modal.confirm(
         '',
-        this.admin.config.t?.confirm_cancel_edit || 'Czy na pewno chcesz anulować edycję? Wprowadzone zmiany zostaną utracone.'
+        this.admin.config.t?.confirm_cancel_edit || 'Anulować edycję?'
       );
       if (!confirmed) {
         return;
@@ -87,7 +100,10 @@ class EDYCJA_FIRMY {
          return data;
         }
         catch (error) {
-            console.error("Error fetching company data:", error);
+            await this.admin.modal.alert(
+                this.admin.config.t?.alert || 'Alert!',
+                this.admin.config.t?.error_generic || 'An error occurred.'
+            );
             return null;
         }
     }

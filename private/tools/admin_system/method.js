@@ -108,6 +108,7 @@ class METHOD {
         };
 
         const cleanedData = {
+            id: Number.isInteger(parseInt(data.company_id || data.id)) ? parseInt(data.company_id || data.id) : null,
             name: normalize(data.name),
             type: normalize(data.type),
             active: data.active === '0' || data.active === 0 || data.active === false ? 0 : 1,

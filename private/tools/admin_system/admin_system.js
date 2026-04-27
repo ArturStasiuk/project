@@ -25,6 +25,7 @@ class ADMIN_SYSTEM {
     async initialize() {
         // inicjalizacja konfiguracji 
         await this.config.initialize();
+        await this.modal.initialize();
         await this.view.addStartMenuItem(await this.config.getMenuItem());
     }
     

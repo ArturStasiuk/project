@@ -15,7 +15,7 @@ const LAUNGE = {
     menu_usun: "Usuń firmę",
     // alerty i komunikaty
     alert: "Alert!",
-    confirm_cancel_edit: "Czy na pewno chcesz anulować edycję? Wprowadzone zmiany zostaną utracone.",
+    confirm_cancel_edit: "Anulować edycję?",
     brak_dostempu_do_modulu: "Brak dostępu do modułu. Skontaktuj się z administratorem.",
     // content dla przegladania firm w formie tabeli
     lista_firm: "Lista firm",
@@ -64,7 +64,7 @@ const LAUNGE = {
     menu_usun: "Delete company",
     // alerty i komunikaty
     alert: "Alert!",
-    confirm_cancel_edit: "Are you sure you want to cancel editing? Your changes will be lost.",
+    confirm_cancel_edit: "Cancel editing?",
     brak_dostempu_do_modulu: "No access to the module. Please contact the administrator.",
     // content dla przegladania firm w formie tabeli
     lista_firm: "Company list",
@@ -113,7 +113,7 @@ const LAUNGE = {
     menu_usun: "Ta bort företag",
     // alerty i komunikaty
     alert: "Varning!",
-    confirm_cancel_edit: "Är du säker på att du vill avbryta redigeringen? Dina ändringar kommer att gå förlorade.",
+    confirm_cancel_edit: "Avbryta redigeringen?",
     brak_dostempu_do_modulu: "Ingen åtkomst till modulen. Kontakta administratören.",
     // content dla przegladania firm w formie tabeli
     lista_firm: "Företagslista",
