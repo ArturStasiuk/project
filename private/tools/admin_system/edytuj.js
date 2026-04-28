@@ -80,9 +80,11 @@ class EDYCJA_FIRMY {
         const message = this.admin.config?.t?.company_updated || 'Company updated successfully.';
         await this.admin.modal.alert(title, message);
         // zamknięcie okna po udanym zapisie
-              const winConfig = await this.configWindows();
-      await this.usunHandlery();
-      await this.admin.view.removeWindow({ id: winConfig.id });
+        const winConfig = await this.configWindows();
+        await this.usunHandlery();
+        await this.admin.view.removeWindow({ id: winConfig.id });
+        // ponowne otworzenie szczegółów firmy po zapisie zmian
+        await this.admin.szczegolyFirmy({ id: this.idCompany });
     }
 
     async closeWindow() {
@@ -96,6 +98,8 @@ class EDYCJA_FIRMY {
       const winConfig = await this.configWindows();
       await this.usunHandlery();
       await this.admin.view.removeWindow({ id: winConfig.id });
+   // ponowne otworzenie okna szczegółów firmy po zamknięciu okna edycji
+      await this.admin.szczegolyFirmy({ id: this.idCompany });
     }
    
     async usunHandlery() {
