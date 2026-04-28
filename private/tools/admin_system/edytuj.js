@@ -75,7 +75,14 @@ class EDYCJA_FIRMY {
             await this.admin.modal.alert(title, message);
             return;
         }
+        // alert o udanym zapisie
+        const title = this.admin.config?.t?.success || 'Success!';
+        const message = this.admin.config?.t?.company_updated || 'Company updated successfully.';
+        await this.admin.modal.alert(title, message);
         // zamknięcie okna po udanym zapisie
+              const winConfig = await this.configWindows();
+      await this.usunHandlery();
+      await this.admin.view.removeWindow({ id: winConfig.id });
     }
 
     async closeWindow() {

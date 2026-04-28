@@ -5,6 +5,9 @@ const LAUNGE = {
     welcome: "Witamy w panelu administracyjnym!",
     title_welcome: "Witamy",
     error_generic: "Wystąpił błąd.",
+    success: "Sukces!",
+    company_updated: "Firma została zaktualizowana pomyślnie.",
+    company_saved_successfully: "Dane firmy zostały zapisane pomyślnie.",
     zapisz: "Zapisz",
     anuluj: "Anuluj",
     // menu okna zarzadaj firmami
@@ -54,6 +57,9 @@ const LAUNGE = {
     welcome: "Welcome to the admin panel!",
     title_welcome: "Welcome",
     error_generic: "An error occurred.",
+    success: "Success!",
+    company_updated: "Company updated successfully.",
+    company_saved_successfully: "Company data saved successfully.",
     zapisz: "Save",
     anuluj: "Cancel",
     // menu okna zarzadzaj firmami
@@ -103,6 +109,9 @@ const LAUNGE = {
     welcome: "Välkommen till administrationspanelen!",
     title_welcome: "Välkommen",
     error_generic: "Ett fel har inträffat.",
+    success: "Framgång!",
+    company_updated: "Företaget uppdaterades framgångsrikt.",
+    company_saved_successfully: "Företagsuppgifterna sparades framgångsrikt.",
     zapisz: "Spara",
     anuluj: "Avbryt",
     // menu okna zarzadzaj firmami

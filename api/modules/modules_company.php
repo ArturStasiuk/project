@@ -95,12 +95,21 @@ class MODULES_COMPANY {
     return $saveResult;
    }
 
-   // metoda do udate_record - aktualizacja danych firmy w bazie danych
+   // metoda do update_record - aktualizacja danych firmy w bazie danych
    public function update_record() {
       if (! $this->checkUpdateAccess('company')){
         return ['status'=> false , 'message'=>'Access denied to update company data'];
-       }
-     // walidacjia danych firmy 
+      }
+      // walidacja danych firmy przed aktualizacją
+      $companyData = $this->param['companyData'] ?? $this->param['formData'] ?? null;
+      if ($companyData === null) {
+          return ['status' => false, 'message' => 'Company data was not provided'];
+      }
+      $validationResult = $this->validateCompanyDataForUpdate($companyData);
+      if (!$validationResult['status']) {
+          return ['status' => false, 'message' => $validationResult['message'] ];
+      }
+      return $this->company->updateCompany($this->method->getDatabaseConnect()['pdo'], $companyData);
    }
 
 
