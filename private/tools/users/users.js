@@ -10,10 +10,12 @@ class USERS {
         this.idFirmy = idFirmy;
         this.init();
 
-
     }
 
-
+    // dodanie ikony do paska nawigacji
+        addNav() {
+         this.method.addNav();
+    }
 
 
 
@@ -26,7 +28,7 @@ class USERS {
         this.handlers = handlers ; // uchwyty do zdarzen
         this.config = new CONFIG(this); // konfiguracja i ustawienia
         this.method = new METHOD(this); // metody i funkcje
-
+        this.addNav(); // dodanie ikony do paska nawigacji
     }
 
 

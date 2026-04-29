@@ -22,12 +22,14 @@ class CONFIG {
 
     }
     // konfiguracja na pasku nawigacji     
-   async configNav () {
+   async configNavBar () {
         return {
-            id: "nav-users", // unikalne id elementu nawigacji
-            icon: this.lang.iconWindow, // ikona elementu nawigacji
-            title: this.lang.nameWindow, // tytuł elementu nawigacji
-            onClick: () => this.user.windows.main.open(), // funkcja otwierająca okno po kliknięciu
+            
+            id:"nav-users-",// unikalne id elementu nawigacji 
+            icon: this.lang.iconWindow,
+            label: this.lang.nameTaskBar,
+            disabled: true, // na początku wyłączony, będzie włączony po załadowaniu okna
+            onClick: () => {} // otwarcie okna po kliknięciu        
         };  
     }
 
