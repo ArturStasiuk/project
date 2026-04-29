@@ -8,6 +8,15 @@ class USUN_FIRME {
         if (!confirm) {
             return; // użytkownik anulował usunięcie
         }
+       const odp = await this.admin.method.deleteCompanyById(this.idCompany);
+       if (odp.status) {
+        const info = await this.admin.config.getInfoWindow('success', 'usunieto_firme');
+        await this.admin.modal.alert(info.title,info.message);
+        await this.admin.przegladajFirmy(); // odświeżenie listy firm po usunięciu
+       } else {
+        const info = await this.admin.config.getInfoWindow('error', odp.message || 'blad_przy_usuwaniu_firmy');
+        await this.admin.modal.alert(info.title,info.message);
+       }
 
     }
 

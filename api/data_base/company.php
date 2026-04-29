@@ -161,6 +161,17 @@ class COMPANY {
             return ['status' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
+    // usuniecie firmy z bazy danych po ID
+    public function deleteCompanyById($pdo, $id) {
+        try {
+            $stmt = $pdo->prepare("DELETE FROM company WHERE id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            return ['status' => true, 'message' => 'Company deleted successfully'];
+        } catch (PDOException $e) {
+            return ['status' => false, 'message' => 'Database error: ' . $e->getMessage()];
+        }
+    }
 
 
 }

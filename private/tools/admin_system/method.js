@@ -44,8 +44,13 @@ class METHOD {
         }
         return odp;
     }
+    /** usuniecie firmy po ID */
+    async deleteCompanyById(id) {
+        const odp = await this.parent.api.send({ modules: 'modules_company', method:'deleteCompanyById', param: { id_company: id } });
+        return odp;
+    }
 
-    /** walidacja danych firmi i zapis do bazy danych  */
+    /** walidacja danych firmi  */
     async validateAndSaveCompanyData(companyData) {
         const data = companyData && typeof companyData === 'object' ? { ...companyData } : {};
         const errors = {};

@@ -19,7 +19,11 @@ const LAUNGE = {
     // alerty i komunikaty
     alert: "Alert!",
     confirm_cancel_edit: "Anulować edycję?",
+    confirm_delete_title: "Potwierdzenie usunięcia",
+    confirm_delete_message: "Czy na pewno chcesz usunąć tę firmę?",
     brak_dostempu_do_modulu: "Brak dostępu do modułu. Skontaktuj się z administratorem.",
+    usunieto_firme: "Firma została usunięta pomyślnie.",
+    blad_przy_usuwaniu_firmy: "Wystąpił błąd podczas usuwania firmy.",
     // content dla przegladania firm w formie tabeli
     lista_firm: "Lista firm",
     name: "Nazwa firmy",
@@ -71,7 +75,11 @@ const LAUNGE = {
     // alerty i komunikaty
     alert: "Alert!",
     confirm_cancel_edit: "Cancel editing?",
+    confirm_delete_title: "Delete confirmation",
+    confirm_delete_message: "Are you sure you want to delete this company?",
     brak_dostempu_do_modulu: "No access to the module. Please contact the administrator.",
+    usunieto_firme: "Company deleted successfully.",
+    blad_przy_usuwaniu_firmy: "An error occurred while deleting the company.",
     // content dla przegladania firm w formie tabeli
     lista_firm: "Company list",
     name: "Company Name",
@@ -123,7 +131,11 @@ const LAUNGE = {
     // alerty i komunikaty
     alert: "Varning!",
     confirm_cancel_edit: "Avbryta redigeringen?",
+    confirm_delete_title: "Bekräftelse av borttagning",
+    confirm_delete_message: "Är du säker på att du vill ta bort detta företag?",
     brak_dostempu_do_modulu: "Ingen åtkomst till modulen. Kontakta administratören.",
+    usunieto_firme: "Företaget har tagits bort.",
+    blad_przy_usuwaniu_firmy: "Ett fel uppstod vid borttagningen av företaget.",
     // content dla przegladania firm w formie tabeli
     lista_firm: "Företagslista",
     name: "Företagsnamn",

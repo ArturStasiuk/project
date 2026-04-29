@@ -111,6 +111,16 @@ class MODULES_COMPANY {
       }
       return $this->company->updateCompany($this->method->getDatabaseConnect()['pdo'], $companyData);
    }
+   public function deleteCompanyById() {
+    if (! $this->checkDeleteAccess('company')){
+        return ['status'=> false , 'message'=>'Access denied to delete company data'];
+      }
+    $id_company = $this->param['id_company'] ?? null;
+    if ($id_company === null) {
+        return ['status' => false, 'message' => 'Company ID was not provided'];
+    }
+    return $this->company->deleteCompanyById($this->method->getDatabaseConnect()['pdo'], $id_company);
+   }
 
 
 
@@ -127,7 +137,7 @@ class MODULES_COMPANY {
     }
     return true ;
    }
-   // Metoda pomocnicza – sprawdza dostęp użytkownika do zapisu wskazanej tabeli.
+   // Metoda pomocnicza – sprawdza dostęp użytkownika do zapisu .
    private function checkWriteAccess($table) {
     $acces = $this->method->getAccessTables(['tables' => $table]) ;
    if (!$acces['status'] || !$acces['access_table'] || !$acces ['add_record']) {
@@ -135,11 +145,17 @@ class MODULES_COMPANY {
     }
     return true ;
    }
-
-
+   // Metoda pomocnicza – sprawdza dostęp użytkownika do aktualizacji .
    private function checkUpdateAccess($table) {
     $acces = $this->method->getAccessTables(['tables' => $table]) ;
    if (!$acces['status'] || !$acces['access_table'] || !$acces ['update_record']) {
+       return false;    
+    }
+    return true ;
+   }
+   private function checkDeleteAccess($table) {
+    $acces = $this->method->getAccessTables(['tables' => $table]) ;
+   if (!$acces['status'] || !$acces['access_table'] || !$acces ['delete_record']) {
        return false;    
     }
     return true ;
