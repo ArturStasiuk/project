@@ -15,7 +15,7 @@ class USERS {
         this.method = new METHOD(this); // metody i funkcje
         this.config = new CONFIG(this); // konfiguracja i ustawienia
         this.method.config = this.config;
-        await this.config.configLang(); // pobranie konfiguracji językowej przed dodaniem nav
+         this.config.configLang(); // pobranie konfiguracji językowej przed dodaniem nav
       //  this.init();
 
     }
