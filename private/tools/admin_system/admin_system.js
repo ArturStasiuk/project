@@ -43,7 +43,11 @@ class ADMIN_SYSTEM {
         await this.view.addWindow(await this.config.get_Window_ZarzadzajFirmami());
         await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
         /** dodanie glownego meniu do okna  */
-        await this.view.addMeniuWindow(await this.config.getMenu_Window_ZarzadzajFirmami());
+        const menuZarzadzajFirmami = await this.config.getMenu_Window_ZarzadzajFirmami();
+        if (menuZarzadzajFirmami) {
+            await this.view.deleteMeniuWindow({ id: this.config.idWindow, menuId: menuZarzadzajFirmami.menuId });
+            await this.view.addMeniuWindow(menuZarzadzajFirmami);
+        }
         
        // await this.method.getCompanyData(); 
         
@@ -54,7 +58,11 @@ class ADMIN_SYSTEM {
     async przegladajFirmy() {
         await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
         /** wstawienie glownego meniu  */
-            await this.view.addMeniuWindow(await this.config.getMenu_Window_ZarzadzajFirmami());
+        const menuZarzadzajFirmami = await this.config.getMenu_Window_ZarzadzajFirmami();
+        if (menuZarzadzajFirmami) {
+            await this.view.deleteMeniuWindow({ id: this.config.idWindow, menuId: menuZarzadzajFirmami.menuId });
+            await this.view.addMeniuWindow(menuZarzadzajFirmami);
+        }
         const response = await this.method.getCompanyData();
         const data = Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : []);
         const config = await this.config.getContent_PrzegladajFirmy(data);
@@ -85,7 +93,11 @@ class ADMIN_SYSTEM {
         /** zmiana meniu w oknie  */
         await this.view.addMeniuWindow(await this.config.getMenu_Window_SzczegolyFirmy());
         /** dodanie meniu zarzadzania urzytkownikami w firmie */
-        await this.view.addMeniuWindow(await this.config.get_Menu_Window_ZarzadzajPracownikami());
+        const menuPracownicy = await this.config.get_Menu_Window_ZarzadzajPracownikami();
+        if (menuPracownicy) {
+            await this.view.deleteMeniuWindow({ id: this.config.idWindow, menuId: menuPracownicy.menuId });
+            await this.view.addMeniuWindow(menuPracownicy);
+        }
 
     }
 

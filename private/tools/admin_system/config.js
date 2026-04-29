@@ -58,6 +58,9 @@ class CONFIG {
     /** meniu dla window zarzadzaj firmami */
     async getMenu_Window_ZarzadzajFirmami() {
         const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajFirmami();
+            if (!opcjeMeniu.access_table) {
+                return null; // Brak dostępu do modułu zarządzania firmami, nie dodajemy menu
+            }
         return {
             id: this.idWindow, // id musi być taki sam jak id okna, do którego menu ma być przypisane
             menuId: 'menu:' + this.idWindow,
@@ -115,16 +118,18 @@ class CONFIG {
     /** menu dla zarządzania pracownikami */
     async get_Menu_Window_ZarzadzajPracownikami() {
         const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajPracownikami();
+         if (!opcjeMeniu.access_table) {
+            return null; // Brak dostępu do modułu zarządzania pracownikami, nie dodajemy menu
+            }
         return {
             id: this.idWindow,
             menuId: 'menu:' + this.idWindow + ':pracownicy',
             label: '👥 ' + (this.t.menu_label_zarzadzaj_pracownikami || 'Manage employees'),
-            disabled: false,
             items: [
                 {
                     icon: '👥',
                     label: this.t.menu_otworz_pracownikow || 'Browse employees',
-                    disabled: !opcjeMeniu.read,
+                    disabled:true,
                     onClick: async () => {
                         // Feature not implemented yet
                     }

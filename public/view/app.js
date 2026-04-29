@@ -972,7 +972,7 @@ class View {
      *  MENUBAR
      *
      *  refresh({ menus:[{ label, id, items:[...] }] })
-     *  addMenu({ label, id, items, position? })
+     *  addMenu({ label, id, items, position?, disabled? })
      *  removeMenu(id)
      *  addMenuItem(menuId, item)
      *  removeMenuItem(menuId, itemId)
@@ -1101,18 +1101,23 @@ class View {
                     ? menuEl.childNodes[0].textContent.trim()
                     : menuEl.dataset.menuId || '';
 
+                const menuDisabled = menuEl.classList.contains('disabled');
                 const section = document.createElement('div');
                 section.className = 'mobile-sheet-section';
 
                 const sectionHeader = document.createElement('div');
-                sectionHeader.className = 'mobile-sheet-section-header';
+                sectionHeader.className = 'mobile-sheet-section-header' + (menuDisabled ? ' disabled' : '');
                 sectionHeader.innerHTML = `<span>${menuLabel}</span><span class="mobile-sheet-section-arrow">▾</span>`;
-                sectionHeader.addEventListener('click', () => section.classList.toggle('collapsed'));
+                if (!menuDisabled) {
+                    sectionHeader.addEventListener('click', () => section.classList.toggle('collapsed'));
+                }
 
                 const sectionBody = document.createElement('div');
-                sectionBody.className = 'mobile-sheet-section-body';
+                sectionBody.className = 'mobile-sheet-section-body' + (menuDisabled ? ' disabled' : '');
 
-                _buildMobileItemsFromDrop(dropEl, sectionBody, overlay, false);
+                if (!menuDisabled) {
+                    _buildMobileItemsFromDrop(dropEl, sectionBody, overlay, false);
+                }
 
                 section.appendChild(sectionHeader);
                 section.appendChild(sectionBody);
@@ -1134,9 +1139,9 @@ class View {
         /* ── end mobile helpers ─────────────────────────────────── */
 
         /* tworzy element .menu-item z dropdown */
-        const _makeMenu = ({ label, id, items = [] }) => {
+        const _makeMenu = ({ label, id, items = [], disabled = false }) => {
             const mi = document.createElement('div');
-            mi.className = 'menu-item';
+            mi.className = 'menu-item' + (disabled ? ' disabled' : '');
             if (id) mi.dataset.menuId = id;
             mi.textContent = label;
 
@@ -1146,16 +1151,18 @@ class View {
             drop.addEventListener('click', e => e.stopPropagation());
             mi.appendChild(drop);
 
-            mi.addEventListener('click', e => {
-                e.stopPropagation();
-                if (_activeMenu === mi) { mi.classList.remove('active'); _activeMenu = null; }
-                else { _closeMenus(); mi.classList.add('active'); _activeMenu = mi; }
-            });
-            mi.addEventListener('mouseenter', () => {
-                if (_activeMenu && _activeMenu !== mi) {
-                    _closeMenus(); mi.classList.add('active'); _activeMenu = mi;
-                }
-            });
+            if (!disabled) {
+                mi.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (_activeMenu === mi) { mi.classList.remove('active'); _activeMenu = null; }
+                    else { _closeMenus(); mi.classList.add('active'); _activeMenu = mi; }
+                });
+                mi.addEventListener('mouseenter', () => {
+                    if (_activeMenu && _activeMenu !== mi) {
+                        _closeMenus(); mi.classList.add('active'); _activeMenu = mi;
+                    }
+                });
+            }
             return mi;
         };
 
@@ -1190,18 +1197,18 @@ class View {
 
             /**
              * Dodaje nowe menu
-             * @param {{ label, id, items, position?: number|'first'|'last' }} cfg
+             * @param {{ label, id, items, position?: number|'first'|'last', disabled?: boolean }} cfg
              */
-            async addMenu({ label, id, items = [], position = 'last' } = {}) {
+            async addMenu({ label, id, items = [], position = 'last', disabled = false } = {}) {
                 const mb = _getMenubar(); if (!mb) return;
                 if (id) {
                     const existing = mb.querySelector(`[data-menu-id="${id}"]`);
                     if (existing) {
-                        existing.replaceWith(_makeMenu({ label, id, items }));
+                        existing.replaceWith(_makeMenu({ label, id, items, disabled }));
                         return;
                     }
                 }
-                const el = _makeMenu({ label, id, items });
+                const el = _makeMenu({ label, id, items, disabled });
                 const existing = mb.querySelectorAll('.menu-item');
                 if (position === 'first') mb.insertBefore(el, mb.firstChild);
                 else if (position === 'last' || position >= existing.length) {
@@ -1236,14 +1243,14 @@ class View {
             /**
              * Odświeża (zastępuje) istniejące menu po data-menu-id
              * @param {string} id
-             * @param {{ label?, items? }} cfg
+             * @param {{ label?, items?, disabled?: boolean }} cfg
              */
-            async refreshMenu(id, { label, items = [] } = {}) {
+            async refreshMenu(id, { label, items = [], disabled = false } = {}) {
                 const mb = _getMenubar(); if (!mb) return;
                 const existing = mb.querySelector(`[data-menu-id="${id}"]`);
                 if (!existing) { console.warn(`menubar.refreshMenu: brak menu "${id}".`); return; }
                 const newLabel = label !== undefined ? label : (existing.childNodes[0]?.nodeType === Node.TEXT_NODE ? existing.childNodes[0].textContent.trim() : '');
-                existing.replaceWith(_makeMenu({ label: newLabel, id, items }));
+                existing.replaceWith(_makeMenu({ label: newLabel, id, items, disabled }));
             },
 
             /**

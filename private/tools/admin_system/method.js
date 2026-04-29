@@ -18,6 +18,7 @@ class METHOD {
     async accessMenu_Window_ZarzadzajFirmami() {
         const odp = await this.parent.api.getAccessTables('company');
         return {
+            "access_table": !!odp.access_table,
             "read": !!odp.read_record,
             "create": !!odp.add_record,
             "update": !!odp.update_record,
