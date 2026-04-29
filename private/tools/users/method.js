@@ -3,7 +3,7 @@ class METHOD {
     constructor(parent){
         this.parent = parent;
         this.api = this.parent.api;
-        this.config = this.parent.config;
+        this.config = null;
         this.handlers = this.parent.handlers;
         this.windows = this.parent.windows;
         this.modal = this.parent.modal;
@@ -15,7 +15,18 @@ class METHOD {
         // dodanie elementu nawigacji do paska nawigacji
         this.windows.addStartMenuItem(navConfig);
     }
-
+    // otwarcie okna po kliknięciu na element nawigacji
+    async openWindow() {
+        // pobranie konfiguracji okna z CONFIG
+        const windowConfig = await this.config.configWindow();
+        // otwarcie okna z pobraną konfiguracją
+       await this.windows.addWindow(windowConfig);
+    }
+    // pobranie konfiguracji językowej
+    async getLang() {
+        return await this.api.send({ method: "getUserLanguage" });
+        
+    }
 
 
 }

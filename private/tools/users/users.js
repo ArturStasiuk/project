@@ -13,10 +13,13 @@ class USERS {
     }
 
     // dodanie ikony do paska nawigacji
-        addNav() {
-         this.method.addNav();
+    async addNav() {
+        await this.method.addNav();
     }
-
+    // otwarcie okna po kliknięciu na element nawigacji
+     async openWindow() {
+        await this.method.openWindow();
+    }
 
 
 
@@ -26,9 +29,11 @@ class USERS {
         this.windows = view; // glowne okna i elementy widoku
         this.api = api ; // komunikacja z backendem
         this.handlers = handlers ; // uchwyty do zdarzen
-        this.config = new CONFIG(this); // konfiguracja i ustawienia
         this.method = new METHOD(this); // metody i funkcje
-        this.addNav(); // dodanie ikony do paska nawigacji
+        this.config = new CONFIG(this); // konfiguracja i ustawienia
+        this.method.config = this.config;
+        await this.config.configLang(); // pobranie konfiguracji językowej przed dodaniem nav
+        await this.addNav(); // dodanie ikony do paska nawigacji
     }
 
 

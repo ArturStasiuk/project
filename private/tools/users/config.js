@@ -7,7 +7,13 @@ class CONFIG {
         this.idWindow ="windows-users" + this.user.idUrzytkownika + "-" + this.user.idFirmy; // unikalne id okna
         this.method = this.user.method; // metody i funkcje
     }
-
+   // pobranie konfiguracji językowej
+    async configLang() {
+        // Pobiera język użytkownika przez API i ustawia tłumaczenia
+        const odp = await this.method.getLang();
+        this.lang = (odp && odp.lang) ? odp.lang : 'English';
+        this.lang = LAUNGE[this.lang] || {};
+    }
 
    // konfiguracja okna glownego 
   async configWindow () {
@@ -15,8 +21,7 @@ class CONFIG {
             id: this.idWindow,// unikalne id okna
             icon: this.lang.iconWindow, // ikona okna
             title: this.lang.nameWindow,// tytuł okna
-            width: 300,
-            height: 300,
+           size: { width: 300, height: 300 }, // rozmiar okna
 
         };
 
@@ -28,8 +33,8 @@ class CONFIG {
             id:"nav-users-",// unikalne id elementu nawigacji 
             icon: this.lang.iconWindow,
             label: this.lang.nameTaskBar,
-            disabled: true, // na początku wyłączony, będzie włączony po załadowaniu okna
-            onClick: () => {} // otwarcie okna po kliknięciu        
+            disabled: false, // na początku wyłączony, będzie włączony po załadowaniu okna
+            onClick: async () => {await this.user.openWindow();} // otwarcie okna po kliknięciu        
         };  
     }
 

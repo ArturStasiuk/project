@@ -49,8 +49,7 @@ class CONFIG {
             id: this.idWindow,
             icon: this.t.icon,
             title: this.t.label_zarzadzaj_firmami,
-            width: 600,
-            height: 400,
+            size: { width: 800, height: 400 } 
 
         };
     }
