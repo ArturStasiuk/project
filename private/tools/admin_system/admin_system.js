@@ -9,7 +9,7 @@ import CONFIG from './config.js';
 import METHOD from './method.js';
 import EDYCJA_FIRMY from './edytuj.js';
 import USUN_FIRME from './usun.js';
-//import USERS from 'private/users/users.js';
+
 
 class ADMIN_SYSTEM {
     
@@ -199,6 +199,11 @@ class ADMIN_SYSTEM {
     async przeglajPracownikow() {
        const idUzytkownika = 1; // domyślnie uzytkownik 
        const idFirmy = 1 ; // domyslne if firmy 
+       this.users = this.users || window.users; 
+       if (!this.users) {
+           console.error('Moduł USERS nie jest załadowany');
+           return;
+       }
        await this.users.init(idUzytkownika, idFirmy); // inicjalizacja modułu USERS z id użytkownika i firmy
 
     }

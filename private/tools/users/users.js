@@ -8,7 +8,15 @@ class USERS {
     constructor(idUsers=null,idCompany=null) {
         this.idUsers= idUsers;
         this.idCompany = idCompany;
-        this.init();
+        this.modal = modal; // okna modalne
+        this.windows = view; // glowne okna i elementy widoku
+        this.api = api ; // komunikacja z backendem
+        this.handlers = handlers ; // uchwyty do zdarzen
+        this.method = new METHOD(this); // metody i funkcje
+        this.config = new CONFIG(this); // konfiguracja i ustawienia
+        this.method.config = this.config;
+        await this.config.configLang(); // pobranie konfiguracji językowej przed dodaniem nav
+      //  this.init();
 
     }
 
@@ -25,19 +33,15 @@ class USERS {
 
     /** ladowanie glownych modowow */
     async init() {
-        this.modal = modal; // okna modalne
-        this.windows = view; // glowne okna i elementy widoku
-        this.api = api ; // komunikacja z backendem
-        this.handlers = handlers ; // uchwyty do zdarzen
-        this.method = new METHOD(this); // metody i funkcje
-        this.config = new CONFIG(this); // konfiguracja i ustawienia
-        this.method.config = this.config;
-        await this.config.configLang(); // pobranie konfiguracji językowej przed dodaniem nav
-        await this.addNav(); // dodanie ikony do paska nawigacji
+        await this.openWindow(); // dodanie ikony do paska nawigacji
+
+
     }
 
 
 
 }
 
-const users = new USERS();
+const users = window.users || new USERS();
+window.USERS = USERS;
+window.users = users;
