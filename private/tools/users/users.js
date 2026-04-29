@@ -5,9 +5,9 @@ import handlers from 'handlers';
 import CONFIG from './config.js';
 import METHOD from './method.js';
 class USERS {
-    constructor(idUrzytkownika=null,idFirmy=null) {
-        this.idUrzytkownika = idUrzytkownika;
-        this.idFirmy = idFirmy;
+    constructor(idUsers=null,idCompany=null) {
+        this.idUsers= idUsers;
+        this.idCompany = idCompany;
         this.init();
 
     }

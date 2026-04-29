@@ -129,8 +129,7 @@ class CONFIG {
                     icon: '👥',
                     label: this.t.menu_otworz_pracownikow || 'Browse employees',
                     disabled: !opcjeMeniu.read,
-                    onClick: async () => {
-                        // Feature not implemented yet
+                    onClick: async () => {await this.parent.przeglajPracownikow()
                     }
                 },
                 {   

@@ -9,6 +9,7 @@ import CONFIG from './config.js';
 import METHOD from './method.js';
 import EDYCJA_FIRMY from './edytuj.js';
 import USUN_FIRME from './usun.js';
+//import USERS from 'private/users/users.js';
 
 class ADMIN_SYSTEM {
     
@@ -21,6 +22,7 @@ class ADMIN_SYSTEM {
         this.config = new CONFIG(this);
         this.edytuj = new EDYCJA_FIRMY(this);
         this.usun = new USUN_FIRME(this);
+       // this.users = new USERS(); // inicjalizacja modułu USERS, który będzie używany do zarządzania użytkownikami w firmie
         this.initialize();
     }
     /** Inicjalizacja modułu ADMIN_SYSTEM */
@@ -193,7 +195,13 @@ class ADMIN_SYSTEM {
         const usunFirmy = new USUN_FIRME(this, companyId);
         await usunFirmy.usunFirme();
     }
+    // zarzadzanie pracownikami w firmie
+    async przeglajPracownikow() {
+       const idUzytkownika = 1; // domyślnie uzytkownik 
+       const idFirmy = 1 ; // domyslne if firmy 
+       await this.users.init(idUzytkownika, idFirmy); // inicjalizacja modułu USERS z id użytkownika i firmy
 
+    }
 
 }
 
