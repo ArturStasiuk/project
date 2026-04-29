@@ -45,7 +45,7 @@ class ADMIN_SYSTEM {
         /** dodanie glownego meniu do okna  */
         const menuZarzadzajFirmami = await this.config.getMenu_Window_ZarzadzajFirmami();
         if (menuZarzadzajFirmami) {
-            await this.view.deleteMeniuWindow({ id: this.config.idWindow, menuId: menuZarzadzajFirmami.menuId });
+            await this.view.refreshWindowMenubar({ id: this.config.idWindow, menus: [] });
             await this.view.addMeniuWindow(menuZarzadzajFirmami);
         }
         
@@ -60,7 +60,7 @@ class ADMIN_SYSTEM {
         /** wstawienie glownego meniu  */
         const menuZarzadzajFirmami = await this.config.getMenu_Window_ZarzadzajFirmami();
         if (menuZarzadzajFirmami) {
-            await this.view.deleteMeniuWindow({ id: this.config.idWindow, menuId: menuZarzadzajFirmami.menuId });
+            await this.view.refreshWindowMenubar({ id: this.config.idWindow, menus: [] });
             await this.view.addMeniuWindow(menuZarzadzajFirmami);
         }
         const response = await this.method.getCompanyData();
@@ -91,11 +91,14 @@ class ADMIN_SYSTEM {
         const config = await this.config.getContent_SzczegolyFirmy(firmaData, usersData);
         await this.view.addWindowCard(config);
         /** zmiana meniu w oknie  */
-        await this.view.addMeniuWindow(await this.config.getMenu_Window_SzczegolyFirmy());
+        const menuSzczegolyFirmy = await this.config.getMenu_Window_SzczegolyFirmy();
+        if (menuSzczegolyFirmy) {
+            await this.view.refreshWindowMenubar({ id: this.config.idWindow, menus: [] });
+            await this.view.addMeniuWindow(menuSzczegolyFirmy);
+        }
         /** dodanie meniu zarzadzania urzytkownikami w firmie */
         const menuPracownicy = await this.config.get_Menu_Window_ZarzadzajPracownikami();
         if (menuPracownicy) {
-            await this.view.deleteMeniuWindow({ id: this.config.idWindow, menuId: menuPracownicy.menuId });
             await this.view.addMeniuWindow(menuPracownicy);
         }
 
@@ -105,7 +108,11 @@ class ADMIN_SYSTEM {
     async formularzDodajFirme() {
         await this.view.refreshWindowContent({ id: this.config.idWindow, cards: [] }); // odświeżenie zawartości okna przed dodaniem nowej karty
         /** dodanie meniu do okna */
-        await this.view.addMeniuWindow(await this.config.getMeniu_window_DodajFirme());
+        const menuDodajFirme = await this.config.getMeniu_window_DodajFirme();
+        if (menuDodajFirme) {
+            await this.view.refreshWindowMenubar({ id: this.config.idWindow, menus: [] });
+            await this.view.addMeniuWindow(menuDodajFirme);
+        }
         const config = await this.config.getContent_DodajFirme();
         await this.view.addWindowCard(config);
         /** nasluchiwanie klikniecia przycisku zapisz i anuluj, callback zwraca id kliknietego przycisku */

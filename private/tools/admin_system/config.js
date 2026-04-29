@@ -129,14 +129,35 @@ class CONFIG {
                 {
                     icon: '👥',
                     label: this.t.menu_otworz_pracownikow || 'Browse employees',
-                    disabled:true,
+                    disabled: !opcjeMeniu.read,
                     onClick: async () => {
                         // Feature not implemented yet
                     }
-                }
+                },
+                {   
+                    icon: '➕',
+                    label: this.t.menu_zapisz_pracownika || 'Add new employee',
+                    disabled: !opcjeMeniu.create, // Dodawanie pracowników nie jest jeszcze zaimplementowane
+                },
+                {
+                    icon: '✏️',
+                    label: this.t.menu_edytuj_pracownika || 'Edit employee',
+                    disabled: true, // Edycja pracowników nie jest jeszcze zaimplementowana
+                },
+                {
+                    icon: '🗑️',
+                    label: this.t.menu_usun_pracownika || 'Delete employee',
+                    disabled: true, // Usuwanie pracowników nie jest jeszcze zaimplementowane
+                }   
             ]
         };
     }
+
+
+
+
+
+
     /** meniu dodaj nowa firme */
     async getMeniu_window_DodajFirme() {
         const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajFirmami();
