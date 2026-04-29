@@ -112,6 +112,26 @@ class CONFIG {
             ]
         };    
     }
+    /** menu dla zarządzania pracownikami */
+    async get_Menu_Window_ZarzadzajPracownikami() {
+        const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajPracownikami();
+        return {
+            id: this.idWindow,
+            menuId: 'menu:' + this.idWindow + ':pracownicy',
+            label: '👥 ' + (this.t.menu_label_zarzadzaj_pracownikami || 'Manage employees'),
+            disabled: false,
+            items: [
+                {
+                    icon: '👥',
+                    label: this.t.menu_otworz_pracownikow || 'Browse employees',
+                    disabled: !opcjeMeniu.read,
+                    onClick: async () => {
+                        // Feature not implemented yet
+                    }
+                }
+            ]
+        };
+    }
     /** meniu dodaj nowa firme */
     async getMeniu_window_DodajFirme() {
         const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajFirmami();

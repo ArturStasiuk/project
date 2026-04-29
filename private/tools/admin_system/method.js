@@ -24,6 +24,17 @@ class METHOD {
             "delete": !!odp.delete_record
         };
     }
+    /** pobranie dostempu meniu w oknie zarzadzaj pracownikami  */
+    async accessMenu_Window_ZarzadzajPracownikami() {
+        const odp = await this.parent.api.getAccessTables('users');
+        return {
+            "access_table": !!odp.access_table,
+            "read": !!odp.read_record,
+            "create": !!odp.add_record,
+            "update": !!odp.update_record,
+            "delete": !!odp.delete_record
+        };
+    }
 
     /** pobranie danych firmy po ID */
     async getCompanyDataById(id) {

@@ -84,6 +84,9 @@ class ADMIN_SYSTEM {
         await this.view.addWindowCard(config);
         /** zmiana meniu w oknie  */
         await this.view.addMeniuWindow(await this.config.getMenu_Window_SzczegolyFirmy());
+        /** dodanie meniu zarzadzania urzytkownikami w firmie */
+        await this.view.addMeniuWindow(await this.config.get_Menu_Window_ZarzadzajPracownikami());
+
     }
 
     /** dodaj firme */

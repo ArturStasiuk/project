@@ -16,6 +16,8 @@ const LAUNGE = {
     menu_zapisz: "Dodaj nową firmę",
     menu_edytuj: "Edytuj firmę",
     menu_usun: "Usuń firmę",
+    menu_label_zarzadzaj_pracownikami: "Zarządzaj pracownikami",
+    menu_otworz_pracownikow: "Przeglądaj pracowników",
     // alerty i komunikaty
     alert: "Alert!",
     confirm_cancel_edit: "Anulować edycję?",
@@ -72,6 +74,8 @@ const LAUNGE = {
     menu_zapisz: "Add new company",
     menu_edytuj: "Edit company",
     menu_usun: "Delete company",
+    menu_label_zarzadzaj_pracownikami: "Manage employees",
+    menu_otworz_pracownikow: "Browse employees",
     // alerty i komunikaty
     alert: "Alert!",
     confirm_cancel_edit: "Cancel editing?",
@@ -128,6 +132,8 @@ const LAUNGE = {
     menu_zapisz: "Lägg till nytt företag",
     menu_edytuj: "Redigera företag",
     menu_usun: "Ta bort företag",
+    menu_label_zarzadzaj_pracownikami: "Hantera anställda",
+    menu_otworz_pracownikow: "Bläddra bland anställda",
     // alerty i komunikaty
     alert: "Varning!",
     confirm_cancel_edit: "Avbryta redigeringen?",
