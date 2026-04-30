@@ -7,16 +7,23 @@ import METHOD from './method.js';
 class USERS {
     static instances = {};
 
+    static get(name = 'default') {
+        const key = name || 'default';
+        return USERS.instances[key] || null;
+    }
+
     static async getOrCreate(name = 'default', idUsers = null, idCompany = null) {
         const key = name || 'default';
-        if (!USERS.instances[key]) {
+        const existing = USERS.instances[key];
+
+        if (!existing) {
             const instance = new USERS(idUsers, idCompany);
             instance.name = key;
             USERS.instances[key] = instance;
-            return { instance, created: true };
+            await instance.init(idUsers, idCompany);
+            return instance;
         }
 
-        const existing = USERS.instances[key];
         if (idUsers !== null) existing.idUsers = idUsers;
         if (idCompany !== null) existing.idCompany = idCompany;
 
@@ -24,7 +31,15 @@ class USERS {
             await existing.refresh(idUsers, idCompany);
         }
 
-        return { instance: existing, created: false };
+        return existing;
+    }
+
+    static async call(name = 'default', methodName, ...args) {
+        const existing = USERS.get(name);
+        if (!existing || typeof existing[methodName] !== 'function') {
+            return null;
+        }
+        return existing[methodName](...args);
     }
 
     constructor(idUsers=null,idCompany=null) {
@@ -56,9 +71,9 @@ class USERS {
     /** pierwsze uruchomienie */
     async init(idUsers = null, idCompany = null) {
         alert('init users');
-        if (idUsers !== null) this.idUsers = idUsers;
-        if (idCompany !== null) this.idCompany = idCompany;
-        await this.openWindow(); // dodanie ikony do paska nawigacji
+      //  if (idUsers !== null) this.idUsers = idUsers;
+      //  if (idCompany !== null) this.idCompany = idCompany;
+     //  await this.openWindow(); // dodanie ikony do paska nawigacji
     }
     /** odswierzanie istniejacego obiektu USERS */
     async refresh(idUsers = null, idCompany = null) {
@@ -68,10 +83,17 @@ class USERS {
 }
 
 window.USERS = window.USERS || USERS;
-const existingUsers = window.users;
-if (existingUsers instanceof USERS) {
-    window.users = { default: existingUsers };
-} else {
-    window.users = existingUsers || {};
-}
-USERS.instances = window.users;
+
+// Wywołanie obiektu USERS po nazwie:
+// - jeśli obiekt nie istnieje: tworzy nowy, przekazując idUsers i idCompany do konstruktora i uruchamia init()
+// - jeśli obiekt istnieje: aktualizuje parametry i uruchamia refresh()
+// Przykład: await users('firma123', 1, 5);
+const users = async (name = 'default', idUsers = null, idCompany = null) => {
+    return window.USERS.getOrCreate(name, idUsers, idCompany);
+};
+
+// Wywołanie dowolnej metody na istniejącym obiekcie USERS:
+// - jeśli obiekt lub metoda nie istnieje, zwraca null
+// Przykład: await window.USERS.call('firma123', 'refresh');
+// Przykład: await window.USERS.call('firma123', 'someMethod', arg1, arg2);
+window.users = users;
