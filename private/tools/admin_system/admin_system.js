@@ -198,14 +198,13 @@ class ADMIN_SYSTEM {
     // zarzadzanie pracownikami w firmie
     async przeglajPracownikow() {
        const idUzytkownika = 1; // domyślnie uzytkownik 
-       const idFirmy = 1 ; // domyslne if firmy 
-       this.users = this.users || window.users; 
-       if (!this.users) {
-           console.error('Moduł USERS nie jest załadowany');
-           return;
+       const idFirmy = 1 ; // domyslne id firmy 
+       const nazwaObiektuUsers = 'przykladowa_nazwa_obiektu_users';
+       const result = await window.USERS.getOrCreate(nazwaObiektuUsers, idUzytkownika, idFirmy);
+       this.users = result.instance;
+       if (result.created) {
+           await this.users.init(); // nowy obiekt: init
        }
-       await this.users.init(idUzytkownika, idFirmy); // inicjalizacja modułu USERS z id użytkownika i firmy
-
     }
 
 }
