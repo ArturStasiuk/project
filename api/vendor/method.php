@@ -73,6 +73,34 @@ class METHOD
 
     }
 
+    /** Zwraca uprawnienia zalogowane uzytkownika do narzędzi(dostemp , odczyt zapis itp.) 
+     * @param array|null $param Tablica z kluczem 'tools' – nazwa narzędzia do sprawdzenia.
+    * @return array Wynik z polami status, tools_name , access_tools, read_record, add_record, update_record, delete_record.
+    */
+    public function getAccessTools($param = null): array{
+        // Sprawdzenie, czy przekazano parametry z narzędziami do sprawdzenia
+        if (empty($param) || !is_array($param)) {
+            return ['status' => false, 'message' => 'No tools specified'];
+        } 
+        // sprawdzenie czy uzytkownik jest zalogowany 
+        include_once __DIR__ . '/../service/session.php';
+        $session = new SESSION();
+        $id_users = $session->getKey('id_users');
+        if (!$id_users) {
+            return ['status' => false, 'message' => 'User not logged in'];
+        } 
+        //  sprawdzenie polaczenia 
+        $dbResult = $this->getDatabaseConnect();
+        if (!$dbResult["status"]) {
+            return ['status' => false, 'message' => 'Database connection failed'];
+        }
+        // pobranie danych z tabeli jkie moze wykonywac operacje na tabeli 
+        $pdo = $dbResult['pdo'];
+        include_once __DIR__ . '/../data_base/access_tools.php';
+        $accessTools = new ACCESS_TOOLS();
+        return $accessTools->getAccessToolsByUserIdAndTool($pdo, $id_users, $param['tools']);
+    }
+  
 
 
     //=====================================================================

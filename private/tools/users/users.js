@@ -43,7 +43,6 @@ class USERS {
 
     constructor(name = 'default', idUsers=null, idCompany=null) {
         this.name = name; // nazwa instancji USERS
-
         this.idUsers= idUsers;
         this.idCompany = idCompany;
         this.modal = modal; // okna modalne
@@ -60,22 +59,64 @@ class USERS {
 
     // dodanie ikony do paska nawigacji
     async addNav() {
+        if (!await this.checkAccess()) return;
         await this.method.addNav();
     }
     // otwarcie okna po kliknięciu na element nawigacji
      async openWindow() {
+        if (!await this.checkAccess()) return;
         await this.method.openWindow();
     }
 
+    // sprawdzenie czy uzytkownik jest zalogowany i ma dostep do tego narzedzia
+    async checkAccess() {
+        const access_tools = await this.method.getAccessTools();
+        if (!access_tools || parseInt(access_tools.access_tools, 10) !== 1) {
+            // Brak dostępu - wyświetlenie komunikatu i zamknięcie okna
+            this.modal.alert(this.config.lang.access_tools || "Access Tools", this.config.lang.noAccess || "You do not have access to this tool.");
+            this.destroy(); //ę usuwania obiektu lub przekierowania
+            return false;
+        }
+        return true;
+    }
 
 
-    /** pierwsze uruchomienie */
+
+
+
+
+
+
+
+
+
+
+
+    /** pierwsze uruchomienie obiektu USERS */
     async init(idUsers = null, idCompany = null) {
        await this.openWindow(); // dodanie ikony do paska nawigacji
     }
-    /** odswierzanie istniejacego obiektu USERS */
+    /** odświeżanie istniejącego obiektu USERS */
     async refresh(idUsers = null, idCompany = null) {
        await this.openWindow(); // odświeżenie okna, można dodać dodatkowe logiki jeśli potrzebne
+    }
+    /** usunięcie obiektu USERS */
+    async destroy() {
+        try {
+            const windowId = this.name;
+            const navId = "nav-users-" + this.name;
+
+            if (this.windows) {
+                await this.windows.removeWindow({ id: windowId });
+                await this.windows.removeStartMenuItem({ id: navId });
+            }
+        } catch (error) {
+            console.warn('USERS.destroy: nie udało się usunąć widoku lub nawigacji', error);
+        } finally {
+            if (USERS.instances && typeof USERS.instances === 'object') {
+                delete USERS.instances[this.name];
+            }
+        }
     }
 
 }

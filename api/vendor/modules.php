@@ -67,4 +67,18 @@ class MODULES
    
 
     }
+
+    // modules access_tools - wszystko co zwiazane z dostepem do narzedzi
+    private function modules_access_tools(): array
+    {   // dostemp do klasy METHOD i jej metod pomocniczych
+        include_once __DIR__ . '/method.php';
+       // dostemp do tabeli access_tools
+        include_once __DIR__ . '/../data_base/access_tools.php';
+        
+        return [
+            'method' => new METHOD(),
+            'table_access_tools' => new ACCESS_TOOLS(),
+
+        ];
+    }
 }

@@ -34,7 +34,8 @@ class ACCESS_TABLES{
                 'delete_record' => false,
             ];
         }
-    }
+    } 
+
 
 
 
