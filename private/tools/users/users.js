@@ -4,6 +4,7 @@ import api from 'api';
 import handlers from 'handlers';
 import CONFIG from './config.js';
 import METHOD from './method.js';
+import DATA from './data.js';
 class USERS {
     static instances = {};
 
@@ -47,7 +48,8 @@ class USERS {
         this.idCompany = idCompany;
         this.modal = modal; // okna modalne
         this.windows = view; // glowne okna i elementy widoku
-        this.api = api ; // komunikacja z backendem
+        this.api = api; // komunikacja z backendem
+        this.data = new DATA(this); // dane i logika biznesowa
         this.handlers = handlers ; // uchwyty do zdarzen
         this.method = new METHOD(this); // metody i funkcje
         this.config = new CONFIG(this); // konfiguracja i ustawienia
@@ -60,21 +62,27 @@ class USERS {
     // dodanie ikony do paska nawigacji
     async addNav() {
         if (!await this.checkAccess()) return;
+        await this.data.getUsersByCompanyId();
+        await this.data.getAccessMenu();
+        await this.method.refreshMenu();
         await this.method.addNav();
     }
     // otwarcie okna po kliknięciu na element nawigacji
      async openWindow() {
         if (!await this.checkAccess()) return;
+        await this.data.getUsersByCompanyId();
+        await this.data.getAccessMenu();
         await this.method.openWindow();
+        await this.method.refreshMenu();
     }
 
     // sprawdzenie czy uzytkownik jest zalogowany i ma dostep do tego narzedzia
     async checkAccess() {
-        const access_tools = await this.method.getAccessTools();
+        const access_tools = await this.data.getAccessTools();
         if (!access_tools || parseInt(access_tools.access_tools, 10) !== 1) {
             // Brak dostępu - wyświetlenie komunikatu i zamknięcie okna
             this.modal.alert(this.config.lang.access_tools || "Access Tools", this.config.lang.noAccess || "You do not have access to this tool.");
-            this.destroy(); //ę usuwania obiektu lub przekierowania
+            this.destroy();
             return false;
         }
         return true;
