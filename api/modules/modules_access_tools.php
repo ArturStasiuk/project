@@ -13,10 +13,11 @@ class MODULES_ACCESS_TOOLS{
         $this->param = $param;
     }
 
-    // pobranie pojedynczego rekordu z tabeli access_tools dla id_users i tools_name
+    // pobranie pojedynczego rekordu z tabeli access_tools dla zalogowanego uzytkownika i konkretnego narzedzia
     public function getAccessTools()
     {
-       return ['status' => $this->param ];
+       $access = $this->method->checkAccess($this->param['user_id'], $this->param['tool_name']);
+       return $access;
     }
 
 }

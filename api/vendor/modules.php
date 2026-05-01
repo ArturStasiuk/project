@@ -70,12 +70,18 @@ class MODULES
 
     // modules access_tools - wszystko co zwiazane z dostepem do narzedzi
     private function modules_access_tools(): array
-    {   // dostemp do klasy METHOD i jej metod pomocniczych
+    {   
+        include_once __DIR__ . '/../config/config_db.php';
+        include_once __DIR__ . '/../connect/connect_db.php';
+        $config_db  = new CONFIG_DB();
+        $connect_db = new CONNECT(); 
+     // dostemp do klasy METHOD i jej metod pomocniczych
         include_once __DIR__ . '/method.php';
        // dostemp do tabeli access_tools
         include_once __DIR__ . '/../data_base/access_tools.php';
         
         return [
+            'pdo' => $connect_db->connect($config_db->getConfig()),
             'method' => new METHOD(),
             'table_access_tools' => new ACCESS_TOOLS(),
 
