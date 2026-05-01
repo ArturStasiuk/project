@@ -17,8 +17,7 @@ class USERS {
         const existing = USERS.instances[key];
 
         if (!existing) {
-            const instance = new USERS(idUsers, idCompany);
-            instance.name = key;
+            const instance = new USERS(key, idUsers, idCompany);
             USERS.instances[key] = instance;
             await instance.init(idUsers, idCompany);
             return instance;
@@ -42,7 +41,9 @@ class USERS {
         return existing[methodName](...args);
     }
 
-    constructor(idUsers=null,idCompany=null) {
+    constructor(name = 'default', idUsers=null, idCompany=null) {
+        this.name = name; // nazwa instancji USERS
+
         this.idUsers= idUsers;
         this.idCompany = idCompany;
         this.modal = modal; // okna modalne
@@ -70,14 +71,11 @@ class USERS {
 
     /** pierwsze uruchomienie */
     async init(idUsers = null, idCompany = null) {
-        alert('init users');
-      //  if (idUsers !== null) this.idUsers = idUsers;
-      //  if (idCompany !== null) this.idCompany = idCompany;
-     //  await this.openWindow(); // dodanie ikony do paska nawigacji
+       await this.openWindow(); // dodanie ikony do paska nawigacji
     }
     /** odswierzanie istniejacego obiektu USERS */
     async refresh(idUsers = null, idCompany = null) {
-        alert('refresh users');
+       await this.openWindow(); // odświeżenie okna, można dodać dodatkowe logiki jeśli potrzebne
     }
 
 }

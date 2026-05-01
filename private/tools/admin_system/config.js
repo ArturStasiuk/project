@@ -49,7 +49,7 @@ class CONFIG {
             id: this.idWindow,
             icon: this.t.icon,
             title: this.t.label_zarzadzaj_firmami,
-            size: { width: 800, height: 400 } 
+            size: { width: 800, height: 600 } 
 
         };
     }
@@ -114,38 +114,38 @@ class CONFIG {
             ]
         };    
     }
-    /** menu dla zarządzania pracownikami */
-    async get_Menu_Window_ZarzadzajPracownikami() {
-        const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajPracownikami();
+    /** menu dla zarządzania użytkownikami */
+    async get_Menu_Window_ZarzadzajUzytkownikami() {
+        const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajUzytkownikami();
          if (!opcjeMeniu.access_table) {
-            return null; // Brak dostępu do modułu zarządzania pracownikami, nie dodajemy menu
+            return null; // Brak dostępu do modułu zarządzania użytkownikami, nie dodajemy menu
             }
         return {
             id: this.idWindow,
-            menuId: 'menu:' + this.idWindow + ':pracownicy',
-            label: '👥 ' + (this.t.menu_label_zarzadzaj_pracownikami || 'Manage employees'),
+            menuId: 'menu:' + this.idWindow + ':uzytkownicy',
+            label: '👥 ' + (this.t.menu_label_zarzadzaj_uzytkownikami || 'Manage users'),
             items: [
                 {
                     icon: '👥',
-                    label: this.t.menu_otworz_pracownikow || 'Browse employees',
+                    label: this.t.menu_otworz_uzytkownikow || 'Browse users',
                     disabled: !opcjeMeniu.read,
-                    onClick: async () => {await this.parent.przeglajPracownikow()
+                    onClick: async () => {await this.parent.przeglajUzytkownikow()
                     }
                 },
                 {   
                     icon: '➕',
-                    label: this.t.menu_zapisz_pracownika || 'Add new employee',
-                    disabled: !opcjeMeniu.create, // Dodawanie pracowników nie jest jeszcze zaimplementowane
+                    label: this.t.menu_zapisz_uzytkownika || 'Add new user',
+                    disabled: !opcjeMeniu.create, // Dodawanie użytkowników nie jest jeszcze zaimplementowane
                 },
                 {
                     icon: '✏️',
-                    label: this.t.menu_edytuj_pracownika || 'Edit employee',
-                    disabled: true, // Edycja pracowników nie jest jeszcze zaimplementowana
+                    label: this.t.menu_edytuj_uzytkownika || 'Edit user',
+                    disabled: true, // Edycja użytkowników nie jest jeszcze zaimplementowana
                 },
                 {
                     icon: '🗑️',
-                    label: this.t.menu_usun_pracownika || 'Delete employee',
-                    disabled: true, // Usuwanie pracowników nie jest jeszcze zaimplementowane
+                    label: this.t.menu_usun_uzytkownika || 'Delete user',
+                    disabled: true, // Usuwanie użytkowników nie jest jeszcze zaimplementowane
                 }   
             ]
         };

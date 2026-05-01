@@ -25,8 +25,8 @@ class METHOD {
             "delete": !!odp.delete_record
         };
     }
-    /** pobranie dostempu meniu w oknie zarzadzaj pracownikami  */
-    async accessMenu_Window_ZarzadzajPracownikami() {
+    /** pobranie dostepu meniu w oknie zarzadzaj uzytkownikami  */
+    async accessMenu_Window_ZarzadzajUzytkownikami() {
         const odp = await this.parent.api.getAccessTables('users');
         return {
             "access_table": !!odp.access_table,

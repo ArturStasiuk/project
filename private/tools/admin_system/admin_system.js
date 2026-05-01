@@ -99,9 +99,9 @@ class ADMIN_SYSTEM {
             await this.view.addMeniuWindow(menuSzczegolyFirmy);
         }
         /** dodanie meniu zarzadzania urzytkownikami w firmie */
-        const menuPracownicy = await this.config.get_Menu_Window_ZarzadzajPracownikami();
-        if (menuPracownicy) {
-            await this.view.addMeniuWindow(menuPracownicy);
+        const menuUzytkownicy = await this.config.get_Menu_Window_ZarzadzajUzytkownikami();
+        if (menuUzytkownicy) {
+            await this.view.addMeniuWindow(menuUzytkownicy);
         }
 
     }
@@ -195,12 +195,19 @@ class ADMIN_SYSTEM {
         const usunFirmy = new USUN_FIRME(this, companyId);
         await usunFirmy.usunFirme();
     }
-    // zarzadzanie pracownikami w firmie
-    async przeglajPracownikow() {
-       const idUzytkownika = 1; // domyślnie uzytkownik 
-       const idFirmy = 1 ; // domyslne id firmy 
-       const nazwaObiektuUsers = 'przykladowa_nazwa_obiektu_users';
-       this.users = await users(nazwaObiektuUsers, idUzytkownika, idFirmy);
+    // wywolanie zarządzania użytkownikami w firmie
+    async przeglajUzytkownikow() {
+        const hiddenInput = document.querySelector('[data-card-id="szczegoly-firmy"] input[name="company_id"]')
+            || document.querySelector('input[name="company_id"]');
+        const companyId = hiddenInput?.value || null;
+
+        if (!companyId) {
+            return;
+        }
+        const idUzytkownika = null; // uzytkownik 
+        const idFirmy = companyId; // id firmy 
+        const nameClass = 'uzytkownicy_firmy' + companyId; // unikalna nazwa klasy dla zarządzania użytkownikami w konkretnej firmie    
+        this.users = await users(nameClass, idUzytkownika, idFirmy);
     }
 
 }
