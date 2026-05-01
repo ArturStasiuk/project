@@ -27,6 +27,11 @@ class METHOD {
         return await this.api.send({ method: "getUserLanguage" });
         
     }
+    // pobranie danych firmy po id
+    async getCompanyDataById(id) {
+        const odp = await this.api.send({ modules: 'modules_company', method:'getCompanyDataById', param: { id_company: id } });
+        return odp.data;
+    }
 
 
 }

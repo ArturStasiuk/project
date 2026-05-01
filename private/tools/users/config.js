@@ -17,11 +17,12 @@ class CONFIG {
 
    // konfiguracja okna glownego 
   async configWindow () {
+         const odp = await this.method.getCompanyDataById(this.user.idCompany);
+         const companyName = odp ? odp.name : 'Unknown Company';
         return {
-            id: this.user.name,// unikalne id okna
+            id: this.user.name,// unikalne id okna z nazwy instancji USERS
             icon: this.lang.iconWindow, // ikona okna
-           // title: this.lang.nameWindow,// tytuł okna
-           title: this.user.name, // tytuł okna ustawiony na nazwę użytkownika
+            title: `${this.lang.nameWindow}${companyName ? ': ' + companyName : ''}`, // tytuł okna z tłumaczeniem i nazwą firmy
             size: { width: 600, height: 500 }, // rozmiar okna
 
         };

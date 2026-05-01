@@ -131,22 +131,7 @@ class CONFIG {
                     disabled: !opcjeMeniu.read,
                     onClick: async () => {await this.parent.przeglajUzytkownikow()
                     }
-                },
-                {   
-                    icon: '➕',
-                    label: this.t.menu_zapisz_uzytkownika || 'Add new user',
-                    disabled: !opcjeMeniu.create, // Dodawanie użytkowników nie jest jeszcze zaimplementowane
-                },
-                {
-                    icon: '✏️',
-                    label: this.t.menu_edytuj_uzytkownika || 'Edit user',
-                    disabled: true, // Edycja użytkowników nie jest jeszcze zaimplementowana
-                },
-                {
-                    icon: '🗑️',
-                    label: this.t.menu_usun_uzytkownika || 'Delete user',
-                    disabled: true, // Usuwanie użytkowników nie jest jeszcze zaimplementowane
-                }   
+                }  
             ]
         };
     }
