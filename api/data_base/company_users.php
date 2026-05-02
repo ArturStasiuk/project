@@ -28,7 +28,7 @@ class COMPANY_USERS
     
   /** pobranie aktywnych użytkowników firmy na podstawie tabel company_users i users */
   public function getActiveUsersByCompanyId($pdo, $companyId){
-      $stmt = $pdo->prepare("SELECT u.id, u.role, u.name, u.last_name, u.email, u.active, u.lang 
+      $stmt = $pdo->prepare("SELECT u.id, u.role, u.name, u.last_name, u.email, cu.active AS active, u.lang 
                              FROM users u
                              INNER JOIN company_users cu ON u.id = cu.id_users
                              WHERE cu.id_company = :company_id AND cu.active = 1");
@@ -38,7 +38,7 @@ class COMPANY_USERS
 
   /** pobranie nieaktywnych użytkowników firmy na podstawie tabel company_users i users */
   public function getInactiveUsersByCompanyId($pdo, $companyId){
-      $stmt = $pdo->prepare("SELECT u.id, u.role, u.name, u.last_name, u.email, u.active, u.lang 
+      $stmt = $pdo->prepare("SELECT u.id, u.role, u.name, u.last_name, u.email, cu.active AS active, u.lang 
                              FROM users u
                              INNER JOIN company_users cu ON u.id = cu.id_users
                              WHERE cu.id_company = :company_id AND cu.active = 0");

@@ -40,7 +40,8 @@ class METHOD {
         // dodanie nasluchiwania klikniecia na karty uzytkownikow
        await this.handlers.handleDataElementClick('[data-user-card]', ({ data, element, event }) => {
             console.log( data );
-            // tutaj można dodać dodatkową logikę po kliknięciu na kartę użytkownika
+         /** otworzenie formulaza z danyci uzytkownika do np edycji */
+
         });
     }
     // wyswietlenie nieaktywnych uzytkownikow
@@ -55,6 +56,12 @@ class METHOD {
   
     }
         
+    /** otwozenie formularza z danymi uzytkownika do np edycji */
+    async openFormUser(idCompany, idUsers) {
+    /** nalezy sprawdzicz czy uzytkownik ma mozliwosc edycji 
+     * danych pracownika 
+     */
+    }
 
 
 }

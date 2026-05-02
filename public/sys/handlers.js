@@ -1,5 +1,4 @@
-/**
- * Uniwersalny handler do obsługi kliknięcia w wiersz tabeli.
+/*** Uniwersalny handler do obsługi kliknięcia w wiersz tabeli.
  * Wywołuje przekazaną funkcję callback z danymi z wiersza (komórki + data-*).
  * @param {string} id_tabeli - id tabeli do obsługi
  * @param {function} callback - funkcja wywoływana z danymi wiersza
