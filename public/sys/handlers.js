@@ -27,14 +27,8 @@ function handleTableRowClick(id_tabeli, callback) {
             headers.forEach((header, i) => {
                 rowData[header] = tds[i]?.textContent.trim();
             });
-            // Dane z data-*
-            const dataAttrs = {};
-            for (const attr of tr.attributes) {
-                if (attr.name.startsWith('data-')) {
-                    const key = attr.name.slice(5);
-                    dataAttrs[key] = attr.value;
-                }
-            }
+            // Dane z data-* (dataset zamienia hyphen-case na camelCase)
+            const dataAttrs = { ...tr.dataset };
             // Połącz dane
             const result = { ...rowData, ...dataAttrs, tableId: id_tabeli };
             if (typeof callback === 'function') callback(result);
@@ -68,8 +62,9 @@ function getFormData(formId) {
 
 /** uniwersalna funkcja do nasluchiwania klikniecia przyciskow o podanym id 
  * i zwrucenie ktory przycisk zostal klikniety, callback zwraca id kliknietego przycisku
- 'przyjmuje tablce z id przyciskow do nasluchiwania i callback'  --- IGNORE ---
- przykad wywolania :    
+ * przyjmuje tablice z id przyciskow do nasluchiwania i callback
+ * przyklad wywolania:
+ *   handleButtonClicks(['btnSave','btnCancel'], id => console.log('clicked', id));
  */
  function handleButtonClicks(buttonIds, callback) {
     buttonIds.forEach(id => {
@@ -92,11 +87,60 @@ function getFormData(formId) {
     });
  }
 
+/** nasluchiwanie klikniecia na elementy i przekazanie data-* do callback
+ *
+ * Przyklad:
+ *   handleDataElementClick('[data-user-card]', ({ data, element, event }) => {
+ *       console.log('kliknieto karte:', data.idCompany, data.idUsers);
+ *   });
+ *
+ * Zwraca w callback obiekt z kluczem `data`, który zawiera wszystkie ukryte dane,
+ * oraz referencje do elementu i event click.
+ */
+ function handleDataElementClick(selector, callback) {
+    if (!selector || typeof callback !== 'function') return;
+    if (!document._dataClickDelegates) document._dataClickDelegates = {};
+    if (document._dataClickDelegates[selector]) {
+        document.removeEventListener('click', document._dataClickDelegates[selector]);
+    }
+    const handler = (event) => {
+        const el = event.target.closest(selector);
+        if (!el) return;
+        const data = { ...el.dataset };
+        callback({ data, element: el, event });
+    };
+    document._dataClickDelegates[selector] = handler;
+    document.addEventListener('click', handler);
+ }
+/** usuniecie nasluchiwania klikniecia na elementy o podanym selektorze
+ *
+ * Przyklad:
+ *   removeDataElementClick('[data-user-card]');
+ *
+ * Usuwa listener klikniecia dla selektora z delegacji dokumentu.
+ */
+ function removeDataElementClick(selector) {
+    if (!selector || !document._dataClickDelegates) return;
+    const handler = document._dataClickDelegates[selector];
+    if (typeof handler !== 'function') return;
+    document.removeEventListener('click', handler);
+    delete document._dataClickDelegates[selector];
+ }
+
+
+
+
+
+
+
 
 export default {
     handleTableRowClick,
     removeTableRowClickHandler,
     handleButtonClicks,
     removeButtonClicks,
-    getFormData
+    getFormData,
+    //getHiddenData,
+    handleDataElementClick,
+    removeDataElementClick
 };

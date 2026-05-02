@@ -94,6 +94,10 @@ class USERS {
         this.method.showActiveUsers();
 
     }
+    // wyswietlenie nieaktywnych uzytkownikow
+    async showInactiveUsers() {
+        this.method.showInactiveUsers();
+    }
 
 
 

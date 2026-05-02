@@ -37,6 +37,11 @@ class METHOD {
        const content = await this.config.getConfigTableUsers(activeUsers);
         // wyswietlenie zawartości w oknie
        await this.windows. addWindowCard(content);
+        // dodanie nasluchiwania klikniecia na karty uzytkownikow
+       await this.handlers.handleDataElementClick('[data-user-card]', ({ data, element, event }) => {
+            console.log( data );
+            // tutaj można dodać dodatkową logikę po kliknięciu na kartę użytkownika
+        });
     }
     // wyswietlenie nieaktywnych uzytkownikow
     async showInactiveUsers() {
@@ -46,6 +51,8 @@ class METHOD {
         const content = await this.config.getConfigTableUsers(inactiveUsers);
         // wyswietlenie zawartości w oknie
         await this.windows.addWindowCard(content);
+
+  
     }
         
 

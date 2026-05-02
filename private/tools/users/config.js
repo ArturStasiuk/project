@@ -56,80 +56,50 @@ class CONFIG {
                 {
                     icon: this.lang.meniuIconUsers2,
                     label: this.lang.menuItemsUsers2,
-                    onClick: async () => {await this.method.showInactiveUsers(); } // pokazanie nieaktywnych użytkowników po kliknięciu
+                    onClick: async () => {await this.user.showInactiveUsers(); } // pokazanie nieaktywnych użytkowników po kliknięciu
                 }
             ]
         }
 
     }
 
-    // tabela uzutkownikow aktywnych i nieaktywnych
-   async getConfigTableUsers(users) {
+    /** lista użytkowników jako kafelki
+     * @param {Array} users - lista użytkowników do wyświetlenia
+     * @returns {Object} - konfiguracja karty z listą użytkowników
+     */
+    getConfigTableUsers(users) {
         const t = this.lang || {};
         if (!Array.isArray(users)) users = [];
         const formatValue = (value) => (value === null || value === undefined || value === '' ? '-' : value);
-        const tableStyle = [
-            'width: 100%',
-            'border-collapse: collapse',
-            'margin: 18px 0',
-            'font-size: 0.98rem'
-        ].join(';');
-        const thStyle = [
-            'text-align: left',
-            'padding: 10px 12px',
-            'font-weight: 700',
-            'background: #f5f7fa',
-            'border-bottom: 2px solid #c8d5ea',
-            'color: #1b4f7a'
-        ].join(';');
-        const tdStyle = [
-            'padding: 10px 12px',
-            'border-bottom: 1px solid #e4ebf3',
-            'background: #fff',
-            'color: #222'
-        ].join(';');
         const usersSection = users.length > 0 ? `
-            <div>
-                <table style="${tableStyle}">
-                    <thead>
-                        <tr>
-                            <th style="${thStyle}">${t.user_name || 'Name'}</th>
-                            <th style="${thStyle}">${t.user_last_name || 'Last name'}</th>
-                            <th style="${thStyle}">${t.user_email || 'Email'}</th>
-                            <th style="${thStyle}">${t.user_role || 'Role'}</th>
-                            <th style="${thStyle}">${t.user_active || 'Active'}</th>
-                            <th style="${thStyle}">${t.user_lang || 'Lang'}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${users.map(user => {
-                            const fullName = [user.name, user.last_name].filter(Boolean).join(' ') || '-';
-                            return `<tr>
-                                <td style="${tdStyle}">${formatValue(user.name)}</td>
-                                <td style="${tdStyle}">${formatValue(user.last_name)}</td>
-                                <td style="${tdStyle}">${formatValue(user.email)}</td>
-                                <td style="${tdStyle}">${formatValue(user.role)}</td>
-                                <td style="${tdStyle}">${user.active === 1 || user.active === true ? '✔️' : '❌'}</td>
-                                <td style="${tdStyle}">${formatValue(user.lang)}</td>
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
+            <div style="display:grid;gap:16px;">
+                ${users.map(user => {
+                    const fullName = [user.name, user.last_name].filter(Boolean).join(' ') || '-';
+                    return `
+                    <div class="user-card" data-user-card="true" data-id-company="${formatValue(user.id_company || this.user.idCompany)}" data-id-users="${formatValue(user.id || user.idUsers)}" style="padding:18px;border:1px solid rgba(177,190,217,0.9);border-radius:14px;background:#fff;box-shadow:0 4px 16px rgba(15,23,42,0.06);cursor:pointer;transition:transform 0.15s ease,box-shadow 0.15s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(15,23,42,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(15,23,42,0.06)'">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                            <div>
+                                <div style="font-size:1rem;font-weight:700;color:#1b4f7a;">${formatValue(fullName)}</div>
+                                <div style="font-size:0.92rem;color:#52607a;margin-top:4px;">${formatValue(user.email)}</div>
+                            </div>
+                            <div style="font-size:0.88rem;font-weight:700;color:${user.active === 1 || user.active === true ? '#2e7d32' : '#b71c1c'};">
+                                ${user.active === 1 || user.active === true ? '✔️ ' + (t.user_active || 'Active') : '❌ ' + (t.user_active || 'Active')}
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;font-size:0.92rem;color:#344054;">
+                            <div><strong>${t.user_role || 'Role'}:</strong> ${formatValue(user.role)}</div>
+                            <div><strong>${t.user_lang || 'Lang'}:</strong> ${formatValue(user.lang)}</div>
+                        </div>
+                    </div>`;
+                }).join('')}
             </div>` : `
             <div style="margin-top: 16px;font-size:0.98rem;color:#444;">
                 ${t.no_users || 'No users available.'}
             </div>`;
-        const html = `
-            <div style="padding: 16px; background: rgba(248,249,250,0.95); border-radius: 12px; border: 1px solid rgba(200,210,220,0.8);">
-                <div style="font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; color: #1769aa;">
-                    ${t.users_list || 'Users'}
-                </div>
-                ${usersSection}
-            </div>
-        `;
+        const html = `${usersSection}`;
         return {
             id: this.user.name,
-            cardId: 'table-users',
+            cardId: 'user-cards',
             title: t.users_list || 'Users',
             text: html
         };
