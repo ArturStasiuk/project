@@ -57,7 +57,7 @@ class METHOD {
     }
         
     /** otwozenie formularza z danymi uzytkownika do np edycji */
-    async openFormUser(idCompany, idUsers) {
+    async openFormUser(data) {
     /** nalezy sprawdzicz czy uzytkownik ma mozliwosc edycji 
      * danych pracownika 
      */
