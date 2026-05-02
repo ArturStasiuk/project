@@ -25,15 +25,15 @@ class METHOD {
             "delete": !!odp.delete_record
         };
     }
-    /** pobranie dostepu meniu w oknie zarzadzaj uzytkownikami  */
+    /** pobranie dostepu do tools users  */
     async accessMenu_Window_ZarzadzajUzytkownikami() {
-        const odp = await this.parent.api.getAccessTables('users');
+        const odp = await this.parent.api.getAccessTools('users');
         return {
-            "access_table": !!odp.access_table,
-            "read": !!odp.read_record,
-            "create": !!odp.add_record,
-            "update": !!odp.update_record,
-            "delete": !!odp.delete_record
+            "access_tools": !!odp.access_tools,
+          //  "read": !!odp.read_record,
+          //  "create": !!odp.add_record,
+          //  "update": !!odp.update_record,
+          //  "delete": !!odp.delete_record
         };
     }
 

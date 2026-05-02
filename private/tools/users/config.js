@@ -51,11 +51,13 @@ class CONFIG {
                 {
                     icon: this.lang.meniuIconUsers1,
                     label: this.lang.menuItemsUsers1,
+                    disabled: !accessMenu.read, // dostęp do odczytu decyduje o aktywności tej opcji
                     onClick: async () => { await this.user.showActiveUsers(); } // pokazanie aktywnych użytkowników po kliknięciu
                 },
                 {
                     icon: this.lang.meniuIconUsers2,
                     label: this.lang.menuItemsUsers2,
+                    disabled: !accessMenu.read, // dostęp do odczytu decyduje o aktywności tej opcji
                     onClick: async () => {await this.user.showInactiveUsers(); } // pokazanie nieaktywnych użytkowników po kliknięciu
                 }
             ]

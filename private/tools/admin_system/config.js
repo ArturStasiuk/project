@@ -117,7 +117,7 @@ class CONFIG {
     /** menu dla zarządzania użytkownikami */
     async get_Menu_Window_ZarzadzajUzytkownikami() {
         const opcjeMeniu = await this.parent.method.accessMenu_Window_ZarzadzajUzytkownikami();
-         if (!opcjeMeniu.access_table) {
+         if (!opcjeMeniu.access_tools) {
             return null; // Brak dostępu do modułu zarządzania użytkownikami, nie dodajemy menu
             }
         return {
@@ -128,7 +128,7 @@ class CONFIG {
                 {
                     icon: '👥',
                     label: this.t.menu_otworz_uzytkownikow || 'Browse users',
-                    disabled: !opcjeMeniu.read,
+                    disabled: !opcjeMeniu.access_tools,
                     onClick: async () => {await this.parent.przeglajUzytkownikow()
                     }
                 }  

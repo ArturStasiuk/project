@@ -112,7 +112,7 @@ class USERS {
 
     /** pierwsze uruchomienie obiektu USERS */
     async init(idUsers = null, idCompany = null) {
-       await this.openWindow(); // dodanie ikony do paska nawigacji
+     //  await this.openWindow(); // dodanie ikony do paska nawigacji
     }
     /** odświeżanie istniejącego obiektu USERS */
     async refresh(idUsers = null, idCompany = null) {

@@ -46,6 +46,15 @@ class API {
     async getAccessTables(tables = null) {
         return await this.sendRequest(this.vendorPath, { method: 'getAccessTables', param: { tables: tables } });
     }
+    /** pobiera uprawnienaia zalogowanego użytkownika do narzędzi użytkowników (tools users)
+        * @returns {Promise<any>}
+     */
+     async getAccessTools(tools =null) {
+        return await this.sendRequest(this.vendorPath, { method: 'getAccessTools',param: { tools: 'users' } });
+    }
+
+
+
 
     // ================================================
     /**
