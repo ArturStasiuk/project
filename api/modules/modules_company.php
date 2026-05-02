@@ -7,12 +7,14 @@ class MODULES_COMPANY {
     private $param;//  parametry przekazane z vendor.php
     private $method;// dostep do klasy METHOD
     private $users;// dostep do tabeli users
+    private $company_users;// dostep do tabeli company_users
     
-    public function __construct( $method, $company, $users, $param = null)
+    public function __construct( $method, $company, $users, $company_users, $param = null)
     {
         $this->method = $method;
         $this->company = $company;//
         $this->users = $users;//
+        $this->company_users = $company_users;//
         $this->param = $param;
     }
         
@@ -53,6 +55,35 @@ class MODULES_COMPANY {
     }
     else{
      $users = $this->users->getUsersByCompanyId($this->method->getDatabaseConnect()['pdo'], $id_company);
+     return ['status' => true, 'data' => $users];    
+    }
+   }
+   /** pobranie aktywnych użytkowników firmy */
+   public function getActiveUsersByCompanyId() {
+    $id_company = $this->param['id_company'] ?? null;
+    if ($id_company === null) {
+        return ['status' => false, 'message' => 'Company ID was not provided'];
+    }
+    if (! $this->checkReadAccess('users')){
+     return ['status'=> false , 'message'=>'Access denied to read users data'];
+    }
+    else{
+     $users = $this->company_users->getActiveUsersByCompanyId($this->method->getDatabaseConnect()['pdo'], $id_company);
+     return ['status' => true, 'data' => $users];    
+    }
+   }
+
+   /** pobranie nieaktywnych użytkowników firmy */
+   public function getInactiveUsersByCompanyId() {
+    $id_company = $this->param['id_company'] ?? null;
+    if ($id_company === null) {
+        return ['status' => false, 'message' => 'Company ID was not provided'];
+    }
+    if (! $this->checkReadAccess('users')){
+     return ['status'=> false , 'message'=>'Access denied to read users data'];
+    }
+    else{
+     $users = $this->company_users->getInactiveUsersByCompanyId($this->method->getDatabaseConnect()['pdo'], $id_company);
      return ['status' => true, 'data' => $users];    
     }
    }

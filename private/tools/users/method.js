@@ -3,6 +3,7 @@ class METHOD {
     constructor(parent){
         this.parent = parent;
         this.api = this.parent.api;
+        this.data = this.parent.data;
         this.config = null;
         this.handlers = this.parent.handlers;
         this.windows = this.parent.windows;
@@ -28,7 +29,25 @@ class METHOD {
         const menuConfig = await this.config.configMenu();
         this.windows.addWindowMenu(menuConfig);
     }
-    
+    // wyswietlanie aktywnych uzytkownikow
+    async showActiveUsers() {
+      // pobranie danych uzytkownikow z DATA
+      const activeUsers = await this.data.getActiveUsers();
+      // generowanie zawartości tabeli z aktywnymi uzytkownikami
+       const content = await this.config.getConfigTableUsers(activeUsers);
+        // wyswietlenie zawartości w oknie
+       await this.windows. addWindowCard(content);
+    }
+    // wyswietlenie nieaktywnych uzytkownikow
+    async showInactiveUsers() {
+        // pobranie danych uzytkownikow z DATA
+        const inactiveUsers = await this.data.getInactiveUsers();
+        // generowanie zawartości tabeli z nieaktywnymi uzytkownikami
+        const content = await this.config.getConfigTableUsers(inactiveUsers);
+        // wyswietlenie zawartości w oknie
+        await this.windows.addWindowCard(content);
+    }
+        
 
 
 }

@@ -13,6 +13,14 @@ const LAUNGE = {
         menuItemsUsers1: "Użytkownicy aktywni",
         meniuIconUsers2: "🔒",
         menuItemsUsers2: "Użytkownicy nieaktywni",
+        users_list: "Użytkownicy",
+        no_users: "Brak dostępnych użytkowników.",
+        user_name: "Imię",
+        user_last_name: "Nazwisko",
+        user_email: "E-mail",
+        user_role: "Rola",
+        user_active: "Aktywny",
+        user_lang: "Język",
     },
     English: {
         // glowne okno
@@ -27,6 +35,14 @@ const LAUNGE = {
         menuItemsUsers1: "Active Users",
         meniuIconUsers2: "🔒",
         menuItemsUsers2: "Inactive Users",
+        users_list: "Users",
+        no_users: "No users available.",
+        user_name: "Name",
+        user_last_name: "Last name",
+        user_email: "Email",
+        user_role: "Role",
+        user_active: "Active",
+        user_lang: "Lang",
     },
     Svenska: {
         // glowne okno

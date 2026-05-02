@@ -34,6 +34,16 @@ class DATA {
         const odp = await this.api.send({ modules: 'modules_access_tools', method: "getAccessTools", param: { tools: "users" } });
         return odp;
     }
+    // pobranie aktywnych uzytkownikow firmy   
+    async getActiveUsers() {
+        const odp = await this.api.send({ modules: 'modules_company', method:'getActiveUsersByCompanyId', param: { id_company: this.idCompany} });
+        return odp.data;
+    }
+    // pobranie nieaktywnych uzytkownikow firmy
+    async getInactiveUsers() {
+        const odp = await this.api.send({ modules: 'modules_company', method:'getInactiveUsersByCompanyId', param: { id_company: this.idCompany} });
+        return odp.data;
+    }
 
 }
 export default DATA;

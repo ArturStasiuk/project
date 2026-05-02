@@ -57,11 +57,14 @@ class MODULES
         include_once __DIR__ . '/method.php';
         // dostemp do tabeli users 
         include_once __DIR__ . '/../data_base/users.php';
+        // dostemp do tabeli company_users
+        include_once __DIR__ . '/../data_base/company_users.php';
         
         return [
             'method' => new METHOD(),
             'table_company' => new COMPANY(),
             'table_users' => new USERS(),
+            'table_company_users' => new COMPANY_USERS(),
 
         ];
    

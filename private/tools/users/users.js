@@ -70,10 +70,11 @@ class USERS {
     // otwarcie okna po kliknięciu na element nawigacji
      async openWindow() {
         if (!await this.checkAccess()) return;
-        await this.data.getUsersByCompanyId();
+      //  await this.data.getUsersByCompanyId();
         await this.data.getAccessMenu();
         await this.method.openWindow();
         await this.method.refreshMenu();
+        await this.data.getActiveUsers();
     }
 
     // sprawdzenie czy uzytkownik jest zalogowany i ma dostep do tego narzedzia
@@ -88,6 +89,11 @@ class USERS {
         return true;
     }
 
+    // wyswietlenie aktywnych uzytkownikow
+    async showActiveUsers() {
+        this.method.showActiveUsers();
+
+    }
 
 
 

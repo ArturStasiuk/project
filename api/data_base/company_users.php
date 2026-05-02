@@ -25,6 +25,25 @@ class COMPANY_USERS
             'data' => null
         ];
     }
+    
+  /** pobranie aktywnych użytkowników firmy na podstawie tabel company_users i users */
+  public function getActiveUsersByCompanyId($pdo, $companyId){
+      $stmt = $pdo->prepare("SELECT u.id, u.role, u.name, u.last_name, u.email, u.active, u.lang 
+                             FROM users u
+                             INNER JOIN company_users cu ON u.id = cu.id_users
+                             WHERE cu.id_company = :company_id AND cu.active = 1");
+      $stmt->execute(['company_id' => $companyId]);
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 
+  /** pobranie nieaktywnych użytkowników firmy na podstawie tabel company_users i users */
+  public function getInactiveUsersByCompanyId($pdo, $companyId){
+      $stmt = $pdo->prepare("SELECT u.id, u.role, u.name, u.last_name, u.email, u.active, u.lang 
+                             FROM users u
+                             INNER JOIN company_users cu ON u.id = cu.id_users
+                             WHERE cu.id_company = :company_id AND cu.active = 0");
+      $stmt->execute(['company_id' => $companyId]);
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 
 }
