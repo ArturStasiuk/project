@@ -6,13 +6,14 @@ class CONFIG {
         this.lang = LAUNGE[this.lang]; // tłumaczenia
         this.method = this.user.method; // metody i funkcje
         this.data = this.user.data; // dane i logika biznesowa
+        this.modal = this.user.modal; // okna modalne
     }
    // pobranie konfiguracji językowej
     async configLang() {
         // Pobiera język użytkownika przez API i ustawia tłumaczenia
         const odp = await this.data.getLang();
         this.lang = (odp && odp.lang) ? odp.lang : 'English';
-        this.lang = LAUNGE[this.lang] || {};
+        this.lang = LAUNGE[this.lang] || LAUNGE['English'];
     }
 
    // konfiguracja okna glownego 
@@ -49,20 +50,33 @@ class CONFIG {
             label: this.lang.menuLabelUsers, // etykieta menu z tłumaczeniem
             items: [
                 {
-                    icon: this.lang.meniuIconUsers1,
+                    icon: this.lang.menuIconUsers1,
                     label: this.lang.menuItemsUsers1,
                     disabled: !accessMenu.read, // dostęp do odczytu decyduje o aktywności tej opcji
                     onClick: async () => { await this.user.showActiveUsers(); } // pokazanie aktywnych użytkowników po kliknięciu
                 },
                 {
-                    icon: this.lang.meniuIconUsers2,
+                    icon: this.lang.menuIconUsers2,
                     label: this.lang.menuItemsUsers2,
                     disabled: !accessMenu.read, // dostęp do odczytu decyduje o aktywności tej opcji
                     onClick: async () => {await this.user.showInactiveUsers(); } // pokazanie nieaktywnych użytkowników po kliknięciu
+                },
+                {
+                    icon: this.lang.menuIconUsers3,
+                    label: this.lang.menuItemsUsers3,
+                    disabled: !accessMenu.create, // dostęp do tworzenia decyduje o aktywności tej opcji
+                    onClick: async () => { /* tutaj można dodać funkcję do dodawania użytkownika */ } // otwarcie formularza dodawania użytkownika po kliknięciu
                 }
             ]
         }
 
+    }
+   // funkcja do wyświetlania komunikatu o braku dostępu 
+    async modalAlertNoAccess() {
+        await this.modal.alert(
+            this.lang.access_tools || "Access Tools",
+            this.lang.noAccess || "You do not have access."
+        );
     }
 
     /** lista użytkowników jako kafelki

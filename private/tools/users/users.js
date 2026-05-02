@@ -112,7 +112,8 @@ class USERS {
 
     /** pierwsze uruchomienie obiektu USERS */
     async init(idUsers = null, idCompany = null) {
-     //  await this.openWindow(); // dodanie ikony do paska nawigacji
+      //  alert('Inicjalizacja USERS:', { idUsers, idCompany });
+       await this.openWindow(); // wywołanie okna zarządzaj użytkownikami
     }
     /** odświeżanie istniejącego obiektu USERS */
     async refresh(idUsers = null, idCompany = null) {

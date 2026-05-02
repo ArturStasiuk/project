@@ -38,10 +38,9 @@ class METHOD {
         // wyswietlenie zawartości w oknie
        await this.windows. addWindowCard(content);
         // dodanie nasluchiwania klikniecia na karty uzytkownikow
-       await this.handlers.handleDataElementClick('[data-user-card]', ({ data, element, event }) => {
-            console.log( data );
+       this.handlers.handleDataElementClick('[data-user-card]', async ({ data, element, event }) => {
          /** otworzenie formulaza z danyci uzytkownika do np edycji */
-
+           await this.openEditUser(data);
         });
     }
     // wyswietlenie nieaktywnych uzytkownikow
@@ -52,15 +51,23 @@ class METHOD {
         const content = await this.config.getConfigTableUsers(inactiveUsers);
         // wyswietlenie zawartości w oknie
         await this.windows.addWindowCard(content);
-
-  
+        this.handlers.handleDataElementClick('[data-user-card]', async ({ data, element, event }) => {
+            /** otworzenie formulaza z danyci uzytkownika do np edycji */
+             await this.openFormUser();
+        });
     }
         
     /** otwozenie formularza z danymi uzytkownika do np edycji */
-    async openFormUser(data) {
-    /** nalezy sprawdzicz czy uzytkownik ma mozliwosc edycji 
+    async openEditUser(data) {
+          /** nalezy sprawdzicz czy uzytkownik ma mozliwosc edycji 
      * danych pracownika 
      */
+      const odp = await this.data.getAccessMenu();
+     if (!odp.update) {
+         await this.config.modalAlertNoAccess();
+       return;
+      }
+     console.log("Otwieranie formularza użytkownika:", { data });
     }
 
 
