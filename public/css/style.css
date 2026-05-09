@@ -97,7 +97,7 @@
     /* ── TITLEBAR ── */
     .titlebar {
         height: 48px;
-        background: rgba(32,32,32,0.85);
+        background: rgb(77, 2, 138);
         backdrop-filter: blur(40px);
         display: flex; align-items: center; justify-content: space-between;
         padding: 0 16px;

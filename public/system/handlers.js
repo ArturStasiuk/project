@@ -139,7 +139,6 @@ export default {
     handleButtonClicks,
     removeButtonClicks,
     getFormData,
-    //getHiddenData,
     handleDataElementClick,
     removeDataElementClick
 };

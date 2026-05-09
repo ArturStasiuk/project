@@ -11,24 +11,6 @@
     <link rel="stylesheet" href="css/modal.css">
   
 
-    <!--
-        Import map: mapuje krótkie nazwy modułów na ich publiczne URL-e.
-        Dzięki temu prywatne narzędzia ładowane przez Blob URL mogą importować
-        publiczne moduły używając krótkich nazw, np.:
-            import modal from 'modal';
-            import api   from 'api';
-        zamiast ścieżek względnych (które nie działają w kontekście Blob URL).
-    -->
-    <script type="importmap">
-    {
-        "imports": {
-            "modal": "./view/modal.js",
-            "view":  "./view/app.js",
-            "api":   "../api/api.js",
-            "handlers": "./sys/handlers.js"
-        }
-    }
-    </script>
 
 </head>
 <body>
@@ -43,12 +25,9 @@
 
 
 <script type="module">
-    import api from '../api/api.js';
-    
-    //const Lang = await api.send({ method: "getUserLanguage" });
-
-    import sys from '../public/sys/sys.js';
-
+    import system from '../public/system/system.js';
+    // inicjalizacja systemu
+  //  await system.init();
 </script>
 
 

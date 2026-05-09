@@ -1,6 +1,6 @@
 // clasa do wyswietlania okien systemowych modalnych takich jak alert, confirm, prompt itp. oraz do tworzenia własnych okien modalnych
 import LAUNGE from './launge.js';
-import api from '../../api/api.js';
+
 class MODAL {
     constructor(parent) {
         this.api = null;
@@ -9,11 +9,7 @@ class MODAL {
     }
 
     async initialize() {
-        // Pobiera język użytkownika przez API i ustawia tłumaczenia
-        if (!this.api) throw new Error('API instance not set in MODAL');
-        const odp = await this.api.send({ method: "getUserLanguage" });
-        this.lang = odp.lang || 'English';
-        this.t = LAUNGE[this.lang] || {};
+
     }
 
 
@@ -70,7 +66,7 @@ class MODAL {
     }
 
     // okno oczekiwania z animacja ladowania pierwsze wywolanie okna pokazuje je a kolejne wywolanie zamyka, mozna tez przekazac tekst do wyswietlenia
-    async loading(message, title) {
+    async loading(title, message) {
         const t = this.t;
         let modal = document.querySelector('.modal--loading');
         if (modal) {
@@ -92,7 +88,7 @@ class MODAL {
     }
 
     /** modal do podania danych przez użytkownika (prompt) */
-    async prompt(message, defaultValue = '', title) {
+    async prompt(title, message, defaultValue = '') {
         const t = this.t;
         return new Promise((resolve) => {
             const modal = document.createElement('div');
@@ -134,9 +130,9 @@ class MODAL {
 
 }
 
-import apiInstance from '../../api/api.js';
+
 const modal = new MODAL();
-modal.api = apiInstance;
-apiInstance.setModal(modal);
+
+
 export default modal;
 
