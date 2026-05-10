@@ -9,8 +9,7 @@ class Login{
     constructor(){
         this.view = view;// widok aplikacji
         this.api = api;// api do komunikacji z backendem
-        this.language = 'English';// domyslny jezyk (klucz LAUNGE_LOGIN)
-        this.launge = LAUNGE_LOGIN.English;
+
         this.config = new config(this);// config logowania
         this.isInitialized = false;// czy logowanie jest już inicjalizowane
         this.handlers = handlers;// handlers do obsługi eventow
@@ -92,13 +91,11 @@ class Login{
 
 
 
-    /** ustawienie jezyka */
+    /** ustawienie jezyka z window.dataSystem (uzupelnione przez system.loadLanguageUser). */
     async setLanguage() {
-        const res = await this.api.getLanguageUser();
-        const code = res?.data?.language ?? 'English';
-        const supported = Object.keys(LAUNGE_LOGIN);
-        this.language = supported.includes(code) ? code : 'English';
-        this.launge = LAUNGE_LOGIN[this.language];
+        const code = window.dataSystem.language ?? 'English';
+        this.language = code;
+        this.launge = window.dataSystem.launge ?? LAUNGE_LOGIN.English;
     }
 
 

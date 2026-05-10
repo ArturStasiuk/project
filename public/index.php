@@ -22,8 +22,13 @@ session_start();
     <div class="window-container" id="windowContainer"></div>
 
 
-
-
+<script>
+const dataSystem = {
+    language: null,
+    launge: null,
+}
+window.dataSystem = dataSystem;
+</script>
 
 
 <script type="module">
