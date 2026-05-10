@@ -8,7 +8,7 @@ class System {
         this.isInitialized = false;// czy system jest już inicjalizowany
         this.widok = view;// widok aplikacji
         this.login = login;// tool do logowania
-        this.init();// inicjalizacja systemu
+      //  this.init();// inicjalizacja systemu
     
     }
 
@@ -21,15 +21,26 @@ class System {
         console.log("ladowanie systemu");
        // sprwdzenie stanu logowania 
       const odp = await this.api.getSessionData();
-       if(odp.data.id_user) {
-        // wywolanie po zalogowaniu strony głównej
-        alert('Zalogowano');
+       if(odp.data.id) {
+        // ladowanie systemu po zalogowaniu
+          await this.loadSystem();
+
        }
        else {
-        // wywolanie po niezalogowaniu strony głównej
-        this.login.init(null);
+        // wywolanie logowania 
+        await this.login.init();
+     
        }
     }
+
+    // ladowanie systeu po gdy zalogowany uzytkownik
+    async loadSystem(){
+        console.log("ladowanie systemu po zalogowaniu");
+    }
+
+
+
+
             
 }
 

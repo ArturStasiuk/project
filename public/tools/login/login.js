@@ -1,4 +1,4 @@
-// ostatnia aktualizacja: 10.05.2026
+
 import LAUNGE_LOGIN from './laungue_login.js';
 import view from '../../view/app.js';
 import api from '../../../private/api/api.js';
@@ -15,7 +15,7 @@ class Login{
         this.isInitialized = false;// czy logowanie jest już inicjalizowane
         this.handlers = handlers;// handlers do obsługi eventow
         this.modal = modal;// modal do wyswietlania komunikatow
-        this.init();// inicjalizacja logowania
+      //  this.init();// inicjalizacja logowania
 
     }
 
@@ -23,7 +23,17 @@ class Login{
         if (this.isInitialized) return;
         this.isInitialized = true;
         await this.setLanguage();
-       await this.showLoginWindow();
+        // sprawdzenie czy jest zalogowany uzytkownik
+        const odp = await this.api.getSessionData();
+        if(odp.data.id) {
+            // wywolanie po zalogowaniu strony głównej
+            window.location.reload();
+            return;
+        }
+        else {
+            // wywolanie logowania 
+            await this.showLoginWindow();
+        }
     }
 
 
@@ -69,6 +79,8 @@ class Login{
         // wywolanie po zalogowaniu strony głównej
         const modal = await this.config.getAlert_Logged_In(odp.data.name + ' ' + odp.data.last_name);
         await this.modal.alert(modal.title, modal.message);
+        // przeladowanie strony głownej
+        window.location.reload();
         return;
        }
     }

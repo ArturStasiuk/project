@@ -1,5 +1,5 @@
-// ostatnia aktualizacja: 10.05.2026
 <?php
+// ostatnia aktualizacja: 10.05.2026
 // wywolywanie procedur skladowych w bazie danych
 $conn = require __DIR__ . '/../connect/connect.php';
 // sprawdzenie czy polaczenie z baza danych jest poprawne

@@ -20,7 +20,7 @@ class Api{
     }
     /** logowanie uzytkownika */
     async login(data) {
-        return await this.responseApi({ procedureSql: 'sql_login_user', arguments: data });
+        return await this.responseApi({ procedurePhp: 'loginUser', arguments: data });
     }
 
 

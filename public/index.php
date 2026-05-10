@@ -29,7 +29,7 @@ session_start();
 <script type="module">
     import system from '../public/system/system.js';
     // inicjalizacja systemu
-  //  await system.init();
+    await system.init();
 </script>
 
 
