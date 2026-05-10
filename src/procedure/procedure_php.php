@@ -1,4 +1,10 @@
 <?php
+
+// Odpowiedzi API są JSON-em (przed jakimkolwiek wyjściem z include’ów).
+if (!headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
+}
+
 // tutaj beda umieszczane procedury napisane w php
 $conn = require __DIR__ . '/../connect/connect.php';
 // sprawdzenie czy polaczenie z baza danych jest poprawne
@@ -8,9 +14,29 @@ if ($conn->connect_error) {
 
 class ProcedurePHP
 {
+    /** @var string|null json_encode(argumentów wywołania) — ustawiane w {@see __call} */
+    private $invocationArgsJson;
+
     public function __construct(mysqli $conn)
     {
         $this->conn = $conn;
+    }
+
+    /**
+     * @param mixed $data zwrócone z procedury (trafia pod klucz "data" w odpowiedzi API)
+     * @return array<string, mixed>
+     */
+    private function wrapProcedureResponse(string $procedureName, $data): array
+    {
+        $argsJson = $this->invocationArgsJson ?? '[]';
+
+        return [
+            'status_response' => [
+                'status' => true,
+                'message' => 'Wywołano procedurę PHP ' . $procedureName . '. Data: ' . $argsJson,
+            ],
+            'data' => $data,
+        ];
     }
 
     /**
@@ -36,25 +62,38 @@ class ProcedurePHP
             throw new RuntimeException('Procedura musi być metodą prywatną.');
         }
 
-        return $this->{$procedureName}(...$arguments);
+        $this->invocationArgsJson = json_encode($arguments, JSON_UNESCAPED_UNICODE);
+        try {
+            $payload = $this->{$procedureName}(...$arguments);
+
+            return $this->wrapProcedureResponse($procedureName, $payload);
+        } finally {
+            $this->invocationArgsJson = null;
+        }
     }
 
     /**
+     * Zwróć tylko dane — {@see __call} sam doda status_response i JSON argumentów.
+     *
      * @param mixed ...$args
-     * @return array<string, mixed>
+     * @return array<int, mixed>
      */
     private function test(...$args): array
     {
-        $argsJson = json_encode($args, JSON_UNESCAPED_UNICODE);
-
-        return [
-            'status_response' => [
-                'status' => true,
-                'message' => 'Wywołano procedurę PHP test. Data: ' . $argsJson,
-            ],
-            'data' => $args,
-        ];
+        return $args;
     }
+
+    private function getSessionData(...$args): array
+    {
+        $_SESSION = ['id_user' => 0, 'login' => 'test', 'email' => 'test@test.com', 'role' => 'admin'];
+        return $_SESSION;
+    }
+
+
+
+
+
 }
 $procedurePhp = new ProcedurePHP($conn);
 return $procedurePhp;
+

@@ -1,8 +1,8 @@
-//import modal from '../../public/view/modal.js';
+
 class Api{
     constructor(){
         this.init();
-       // this.modal = modal;
+
     }
 
     async init() {
@@ -10,8 +10,8 @@ class Api{
         this.isInitialized = true;
         console.log("ladowanie api");
     }
-    async testApi() {
-
+    async getSessionData() {
+        return await this.responseApi({ procedurePhp: 'getSessionData', arguments: {} });
     }
    
 

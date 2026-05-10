@@ -13,6 +13,8 @@ class Login{
         if (this.isInitialized) return;
         this.isInitialized = true;
         console.log("ladowanie loginu");
+
+
     }
 
 

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/bootstrap_api.php';
+
 /*
  * API endpoint do wywolywania procedur SQL przez POST JSON.
  *
@@ -20,10 +22,20 @@
  *           przy braku wierszy: { data: [] } — normalizacja w sql_procedure.php
  * - blad techniczny: { "error": "..." }
  */
-// dolaczenie pliku oblugi procedur w sql
-require_once __DIR__ . '/procedure/procedure_sql.php'; 
-// dolaczenie procedur w php 
-require_once __DIR__ . '/procedure/procedure_php.php';
+try {
+    // dolaczenie pliku oblugi procedur w sql
+    require_once __DIR__ . '/procedure/procedure_sql.php';
+    // dolaczenie procedur w php
+    require_once __DIR__ . '/procedure/procedure_php.php';
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'status' => false,
+        'message' => 'Błąd inicjalizacji lub połączenia z bazą.',
+        'data' => null,
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 $data = json_decode(file_get_contents('php://input'), true);
 
@@ -32,7 +44,6 @@ if ($data === null) {
     echo json_encode(['error' => 'Invalid JSON']);
     exit;
 }
-header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
