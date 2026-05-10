@@ -89,6 +89,20 @@ class config{
             message: t.alert_logged_in_message + ' ' + user_info,
         };
     }
+    // ikona logowania do paska menu
+    async getLoginIcon(){
+        const t = this._t();
+        const icon = {
+          id: 'login_icon', // id ikony logowania
+          title:t.login_icon_title,
+          icon: t.icon_login, // ikona logowania
+          onClick: async () => {
+            // wywolanie pokazania okna logowania
+              await this.login.showLoginWindow();
+          }
+      }
+      return icon;
+    }
 
 
     

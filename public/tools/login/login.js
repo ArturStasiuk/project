@@ -31,8 +31,8 @@ class Login{
             return;
         }
         else {
-            // wywolanie logowania 
-            await this.showLoginWindow();
+           // dodanie ikony logowania do paska menu
+           await this.addLoginIconToTaskbar();
         }
     }
 
@@ -84,7 +84,11 @@ class Login{
         return;
        }
     }
+    // dodanie ikony logowania do paska menu
+    async addLoginIconToTaskbar() {
 
+        await this.view.addTaskbarItem(await this.config.getLoginIcon());
+    }
 
 
 

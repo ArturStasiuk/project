@@ -15,6 +15,8 @@ const LAUNGE_LOGIN = {
 		alert_login_error_message: 'Wprowadź poprawny adres e-mail i hasło',
 		alert_logged_in: 'Witaj	',
 		alert_logged_in_message: 'Witaj w aplikacji',
+		login_icon_title: 'Zaloguj się',
+		icon_login: '🔐',
 	},
 
 	English: {
@@ -33,6 +35,8 @@ const LAUNGE_LOGIN = {
 		alert_login_error_message: 'Enter the correct email and password',
 			alert_logged_in: 'Logged in successfully',
 			alert_logged_in_message: 'Logged in successfully as',
+			login_icon_title: 'Sign in',
+			icon_login: '🔐',
 	},
 
 	Svenska: {
@@ -51,6 +55,8 @@ const LAUNGE_LOGIN = {
 		alert_login_error_message: 'Ange korrekt e-postadress och lösenord',
 	    alert_logged_in: 'Välkommen',
 		alert_logged_in_message: 'Välkommen till applikationen',
+		login_icon_title: 'Logga in',
+		icon_login: '🔐',
 	},
 };
 export default LAUNGE_LOGIN;
