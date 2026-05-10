@@ -22,8 +22,6 @@ class Api{
     async login(data) {
         return await this.responseApi({ procedureSql: 'sql_login_user', arguments: data });
     }
-   
-
 
 
 

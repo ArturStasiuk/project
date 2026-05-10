@@ -40,8 +40,9 @@ class Login{
         if(id === 'button_zaloguj'){
             this.zaloguj();
         }else if(id === 'button_anuluj'){
-            //zamkniecie okna
-            this.view.removeWindow({id:window.id});
+            //zminimalizowanie okna 
+            this.view.minimizeWindow({id:window.id});
+           // this.view.removeWindow({id:window.id});
         }
        });
 

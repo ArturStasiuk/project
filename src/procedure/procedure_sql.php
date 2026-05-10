@@ -1,3 +1,4 @@
+// ostatnia aktualizacja: 10.05.2026
 <?php
 // wywolywanie procedur skladowych w bazie danych
 $conn = require __DIR__ . '/../connect/connect.php';
@@ -215,6 +216,10 @@ class ProcedureSQL
 
         return $rows;
     }
+
+
+
+
 }
 
 $procedureSql = new ProcedureSQL($conn);

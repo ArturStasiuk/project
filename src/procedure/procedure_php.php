@@ -85,7 +85,13 @@ class ProcedurePHP
         $language = $_SESSION['language'] ?? 'Svenska';
         return ['language' => $language];
     }
-
+    /** logowanie uzytkownika i ustawienie danych sesji  */
+    private function loginUser(...$args): array
+    {
+      require_once __DIR__ . '/procedure_sql.php';
+      $procedureSql = new ProcedureSQL($this->conn);
+      $result = $procedureSql->sql_login_user(...$args);
+    }
 
 
 
