@@ -25,7 +25,7 @@ class config{
           height: 500,
         },
         controls: {
-          minimize: true,
+          minimize: false,
           maximize: true,
           close: false,
         },

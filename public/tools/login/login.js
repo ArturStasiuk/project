@@ -46,13 +46,13 @@ class Login{
        // dodanie karty
        await  this.view.addWindowCard(content);
        // podpiecie eventow do nasluchiwania klikniecia na przyciski
-       this.handlers.handleButtonClicks(['button_zaloguj', 'button_anuluj'], (id) => {
+       await this.handlers.handleButtonClicks(['button_zaloguj', 'button_anuluj'], async (id) => {
         if(id === 'button_zaloguj'){
             this.zaloguj();
         }else if(id === 'button_anuluj'){
-            //zminimalizowanie okna 
-            this.view.minimizeWindow({id:window.id});
-           // this.view.removeWindow({id:window.id});
+            //usuniecie okna 
+          //  this.view.minimizeWindow({id:window.id});
+            await this.view.removeWindow({id:window.id});
         }
        });
 

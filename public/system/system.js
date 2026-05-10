@@ -16,9 +16,7 @@ class System {
         // sprawdzenie czy system jest już inicjalizowany
         if (this.isInitialized) return;
         this.isInitialized = true;
-        // ukrycie widoku paska meniu 
-      // this.widok.hideTaskbar();
-        console.log("ladowanie systemu");
+       // this.widok.hideTaskbar();
        // sprwdzenie stanu logowania 
       const odp = await this.api.getSessionData();
        if(odp.data.id) {
@@ -27,14 +25,29 @@ class System {
 
        }
        else {
-        // wywolanie logowania 
-        await this.login.init();
+        // jezeli nie zalogowany dodanie ikony logowaniana do paska menu
+        const icon = {
+            id: 'login_icon',
+            icon: '🔐',
+            label: 'Login',
+            onClick: async () => {
+                await this.login.showLoginWindow();
+            }
+        }
+        this.widok.addTaskbarItem(icon);
+      //  await this.login.init();
      
        }
     }
 
+
+
+
+
     // ladowanie systeu po gdy zalogowany uzytkownik
     async loadSystem(){
+
+
         console.log("ladowanie systemu po zalogowaniu");
     }
 

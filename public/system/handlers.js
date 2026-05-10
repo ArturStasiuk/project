@@ -65,7 +65,7 @@ async function getFormData(formId) {
  * przyklad wywolania:
  *   handleButtonClicks(['btnSave','btnCancel'], id => console.log('clicked', id));
  */
- function handleButtonClicks(buttonIds, callback) {
+ async function handleButtonClicks(buttonIds, callback) {
     buttonIds.forEach(id => {
         const button = document.getElementById(id);
         if (button) {
@@ -76,7 +76,7 @@ async function getFormData(formId) {
     });
  }
  /** funkcja do usuwania nasluchiwania klikniec przyciskow o podanym id */
- function removeButtonClicks(buttonIds) {
+ async function removeButtonClicks(buttonIds) {
     buttonIds.forEach(id => {
         const button = document.getElementById(id);
         if (button) {
@@ -96,7 +96,7 @@ async function getFormData(formId) {
  * Zwraca w callback obiekt z kluczem `data`, który zawiera wszystkie ukryte dane,
  * oraz referencje do elementu i event click.
  */
- function handleDataElementClick(selector, callback) {
+ async function handleDataElementClick(selector, callback) {
     if (!selector || typeof callback !== 'function') return;
     if (!document._dataClickDelegates) document._dataClickDelegates = {};
     if (document._dataClickDelegates[selector]) {
@@ -118,7 +118,7 @@ async function getFormData(formId) {
  *
  * Usuwa listener klikniecia dla selektora z delegacji dokumentu.
  */
- function removeDataElementClick(selector) {
+ async function removeDataElementClick(selector) {
     if (!selector || !document._dataClickDelegates) return;
     const handler = document._dataClickDelegates[selector];
     if (typeof handler !== 'function') return;
