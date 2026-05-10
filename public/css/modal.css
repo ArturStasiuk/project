@@ -114,6 +114,52 @@ body > *:not(.modal) {
     border: 1px solid #b71c1c;
 }
 
+/* --- LOGIN (okno aplikacji, ten sam wygląd co modal.js) --- */
+.login-modal-embed.modal-content {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 0 20px 0;
+}
+.login-modal-fields {
+    padding: 20px 24px 8px;
+    text-align: left;
+}
+.login-modal-field {
+    margin-bottom: 16px;
+}
+.login-modal-field:last-of-type {
+    margin-bottom: 10px;
+}
+.login-modal-field label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 6px;
+    font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+}
+.login-modal-field input[type="email"],
+.login-modal-field input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.55em 0.75em;
+    border-radius: 6px;
+    border: 1px solid #b4c7e7;
+    font-size: 1rem;
+    font-family: 'Segoe UI Variable', 'Segoe UI', Arial, sans-serif;
+    color: #222;
+    background: #fff;
+    outline: none;
+    transition: border 0.15s, box-shadow 0.15s;
+}
+.login-modal-field input:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
 /* --- LOADING MODAL --- */
 .modal--loading .modal-content {
     min-width: 260px;

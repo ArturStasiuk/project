@@ -72,21 +72,18 @@ class ProcedurePHP
         }
     }
 
-    /**
-     * Zwróć tylko dane — {@see __call} sam doda status_response i JSON argumentów.
-     *
-     * @param mixed ...$args
-     * @return array<int, mixed>
-     */
-    private function test(...$args): array
-    {
-        return $args;
-    }
 
+    /** pobranie danych sesji uzytkownika */
     private function getSessionData(...$args): array
     {
-        $_SESSION = ['id_user' => 0, 'login' => 'test', 'email' => 'test@test.com', 'role' => 'admin'];
         return $_SESSION;
+    }
+    /** pobranie jezyka dla zalogowanego uzytkownka */
+    private function getLanguageUser(...$args): array
+    {
+        /** jezeli nie ma jezyka w sesji to domyslnie jest angielski */
+        $language = $_SESSION['language'] ?? 'Svenska';
+        return ['language' => $language];
     }
 
 

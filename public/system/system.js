@@ -4,11 +4,11 @@ import login from '../tools/login/login.js';
 
 class System {
     constructor() {
-        this.api = api;
-        this.isInitialized = false;
-        this.widok = view;
-        this.login = login;
-        this.init();
+        this.api = api;// api do komunikacji z backendem
+        this.isInitialized = false;// czy system jest już inicjalizowany
+        this.widok = view;// widok aplikacji
+        this.login = login;// tool do logowania
+        this.init();// inicjalizacja systemu
     
     }
 
@@ -17,7 +17,7 @@ class System {
         if (this.isInitialized) return;
         this.isInitialized = true;
         // ukrycie widoku paska meniu 
-       this.widok.hideTaskbar();
+      // this.widok.hideTaskbar();
         console.log("ladowanie systemu");
        // sprwdzenie stanu logowania 
       const odp = await this.api.getSessionData();
@@ -27,7 +27,7 @@ class System {
        }
        else {
         // wywolanie po niezalogowaniu strony głównej
-        alert('Nie zalogowano');
+        this.login.init(null);
        }
     }
             

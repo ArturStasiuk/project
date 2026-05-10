@@ -48,7 +48,7 @@ function removeTableRowClickHandler(id_tabeli) {
 }
 
 /** odczytywanie danych z formularza o podanym id */
-function getFormData(formId) {
+async function getFormData(formId) {
     const form = document.getElementById(formId);
     if (!form) return null;
     const formData = new FormData(form);

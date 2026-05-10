@@ -10,8 +10,17 @@ class Api{
         this.isInitialized = true;
         console.log("ladowanie api");
     }
+    /** pobiera wszystkie dane sesji uzytkownika */
     async getSessionData() {
         return await this.responseApi({ procedurePhp: 'getSessionData', arguments: {} });
+    }
+    /** pobranie  jezyka dla zalogowanego uzytkownka */
+    async getLanguageUser() {
+        return await this.responseApi({ procedurePhp: 'getLanguageUser', arguments: {} });
+    }
+    /** logowanie uzytkownika */
+    async login(data) {
+        return await this.responseApi({ procedureSql: 'sql_login_user', arguments: data });
     }
    
 
