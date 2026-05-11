@@ -126,7 +126,7 @@ class ProcedurePHP
       // utworzenie obiektu procedury sql
       $procedureSql = new ProcedureSQL($this->conn);
       // wywolanie procedury sql_login_user i zwrocenie odpowiedzi 1:1
-      $result = $procedureSql->sql_login_user(...$args);
+      $result = $procedureSql->sp_login_user(...$args);
       if ($result['status_response']['status'] !== true) {
       return $result;}
       else { 
@@ -137,6 +137,9 @@ class ProcedurePHP
         return $result;
       }
     }
+
+
+
 
 
 

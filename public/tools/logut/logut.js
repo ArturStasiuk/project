@@ -28,6 +28,8 @@ class Logut{
     async showLogoutWindow(){
       const window = await this.config.configLogoutWindow();
       await this.view.addWindow(window);
+      const content = await this.config.configLogoutContent();
+      await this.view.addWindowCard(content);
     }
 
 

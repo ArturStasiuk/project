@@ -48,6 +48,35 @@ class Config{
 
     }
    }
+   // konfiguracja contentu okna wylogowywania
+   async configLogoutContent(){
+    const title = this.launge.logout_window_title ?? 'Logout';
+    const actionLabel = window.dataSystem?.language === 'Polski' ? 'Wyloguj' : 'Logout';
+    const cancelLabel = window.dataSystem?.language === 'Polski' ? 'Anuluj' : 'Cancel';
+    const message = window.dataSystem?.language === 'Polski'
+      ? 'Czy na pewno chcesz zakończyć sesję?'
+      : 'Are you sure you want to end the session?';
+
+    const formHtml = `
+      <form id="logout_form">
+        <div class="login-form">
+          <div class="login-form-brand" aria-hidden="true"></div>
+          <h2 class="login-form-heading">${title}</h2>
+          <p class="login-form-lead">${message}</p>
+          <div class="login-form-actions">
+            <button type="button" id="button_wyloguj" class="login-btn login-btn--primary">${actionLabel}</button>
+            <button type="button" id="button_anuluj_wylogowanie" class="login-btn login-btn--secondary">${cancelLabel}</button>
+          </div>
+        </div>
+      </form>`;
+
+    return {
+      id: 'logout_window',
+      cardId: 'logout-card',
+      title: '',
+      text: formHtml,
+    };
+   }
 
 
 
