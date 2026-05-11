@@ -1,6 +1,16 @@
 <?php
 session_start();
 
+require_once __DIR__ . '/../src/modules/newAdmin.php';
+$bootstrap = bootstrap_first_system_admin();
+if ($bootstrap['action'] === 'error') {
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>Błąd</title></head><body><p>'
+        . htmlspecialchars($bootstrap['message'] ?? 'Błąd', ENT_QUOTES, 'UTF-8')
+        . '</p></body></html>';
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 
@@ -16,6 +26,9 @@ session_start();
 
 </head>
 <body>
+<?php if ($bootstrap['action'] === 'first_user_created' && !empty($bootstrap['message'])): ?>
+<script>alert(<?= json_encode($bootstrap['message'], JSON_UNESCAPED_UNICODE) ?>);</script>
+<?php endif; ?>
     <div class="desktop-bg"></div>
     <div class="desktop-icons" id="desktopIcons"></div>
     <div class="taskbar" id="taskbar"></div>
