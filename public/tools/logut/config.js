@@ -42,7 +42,7 @@ class Config{
         controls: {
           minimize: false,
           maximize: false,
-          close: true,
+          close: false,
         },
 
 
@@ -50,12 +50,10 @@ class Config{
    }
    // konfiguracja contentu okna wylogowywania
    async configLogoutContent(){
-    const title = this.launge.logout_window_title ?? 'Logout';
-    const actionLabel = window.dataSystem?.language === 'Polski' ? 'Wyloguj' : 'Logout';
-    const cancelLabel = window.dataSystem?.language === 'Polski' ? 'Anuluj' : 'Cancel';
-    const message = window.dataSystem?.language === 'Polski'
-      ? 'Czy na pewno chcesz zakończyć sesję?'
-      : 'Are you sure you want to end the session?';
+    const title = this.launge.logout_window_title;
+    const actionLabel = this.launge.logout_button_submit;
+    const cancelLabel = this.launge.logout_button_cancel;
+    const message = this.launge.logout_content_message;
 
     const formHtml = `
       <form id="logout_form">

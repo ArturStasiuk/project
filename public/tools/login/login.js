@@ -47,10 +47,13 @@ class Login{
        // podpiecie eventow do nasluchiwania klikniecia na przyciski
        await this.handlers.handleButtonClicks(['button_zaloguj', 'button_anuluj'], async (id) => {
         if(id === 'button_zaloguj'){
+            // usuniecie nasluchiwania na eventy
+            await this.handlers.removeButtonClicks(['button_zaloguj', 'button_anuluj']);
             this.zaloguj();
         }else if(id === 'button_anuluj'){
-            //usuniecie okna 
-          //  this.view.minimizeWindow({id:window.id});
+            // usuniecie nasluchiwania na eventy
+            await this.handlers.removeButtonClicks(['button_zaloguj', 'button_anuluj']);
+            //usuniecie okna logowania
             await this.view.removeWindow({id:window.id});
         }
        });

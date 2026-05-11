@@ -22,6 +22,10 @@ class Api{
     async login(data) {
         return await this.responseApi({ procedurePhp: 'loginUser', arguments: data });
     }
+    /** wylogowanie uzytkownika */
+    async logout() {
+        return await this.responseApi({ procedurePhp: 'logout', arguments: {} });
+    }
 
 
 

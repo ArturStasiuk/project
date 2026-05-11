@@ -137,6 +137,16 @@ class ProcedurePHP
         return $result;
       }
     }
+    /** wylogowanie uzytkownika */
+    private function logout(...$args): array
+    {
+      // usuniecie danych sesji uzytkwnika z sesji
+      session_destroy();
+      return ['status' => true, 'message' => 'Użytkownik wylogowany'];
+      // odswiezenie strony
+      header('Location: ' . $_SERVER['REQUEST_URI']);
+      exit;
+    }
 
 
 
