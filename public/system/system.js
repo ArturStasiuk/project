@@ -48,6 +48,9 @@ class System {
         await this.loadLanguageUser();
         // tools wylogowywania
         await this.logut.init();
+        // ladowanie prywatnych modulow systemu
+        await this.api.loadPrivateModules();
+
     }
 
 

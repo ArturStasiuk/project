@@ -147,7 +147,44 @@ class ProcedurePHP
       header('Location: ' . $_SERVER['REQUEST_URI']);
       exit;
     }
+    /** pobranie dostepu do modulow systemu */
+    private function loadPrivateModules(...$args): array
+    {
+     // utworzenie obiektu procedury sql
+     $procedureSql = new ProcedureSQL($this->conn);
+     // pobranie id uzytkownika z sesji
+     $id_users = $_SESSION['id'];
+     // wywolanie procedury sql_get_access_tools i zwrocenie odpowiedzi 1:1
+     $result = $procedureSql->sp_get_access_tools($id_users);
+     if (
+        !isset($result['status_response']['status'])
+        || $result['status_response']['status'] !== true
+        || !isset($result['data'])
+        || !is_array($result['data'])
+     ) {
+        return $result;
+     }
 
+     $toolsNames = [];
+     foreach ($result['data'] as $toolRow) {
+        if (!is_array($toolRow)) {
+            continue;
+        }
+
+        $hasAccess = $toolRow['access_tools'] ?? 0;
+        if (
+            ($hasAccess === 1 || $hasAccess === '1' || $hasAccess === true)
+            && isset($toolRow['tools_name'])
+            && $toolRow['tools_name'] !== ''
+        ) {
+            $toolsNames[] = $toolRow['tools_name'];
+        }
+     }
+
+     $result['data'] = $toolsNames;
+     return $result;
+  
+    }
 
 
 

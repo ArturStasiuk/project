@@ -53,7 +53,11 @@ class ProcedureSQL
 
         $stmt->close();
         $rows = $this->normalizeStatusBoolean($rows);
-        $wrapped = $this->wrapStatusResponseAndData($rows);
+        if ($procedureName === 'sp_get_access_tools') {
+            $wrapped = $this->wrapSpGetAccessToolsTableRows($rows);
+        } else {
+            $wrapped = $this->wrapStatusResponseAndData($rows);
+        }
 
         return $this->asSingleRootObject($wrapped);
     }
@@ -114,6 +118,72 @@ class ProcedureSQL
         }
 
         return $wrapped;
+    }
+
+    /**
+     * Procedura zwraca wiele wierszy (tabela); scala do jednego obiektu API.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function wrapSpGetAccessToolsTableRows(array $rows): array
+    {
+        if ($rows === []) {
+            return [
+                [
+                    'status_response' => [
+                        'status' => false,
+                        'message' => 'no tools',
+                    ],
+                    'data' => null,
+                ],
+            ];
+        }
+
+        $first = $rows[0];
+        $status = $first['status'] ?? false;
+        if ($status !== true) {
+            return [
+                [
+                    'status_response' => [
+                        'status' => false,
+                        'message' => $first['message'] ?? 'no tools',
+                    ],
+                    'data' => null,
+                ],
+            ];
+        }
+
+        $toolKeys = [
+            'id',
+            'id_users',
+            'tools_name',
+            'access_tools',
+            'read_tools',
+            'add_tools',
+            'delete_tools',
+            'update_tools',
+        ];
+        $data = [];
+        foreach ($rows as $row) {
+            $tool = [];
+            foreach ($toolKeys as $key) {
+                if (array_key_exists($key, $row)) {
+                    $tool[$key] = $row[$key];
+                }
+            }
+            $data[] = $tool;
+        }
+
+        return [
+            [
+                'status_response' => [
+                    'status' => true,
+                    'message' => $first['message'] ?? 'get tools',
+                ],
+                'data' => $data,
+            ],
+        ];
     }
 
     /**

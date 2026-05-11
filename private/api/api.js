@@ -26,6 +26,10 @@ class Api{
     async logout() {
         return await this.responseApi({ procedurePhp: 'logout', arguments: {} });
     }
+    /** ladowanie prywatnych modulow systemu */
+    async loadPrivateModules() {
+        return await this.responseApi({ procedurePhp: 'loadPrivateModules', arguments: {} });
+    }
 
 
 
