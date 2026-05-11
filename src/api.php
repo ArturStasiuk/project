@@ -1,5 +1,20 @@
 <?php
-require_once __DIR__ . '/bootstrap_api.php';
+declare(strict_types=1);
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
+}
+
+set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+    if (!(error_reporting() & $severity)) {
+        return false;
+    }
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
 
 /*
  * API endpoint do wywolywania procedur SQL przez POST JSON.
