@@ -26,6 +26,7 @@ session_start();
 const dataSystem = {
     language: null,
     launge: null,
+    privateModules: [],
 }
 window.dataSystem = dataSystem;
 </script>

@@ -7,6 +7,7 @@ if (!headers_sent()) {
 
 // tutaj beda umieszczane procedury napisane w php
 $conn = require __DIR__ . '/../connect/connect.php';
+require_once __DIR__ . '/../modules/loadPrivateModules.php';
 // dolaczenie procedury sql
 //require_once __DIR__ . '/procedure_sql.php';
 
@@ -153,7 +154,16 @@ class ProcedurePHP
      // utworzenie obiektu procedury sql
      $procedureSql = new ProcedureSQL($this->conn);
      // pobranie id uzytkownika z sesji
-     $id_users = $_SESSION['id'];
+     $id_users = $_SESSION['id'] ?? null;
+     if ($id_users === null || $id_users === '') {
+        return [
+            'status_response' => [
+                'status' => false,
+                'message' => 'Brak zalogowanego uzytkownika.',
+            ],
+            'data' => [],
+        ];
+     }
      // wywolanie procedury sql_get_access_tools i zwrocenie odpowiedzi 1:1
      $result = $procedureSql->sp_get_access_tools($id_users);
      if (
@@ -164,24 +174,7 @@ class ProcedurePHP
      ) {
         return $result;
      }
-
-     $toolsNames = [];
-     foreach ($result['data'] as $toolRow) {
-        if (!is_array($toolRow)) {
-            continue;
-        }
-
-        $hasAccess = $toolRow['access_tools'] ?? 0;
-        if (
-            ($hasAccess === 1 || $hasAccess === '1' || $hasAccess === true)
-            && isset($toolRow['tools_name'])
-            && $toolRow['tools_name'] !== ''
-        ) {
-            $toolsNames[] = $toolRow['tools_name'];
-        }
-     }
-
-     $result['data'] = $toolsNames;
+     $result['data'] = PrivateModulesLoader::buildSafeModules($result['data']);
      return $result;
   
     }

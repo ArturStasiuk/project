@@ -10,6 +10,7 @@ class System {
         this.widok = view;// widok aplikacji
         this.login = login;// tool do logowania
         this.logut = logut;// tool do wylogowywania
+        this.privateModules = new Map();// zaladowane prywatne moduly
       //  this.init();// inicjalizacja systemu
     
     }
@@ -49,8 +50,47 @@ class System {
         // tools wylogowywania
         await this.logut.init();
         // ladowanie prywatnych modulow systemu
-        await this.api.loadPrivateModules();
+        const modulesResponse = await this.api.loadPrivateModules();
+        await this.loadPrivateModules(modulesResponse);
 
+    }
+
+    isValidPrivateModuleRow(row) {
+        if (!row || typeof row !== 'object') return false;
+        if (typeof row.name !== 'string' || typeof row.import_path !== 'string') return false;
+
+        const nameValid = /^[a-z0-9_]+$/.test(row.name);
+        const importValid = /^\.\.\/\.\.\/private\/tools\/[a-z0-9_]+\/[a-z0-9_]+\.js$/.test(row.import_path);
+
+        return nameValid && importValid;
+    }
+
+    async loadPrivateModules(modulesResponse) {
+        const status = modulesResponse?.status_response?.status;
+        if (status !== true) {
+            console.warn('Nie mozna zaladowac modulow prywatnych.', modulesResponse);
+            return;
+        }
+
+        const rows = Array.isArray(modulesResponse?.data) ? modulesResponse.data : [];
+        const loadedModuleNames = [];
+        for (const row of rows) {
+            if (!this.isValidPrivateModuleRow(row)) {
+                console.warn('Pominieto niepoprawny wpis modulu.', row);
+                continue;
+            }
+
+            try {
+                const moduleRef = await import(row.import_path);
+                const resolved = moduleRef?.default ?? moduleRef;
+                this.privateModules.set(row.name, resolved);
+                loadedModuleNames.push(row.name);
+            } catch (error) {
+                console.error('Blad ladowania modulu prywatnego:', row.name, error);
+            }
+        }
+
+        window.dataSystem.privateModules = loadedModuleNames;
     }
 
 
