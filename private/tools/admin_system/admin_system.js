@@ -11,10 +11,12 @@ class AdminSystem{
         this.init();
     }
     async init(){
-        
+    // dodanie ikony na pasku zadan
       await this.view.addTaskbarItem(await this.config.getTasbarItem());
+    // dodanie ikony na pasku menu start
       await this.view.addStartMenuItem(await this.config.getStartMenuIcon());
-      await this.desktopIcons.addIcon(await this.config.getDesktopIcon());
+    // dodanie ikony na pulpicie
+      await this.view.addIcon(await this.config.getDesktopIcon());
 
 
 

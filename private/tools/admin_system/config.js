@@ -31,9 +31,14 @@ class Config{
             id: 'desktop_admin_system',
             label: 'Administracja systemu',
             icon: '⚙️'	,
-            disabled: false,
-            onClick: async () => {//
-            }
+            disabled: true,
+            onClick: async () => {
+                alert('kliknieto ikone');
+                        },
+                        menuItems: [
+                            { icon: '📄', label: 'Dokument.txt',  onClick: async () => alert('Plik') },
+                            { icon: '📂', label: 'Otwórz folder', onClick: async () => alert('Folder') }
+                        ]
         };
     }
 

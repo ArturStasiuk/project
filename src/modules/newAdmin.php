@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Pierwsze uruchomienie: gdy baza `project` istnieje, tabela `users` jest pusta,
  * tworzony jest pierwszy administrator (haslo jak w sp_login_user: SHA-256 hex).
  *
- * Rozszerzenia (np. access_tables, company_users): dopisz INSERT-y w seed_default_permissions().
+ * Rozszerzenia (np. company_users): dopisz INSERT-y w seed_default_permissions().
  */
 
 const BOOTSTRAP_ADMIN_EMAIL = 'admin@admin.pl';
@@ -134,40 +134,63 @@ function bootstrap_first_system_admin(): array
 }
 
 /**
- * Domyslne uprawnienia do modulow (access_tools).
+ * Domyslne uprawnienia: access_tools (moduly), access_tables (wybrane tabele).
  * Dopisz tu INSERT-y do innych tabel wedlug potrzeb.
  *
  * @param mysqli $conn Polaczenie z wybrana baza (transakcja juz otwarta).
  */
 function seed_default_permissions(mysqli $conn, int $idUser): void
 {
-    $hasAccessTools = table_exists($conn, 'access_tools');
-    if (!$hasAccessTools) {
-        return;
-    }
+    if (table_exists($conn, 'access_tools')) {
+        $tools = [
+            ['admin_company', 1, 1, 1, 1, 1],
+            ['admin_system', 1, 1, 1, 1, 1],
+        ];
 
-    $tools = [
-        ['admin_company', 1, 1, 1, 1, 1],
-        ['admin_system', 1, 1, 1, 1, 1],
-    ];
-
-    $st = $conn->prepare(
-        'INSERT INTO `access_tools`
-        (`id_users`, `tools_name`, `access_tools`, `read_tools`, `add_tools`, `delete_tools`, `update_tools`)
-        VALUES (?, ?, ?, ?, ?, ?, ?)'
-    );
-    if ($st === false) {
-        throw new RuntimeException($conn->error);
-    }
-
-    foreach ($tools as $row) {
-        [$name, $at, $rt, $ad, $del, $up] = $row;
-        $st->bind_param('isiiiii', $idUser, $name, $at, $rt, $ad, $del, $up);
-        if (!$st->execute()) {
-            throw new RuntimeException($st->error ?: $conn->error);
+        $st = $conn->prepare(
+            'INSERT INTO `access_tools`
+            (`id_users`, `tools_name`, `access_tools`, `read_tools`, `add_tools`, `delete_tools`, `update_tools`)
+            VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        if ($st === false) {
+            throw new RuntimeException($conn->error);
         }
+
+        foreach ($tools as $row) {
+            [$name, $at, $rt, $ad, $del, $up] = $row;
+            $st->bind_param('isiiiii', $idUser, $name, $at, $rt, $ad, $del, $up);
+            if (!$st->execute()) {
+                throw new RuntimeException($st->error ?: $conn->error);
+            }
+        }
+        $st->close();
     }
-    $st->close();
+
+    if (table_exists($conn, 'access_tables')) {
+        $tables = [
+            ['users', 1, 1, 1, 1, 1],
+            ['company', 1, 1, 1, 1, 1],
+            ['company_users', 1, 1, 1, 1, 1],
+        ];
+
+        $st = $conn->prepare(
+            'INSERT INTO `access_tables`
+            (`id_users`, `tables`, `access_table`, `add_record`, `read_record`, `update_record`, `delete_record`)
+            VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        if ($st === false) {
+            throw new RuntimeException($conn->error);
+        }
+
+        foreach ($tables as $row) {
+            [$tbl, $at, $add, $read, $upd, $del] = $row;
+            $st->bind_param('isiiiii', $idUser, $tbl, $at, $add, $read, $upd, $del);
+            if (!$st->execute()) {
+                throw new RuntimeException($st->error ?: $conn->error);
+            }
+        }
+        $st->close();
+    }
 }
 
 function table_exists(mysqli $conn, string $table): bool
