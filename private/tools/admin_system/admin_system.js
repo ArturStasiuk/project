@@ -17,7 +17,7 @@ class AdminSystem{
       await this.view.addStartMenuItem(await this.config.getStartMenuIcon());
     // dodanie ikony na pulpicie
       await this.view.addIcon(await this.config.getDesktopIcon());
-
+    
 
 
     }
