@@ -8,7 +8,7 @@ class AdminCompany{
         this.init();
     }
     async init(){
-       
+      console.log('AdminCompany');
     }
 }
 const adminCompany = new AdminCompany();

@@ -23,7 +23,7 @@ function bootstrap_first_system_admin(): array
     if ($root->connect_error) {
         return [
             'action' => 'error',
-            'message' => 'Brak polaczenia z serwerem MySQL: ' . $root->connect_error,
+            'message' => 'MySQL: ' . $root->connect_error,
         ];
     }
 
