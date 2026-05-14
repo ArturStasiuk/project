@@ -1,10 +1,11 @@
 <?php
 
-function test(): array
+function test(array $data = []): array
 {
     return [
         'status' => true,
         'message' => 'This is a test response.',
+        'data' => $data,
     ];
 }
 
