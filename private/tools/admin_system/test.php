@@ -1,12 +1,15 @@
 <?php
 
-function test(array $data = []): array
+class TestClass
 {
-    return [
-        'status' => true,
-        'message' => 'This is a test response.',
-        'data' => $data,
-    ];
+    public function test(...$args): array
+    {
+        return [
+            'status' => true,
+            'message' => 'This is a test response.',
+            'data' => $args,
+        ];
+    }
 }
 
 function getRequestMethodName(): string
@@ -27,30 +30,41 @@ function getRequestArguments(): array
     return is_array($arguments) ? $arguments : [];
 }
 
-function canCallMethod(string $method): bool
+function canCallMethod(object $object, string $method): bool
 {
-    if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $method) || !function_exists($method)) {
+    if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $method) || !method_exists($object, $method)) {
         return false;
     }
 
-    $reflection = new ReflectionFunction($method);
+    $reflection = new ReflectionMethod($object, $method);
 
-    return $reflection->getFileName() === __FILE__;
+    return $reflection->isPublic();
+}
+
+function jsonResponse($data): void
+{
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
 
 header('Content-Type: application/json; charset=utf-8');
 
+$handler = new TestClass();
 $method = getRequestMethodName();
 
-if (!canCallMethod($method)) {
-    echo json_encode([
+if (!canCallMethod($handler, $method)) {
+    jsonResponse([
         'status' => false,
         'message' => 'no method',
-    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    ]);
 
     exit;
 }
 
-$result = call_user_func_array($method, getRequestArguments());
-
-echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+try {
+    jsonResponse(call_user_func_array([$handler, $method], getRequestArguments()));
+} catch (Throwable $exception) {
+    jsonResponse([
+        'status' => false,
+        'message' => $exception->getMessage(),
+    ]);
+}

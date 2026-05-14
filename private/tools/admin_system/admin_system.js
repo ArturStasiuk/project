@@ -18,28 +18,56 @@ class AdminSystem{
     // dodanie ikony na pulpicie
       await this.view.addIcon(await this.config.getDesktopIcon());
       const data = {
-        name: 'Admin System',
-        version: '1.0.0',
-        description: 'System zarządzania dla administratorów',
+        name: './test.php',
+        action: 'test',
+        args: [
+          'test',
+          123,
+        ]
       };
 
-      const responseData = await this.fetchData('./test.php', 'test', data);
+     
+      const responseData = await this.fetchData(data);
 
       console.log(responseData);
 
 
     }
    
-    async fetchData(plik, action, args = []){
-        const url = new URL(plik, import.meta.url);
-        const requestArgs = Array.isArray(args) ? args : [args];
+    async fetchData(data){
+        if (!data || typeof data !== 'object' || !('name' in data) || !('action' in data) || !('args' in data)) {
+            return {
+                status: false,
+                message: 'invalid data',
+            };
+        }
 
-        url.searchParams.set('action', action);
+        if (data.args !== null && !Array.isArray(data.args)) {
+            return {
+                status: false,
+                message: 'invalid args',
+            };
+        }
+
+        const url = new URL(data.name, import.meta.url);
+        const requestArgs = data.args === null ? [] : data.args;
+
+        url.searchParams.set('action', data.action);
         url.searchParams.set('args', JSON.stringify(requestArgs));
 
         const response = await fetch(url);
 
-        return response.json();
+        const responseText = await response.text();
+
+        try {
+            return JSON.parse(responseText);
+        } catch (error) {
+            return {
+                status: false,
+                message: 'invalid json response',
+                response: responseText,
+            };
+        }
     }
 
 
