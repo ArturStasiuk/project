@@ -17,7 +17,11 @@ class AdminSystem{
       await this.view.addStartMenuItem(await this.config.getStartMenuIcon());
     // dodanie ikony na pulpicie
       await this.view.addIcon(await this.config.getDesktopIcon());
-    
+     
+      const response = await fetch(new URL('./test.php?action=test', import.meta.url));
+      const data = await response.json();
+
+      console.log(data);
 
 
     }
