@@ -20,10 +20,10 @@ class AdminSystem{
       const data = {
         name: './test.php',
         action: 'test',
-        args: [
-          'test',
-          123,
-        ]
+        args: {
+          param1: 'value1',
+          param2: 'value2',
+        }
       };
 
      
@@ -42,7 +42,7 @@ class AdminSystem{
             };
         }
 
-        if (data.args !== null && !Array.isArray(data.args)) {
+        if (data.args !== null && (typeof data.args !== 'object' || Array.isArray(data.args))) {
             return {
                 status: false,
                 message: 'invalid args',
