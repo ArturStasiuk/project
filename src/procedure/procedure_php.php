@@ -119,7 +119,8 @@ class ProcedurePHP
     private function getLanguageUser(...$args): array
     {
         /** jezeli nie ma jezyka w sesji to domyslnie jest angielski */
-        $language = $_SESSION['lang'] ?? '	English';
+        $language = $_SESSION['language'] ?? 'English';
+
         return ['language' => $language];
     }
     /** logowanie uzytkownika i ustawienie danych sesji  */
@@ -145,9 +146,6 @@ class ProcedurePHP
       // usuniecie danych sesji uzytkwnika z sesji
       session_destroy();
       return ['status' => true, 'message' => 'Użytkownik wylogowany'];
-      // odswiezenie strony
-      header('Location: ' . $_SERVER['REQUEST_URI']);
-      exit;
     }
     /** pobranie dostepu do modulow systemu */
     private function loadPrivateModules(...$args): array
@@ -179,7 +177,15 @@ class ProcedurePHP
      return $result;
   
     }
-
+//=======================================================
+    private function getUsersData(...$args): array{
+        // inkludowanie klasy Users
+        require_once __DIR__ . '/../tables/users.php';
+        $users = new Users($this->conn, $args);
+        // wywolanie poprawnej metody i zwrocenie wyniku jako tablica
+        return $users->getUsersData();
+      
+    }
 
 
 
@@ -188,4 +194,3 @@ class ProcedurePHP
 }
 $procedurePhp = new ProcedurePHP($conn);
 return $procedurePhp;
-

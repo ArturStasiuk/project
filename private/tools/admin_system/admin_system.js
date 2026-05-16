@@ -1,13 +1,18 @@
 import view from '../../../public/view/app.js';
+import api from '../../api/api.js';
 
+
+import Data from './data.js';
 import config from './config.js';
 
 
 class AdminSystem{
     constructor(){
+        this.data = new Data();
+        this.api = api;
         this.config = config;
         this.view = view;
-        this.desktopIcons = desktopIcons;
+  
         this.init();
     }
     async init(){
@@ -16,7 +21,7 @@ class AdminSystem{
     // dodanie ikony na pasku menu start
       await this.view.addStartMenuItem(await this.config.getStartMenuIcon());
     // dodanie ikony na pulpicie
-      await this.view.addIcon(await this.config.getDesktopIcon());
+    //  await this.view.addIcon(await this.config.getDesktopIcon());
       const data = {
         name: './test.php',
         action: 'test',
@@ -27,48 +32,13 @@ class AdminSystem{
       };
 
      
-      const responseData = await this.fetchData(data);
+      const responseData = await this.data.fetchData(data);
 
       console.log(responseData);
-
+      await this.api.getUsersData();
 
     }
    
-    async fetchData(data){
-        if (!data || typeof data !== 'object' || !('name' in data) || !('action' in data) || !('args' in data)) {
-            return {
-                status: false,
-                message: 'invalid data',
-            };
-        }
-
-        if (data.args !== null && (typeof data.args !== 'object' || Array.isArray(data.args))) {
-            return {
-                status: false,
-                message: 'invalid args',
-            };
-        }
-
-        const url = new URL(data.name, import.meta.url);
-        const requestArgs = data.args === null ? [] : data.args;
-
-        url.searchParams.set('action', data.action);
-        url.searchParams.set('args', JSON.stringify(requestArgs));
-
-        const response = await fetch(url);
-
-        const responseText = await response.text();
-
-        try {
-            return JSON.parse(responseText);
-        } catch (error) {
-            return {
-                status: false,
-                message: 'invalid json response',
-                response: responseText,
-            };
-        }
-    }
 
 
 }
