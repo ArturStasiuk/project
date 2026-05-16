@@ -12,14 +12,29 @@ class Users
         $this->conn = $conn;
         $this->data = $data;
 
+      
+
+    }
+    public function getUsersData(): array{
+        $this->sprawdzSesje();
+        return [
+            'status' => true,
+            'message' => true,
+            'data' => $this->data,
+        ];
     }
 
-    public function getUsersData(): int
-    {
-        $data=15;
-        return $data;
-    }
 
+    private function sprawdzSesje(): bool{
+        if (isset($_SESSION['id'])) {
+            return true;
+        }
+        exit (json_encode([
+            'status' => false,
+            'message' => false,
+            'data' => null,
+        ]));
+    }
 
 
 

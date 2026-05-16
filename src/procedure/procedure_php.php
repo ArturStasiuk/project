@@ -181,7 +181,8 @@ class ProcedurePHP
     private function getUsersData(...$args): array{
         // inkludowanie klasy Users
         require_once __DIR__ . '/../tables/users.php';
-        $users = new Users($this->conn, $args);
+        $data = $args[0] ?? null;
+        $users = new Users($this->conn, $data);
         // wywolanie poprawnej metody i zwrocenie wyniku jako tablica
         return $users->getUsersData();
       

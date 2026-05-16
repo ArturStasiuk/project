@@ -35,7 +35,7 @@ class AdminSystem{
       const responseData = await this.data.fetchData(data);
 
       console.log(responseData);
-      await this.api.getUsersData();
+      await this.api.getUsersData({id: 1});
 
     }
    

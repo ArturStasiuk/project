@@ -31,8 +31,8 @@ class Api{
         return await this.responseApi({ procedurePhp: 'loadPrivateModules', arguments: {} });
     }
     // uzytkownik 
-    async getUsersData(){
-        return await this.responseApi({ procedurePhp: 'getUsersData', arguments: {} });
+    async getUsersData(data) {
+        return await this.responseApi({ procedurePhp: 'getUsersData', arguments: { data } });
     }
 
 
