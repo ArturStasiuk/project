@@ -9,7 +9,7 @@ if (!headers_sent()) {
 $conn = require __DIR__ . '/../connect/connect.php';
 require_once __DIR__ . '/../modules/loadPrivateModules.php';
 // dolaczenie procedury sql
-//require_once __DIR__ . '/procedure_sql.php';
+require_once __DIR__ . '/procedure_sql.php';
 
 // sprawdzenie czy polaczenie z baza danych jest poprawne
 if ($conn->connect_error) {
@@ -18,6 +18,7 @@ if ($conn->connect_error) {
 
 class ProcedurePHP
 {
+    private mysqli $conn;
     public function __construct(mysqli $conn)
     {
         $this->conn = $conn;
