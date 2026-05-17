@@ -1,7 +1,9 @@
 class Data 
-{
+{ 
+    
     constructor(parent)
     {
+      //this.url = './php/admin_system.php';  
     }
 
     async fetchData(data){
@@ -43,7 +45,7 @@ class Data
     // pobranie aministratorow systemu 
     async getAdminSystem(){
         const data = {
-            url: './admin_system.php',
+            url: './php/admin_system.php',
             method: 'getAdminSystem',
             args: {
             }
