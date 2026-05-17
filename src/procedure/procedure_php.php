@@ -189,7 +189,7 @@ class ProcedurePHP
         $data = $args[0] ?? null;
         $users = new Users($this->conn, $data);
         // wywolanie poprawnej metody i zwrocenie wyniku jako tablica
-        return $users->getUsers();
+        return $users->getAdminSystem();
       
     }
  

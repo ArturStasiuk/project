@@ -19,7 +19,26 @@ class AdminSystem
         $idUsers = $this->sprawdzSesje();
         $this->sprawdzAktywneKonto($idUsers);
         $this->sprawdzDostepDoTabeli($idUsers, 'users', 'read');
-        return $this->tableUsers->getAdminSystem();
+        $table = 'users';
+        $column = 'role';
+        $value = 'admin system';
+        $data = [];
+        $stmt = $this->conn->prepare("CALL get_records_by_value(?, ?, ?)");
+        $stmt->bind_param("sss", $table, $column, $value);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($result && $row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+         $stmt->close();
+        // Czyszczenie pozostałych wyników procedury składowanej (wymagane w MySQLi)
+        while ($this->conn->more_results() && $this->conn->next_result());
+
+        return [
+            'status' => true,
+            'message' => 'pobrano dane',
+            'data' => $data,
+        ];
     }
     
 
@@ -122,7 +141,7 @@ class AdminSystem
 //==================
 function getRequestMethodName(): string
 {
-    return (string) ($_REQUEST['method'] ?? $_REQUEST['action'] ?? '');
+    return (string) ($_REQUEST['method'] ?? $_REQUEST['method'] ?? '');
 }
 
 function getRequestArguments(): array

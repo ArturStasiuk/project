@@ -23,9 +23,15 @@ class AdminSystem{
     // dodanie ikony na pulpicie
     //  await this.view.addIcon(await this.config.getDesktopIcon());
        const data = {
-         name: './admin_system.php',
-         action: 'getAdminSystem',
+         url: './admin_system.php',
+         method: 'getAdminSystem',
          args: {
+         // columns:'role',
+         // where: 'admin system',
+  
+
+
+           
 
          }
        };
@@ -35,7 +41,7 @@ class AdminSystem{
 
       console.log(responseData);
 
-      await this.api.getSessionData({});
+      
 
     }
    

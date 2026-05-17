@@ -5,7 +5,7 @@ class Data
     }
 
     async fetchData(data){
-        if (!data || typeof data !== 'object' || !('name' in data) || !('action' in data) || !('args' in data)) {
+        if (!data || typeof data !== 'object' || !('url' in data) || !('method' in data) || !('args' in data)) {
             return {
                 status: false,
                 message: 'invalid data',
@@ -19,10 +19,10 @@ class Data
             };
         }
 
-        const url = new URL(data.name, import.meta.url);
+        const url = new URL(data.url, import.meta.url);
         const requestArgs = data.args === null ? [] : data.args;
 
-        url.searchParams.set('action', data.action);
+        url.searchParams.set('method', data.method);
         url.searchParams.set('args', JSON.stringify(requestArgs));
 
         const response = await fetch(url);

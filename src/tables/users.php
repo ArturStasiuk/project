@@ -19,12 +19,12 @@ class Users
 
 
     
-    public function getAdminSystem(): array{
-
+    public function read(): array{
+   
 
         return [
             'status' => true,
-            'message' => 'pobrano dane z tabeli users',
+            'message' => 'pobrano dane ',
             'data' => $this->data,
         ];
     }
