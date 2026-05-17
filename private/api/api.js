@@ -31,14 +31,12 @@ class Api{
         return await this.responseApi({ procedurePhp: 'loadPrivateModules', arguments: {} });
     }
     // uzytkownik 
-    async getUsersData(data) {
-        return await this.responseApi({ procedurePhp: 'getUsersData', arguments: { data } });
+    async getAdminSystem(data) {
+        
+        return await this.responseApi({ procedurePhp: 'getAdminSystem', arguments: { data } });
     }
-    // pobranie danych po podaniu nazwy kolumny i paramentu 
-    async getUsersData(data) {
-        // data: { column: 'name', value: 'John' }
-        return await this.responseApi({ procedurePhp: 'getUsersDataByColumn', arguments: { data } });
-    }
+    
+
 
 
 

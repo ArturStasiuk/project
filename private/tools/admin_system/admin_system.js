@@ -22,20 +22,21 @@ class AdminSystem{
       await this.view.addStartMenuItem(await this.config.getStartMenuIcon());
     // dodanie ikony na pulpicie
     //  await this.view.addIcon(await this.config.getDesktopIcon());
-      const data = {
-        name: './test.php',
-        action: 'test',
-        args: {
+       const data = {
+         name: './admin_system.php',
+         action: 'test',
+         args: {
           param1: 'value1',
-          param2: 'value2',
-        }
-      };
+           param2: 'value2',
+         }
+       };
 
      
       const responseData = await this.data.fetchData(data);
 
       console.log(responseData);
-      await this.api.getUsersData({id: 1});
+
+      await this.api.getSessionData({});
 
     }
    

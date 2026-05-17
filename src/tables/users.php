@@ -1,6 +1,6 @@
 <?php
 
-class Users
+class Users 
 {
        private mysqli $conn;
        private ?array $data;
@@ -28,7 +28,7 @@ class Users
             'data' => $this->data,
         ];
     }
-
+    
 
 
 

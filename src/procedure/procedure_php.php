@@ -178,10 +178,10 @@ class ProcedurePHP
   
     }
 //=======================================================
-    private function getUsersData(...$args): array{
+    private function getAdminSystem(...$args): array{
        $userId = $this->sprawdzSesje();
        $this->sprawdzAktywneKonto($userId);
-       $this->sprawdzDostepDoTabeli($userId, 'users', 'add');
+       $this->sprawdzDostepDoTabeli($userId,'users', 'add');
        
         
         // inkludowanie klasy Users
