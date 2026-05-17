@@ -24,10 +24,9 @@ class AdminSystem{
     //  await this.view.addIcon(await this.config.getDesktopIcon());
        const data = {
          name: './admin_system.php',
-         action: 'test',
+         action: 'getAdminSystem',
          args: {
-          param1: 'value1',
-           param2: 'value2',
+
          }
        };
 

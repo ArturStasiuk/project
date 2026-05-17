@@ -1,26 +1,27 @@
 <?php
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 class AdminSystem
 {
     private $conn;
+    private $tableUsers;
+
     public function __construct()
     {
       $this->conn = require __DIR__ . '/../../../src/connect/connect.php';
-        // Inicjalizacja, jeśli potrzebna
-     
+      require_once __DIR__ . '/../../../src/tables/users.php';
+      $this->tableUsers = new Users($this->conn);
     }
-    public function test(...$args): array
+    public function getAdminSystem(...$args): array
     {
-         $this->sprawdzSesje();
-       // $this->sprawdzAktywneKonto($idUsers);
-       // $this->sprawdzDostepDoTabeli($idUsers, 'some_table', 'read');
-        return [
-            'status' => true,
-            'message' => 'This is a test response.',
-            'data' => $args,
-        ];
+        $idUsers = $this->sprawdzSesje();
+        $this->sprawdzAktywneKonto($idUsers);
+        $this->sprawdzDostepDoTabeli($idUsers, 'users', 'read');
+        return $this->tableUsers->getAdminSystem();
     }
+    
 
 
 
@@ -72,7 +73,7 @@ class AdminSystem
      */
     private function sprawdzDostepDoTabeli(int $userId, string $tableName, string $action): bool{
      $mapaAkcji = [
-        'access' => 'access_tables',
+        'access' => 'access_table',
         'add'    => 'add_record',
         'read'   => 'read_record',
         'update' => 'update_record',
