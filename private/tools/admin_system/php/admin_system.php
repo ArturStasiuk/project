@@ -16,13 +16,15 @@ if (file_exists($currentDir . '/src/bootstrap.php')) {
 
 class AdminSystem
 {
-    private $conn;
+   // private $conn;
     private $access;
+    private $getData;
 
     public function __construct()
     {
-      $this->conn = require PATH_CONNECT;
-      $this->access = require PATH_ACCESS;
+     // $this->conn = require PATH_CONNECT;// polaczenie z baza danych
+      $this->access = require PATH_ACCESS;// obiekt do sprawdzania dostepu
+      $this->getData = require PATH_GET_DATA;// obiekt do pobierania danych
 
 
     }
@@ -35,17 +37,7 @@ class AdminSystem
         $column = 'role';
         $value = 'admin system';
         $data = [];
-        // Wywołanie procedury składowanej z parametrami do pobrania rekordów
-        $stmt = $this->conn->prepare("CALL get_records_by_value(?, ?, ?)");
-        $stmt->bind_param("sss", $table, $column, $value);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($result && $row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-         $stmt->close();
-        // Czyszczenie pozostałych wyników procedury składowanej (wymagane w MySQLi)
-        while ($this->conn->more_results() && $this->conn->next_result());
+        $data = $this->getData->get_records_by_value($table, $column, $value);
 
         return [
             'status' => true,

@@ -20,7 +20,7 @@ class Access
 
     }
 
-//funkcje pomocnicze do obsługi żądań i odpowiedzi
+   //funkcje pomocnicze do obsługi żądań i odpowiedzi
    public function sprawdzSesje() {
         if (!isset($_SESSION['id'])) {
             exit(json_encode([
