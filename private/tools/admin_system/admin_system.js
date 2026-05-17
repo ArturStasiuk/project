@@ -40,7 +40,8 @@ class AdminSystem{
       const responseData = await this.data.fetchData(data);
 
       console.log(responseData);
-      
+    
+      await this.api.responseApi({procedureSql: 'get_records_by_value', arguments: {tables: 'users', columns: 'role', value: 'admin system'}});
      
       
 
