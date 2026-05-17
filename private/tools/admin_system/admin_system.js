@@ -17,31 +17,16 @@ class AdminSystem{
     }
     async init(){
     // dodanie ikony na pasku zadan
-      await this.view.addTaskbarItem(await this.config.getTasbarItem());
+     // await this.view.addTaskbarItem(await this.config.getTasbarItem());
     // dodanie ikony na pasku menu start
       await this.view.addStartMenuItem(await this.config.getStartMenuIcon());
     // dodanie ikony na pulpicie
     //  await this.view.addIcon(await this.config.getDesktopIcon());
-       const data = {
-         url: './admin_system.php',
-         method: 'getAdminSystem',
-         args: {
-         // columns:'role',
-         // where: 'admin system',
-  
 
 
-           
-
-         }
-       };
-
-     
-      const responseData = await this.data.fetchData(data);
-
-      console.log(responseData);
+      console.log(await this.data.getAdminSystem());
     
-      await this.api.responseApi({procedureSql: 'get_records_by_value', arguments: {tables: 'users', columns: 'role', value: 'admin system'}});
+    
      
       
 

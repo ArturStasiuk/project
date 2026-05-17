@@ -23,6 +23,7 @@ class AdminSystem
         $column = 'role';
         $value = 'admin system';
         $data = [];
+        // Wywołanie procedury składowanej z parametrami do pobrania rekordów
         $stmt = $this->conn->prepare("CALL get_records_by_value(?, ?, ?)");
         $stmt->bind_param("sss", $table, $column, $value);
         $stmt->execute();

@@ -39,6 +39,21 @@ class Data
             };
         }
     }
+    
+    // pobranie aministratorow systemu 
+    async getAdminSystem(){
+        const data = {
+            url: './admin_system.php',
+            method: 'getAdminSystem',
+            args: {
+            }
+        };
+        return await this.fetchData(data);
+    }
+
+
+
+
 
 
 }

@@ -135,7 +135,7 @@ try {
     if ($procedureType === 'php') {
         $result = $procedurePhp->{$procedureName}(...$arguments);
     } else {
-         $result = $procedureSql->{$procedureName}(...$arguments);
+       //  $result = $procedureSql->{$procedureName}(...$arguments);
     }
     echo json_encode($result, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
