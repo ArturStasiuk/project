@@ -42,16 +42,6 @@ class Data
         }
     }
     
-    // pobranie aministratorow systemu 
-    async getAdminSystem(){
-        const data = {
-            url: './php/admin_system.php',
-            method: 'getAdminSystem',
-            args: {
-            }
-        };
-        return await this.fetchData(data);
-    }
 
 
 

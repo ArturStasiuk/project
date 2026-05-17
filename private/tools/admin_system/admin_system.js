@@ -24,7 +24,7 @@ class AdminSystem{
     //  await this.view.addIcon(await this.config.getDesktopIcon());
 
         await this.api.adminSystem({method: 'getAdminSystem', arguments: {}});
-      //console.log(await this.data.getAdminSystem());
+    
     
     
      

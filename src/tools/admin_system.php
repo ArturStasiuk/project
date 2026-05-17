@@ -19,14 +19,12 @@ class AdminSystem
    // private $conn;
     private $access;
     private $getData;
-    private $data;  
 
-    public function __construct( $data = null) 
+    public function __construct()
     {
      // $this->conn = require PATH_CONNECT;// polaczenie z baza danych
       $this->access = require PATH_ACCESS;// obiekt do sprawdzania dostepu
       $this->getData = require PATH_GET_DATA;// obiekt do pobierania danych
-      $this->data = $data;
 
 
     }
@@ -69,21 +67,20 @@ class AdminSystem
 }
 //====
 
-
-
-
-
-
-
 //==================
+// Pobranie danych wejściowych z JSON (dla fetch) oraz $_REQUEST (dla tradycyjnych form)
+$inputData = json_decode(file_get_contents('php://input'), true) ?? [];
+
 function getRequestMethodName(): string
 {
-    return (string) ($_REQUEST['method'] ?? $_REQUEST['method'] ?? '');
+    global $inputData;
+    return (string) ($inputData['method'] ?? $_REQUEST['method'] ?? '');
 }
 
 function getRequestArguments(): array
 {
-    $arguments = $_REQUEST['args'] ?? [];
+    global $inputData;
+    $arguments = $inputData['arguments'] ?? $_REQUEST['args'] ?? [];
 
     if (is_string($arguments)) {
         $decodedArguments = json_decode($arguments, true);
@@ -118,7 +115,7 @@ $method = getRequestMethodName();
 if (!canCallMethod($handler, $method)) {
     jsonResponse([
         'status' => false,
-        'message' => 'snow method',
+        'message' => 'no method',
     ]);
 
     exit;
