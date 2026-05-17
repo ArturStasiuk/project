@@ -25,15 +25,22 @@ class Users
     }
 
 
-    private function sprawdzSesje(): bool{
-        if (isset($_SESSION['id'])) {
-            return true;
-        }
-        exit (json_encode([
+    // sprawdzenie czy jest sesja uzytkownika
+    private function sprawdzSesje():int{
+        if (!isset($_SESSION['id'])) {
+            exit (json_encode([
             'status' => false,
             'message' => false,
             'data' => null,
-        ]));
+        ]));  
+        }else{
+            return $_SESSION['id'];
+        }
+
+    }
+    // sprawdzenie czy uzytkownik ma aktywne konto
+    private function sprawdzAktywneKonto(): void{
+     
     }
 
 
