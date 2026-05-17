@@ -30,11 +30,7 @@ class Api{
     async loadPrivateModules() {
         return await this.responseApi({ procedurePhp: 'loadPrivateModules', arguments: {} });
     }
-    // uzytkownik 
-    async getAdminSystem(data) {
-        
-        return await this.responseApi({ procedurePhp: 'getAdminSystem', arguments: { data } });
-    }
+
     
 
 
