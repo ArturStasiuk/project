@@ -2,6 +2,7 @@
 class Api{
     constructor(){
         this.init();
+        this.urlProcedurePhp = '../src/api.php';
 
     }
 
@@ -12,23 +13,23 @@ class Api{
     }
     /** pobiera wszystkie dane sesji uzytkownika */
     async getSessionData() {
-        return await this.responseApi({ procedurePhp: 'getSessionData', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'getSessionData', arguments: {} });
     }
     /** pobranie  jezyka dla zalogowanego uzytkownka */
     async getLanguageUser() {
-        return await this.responseApi({ procedurePhp: 'getLanguageUser', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'getLanguageUser', arguments: {} });
     }
     /** logowanie uzytkownika */
     async login(data) {
-        return await this.responseApi({ procedurePhp: 'loginUser', arguments: data });
+        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'loginUser', arguments: data });
     }
     /** wylogowanie uzytkownika */
     async logout() {
-        return await this.responseApi({ procedurePhp: 'logout', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'logout', arguments: {} });
     }
     /** ladowanie prywatnych modulow systemu */
     async loadPrivateModules() {
-        return await this.responseApi({ procedurePhp: 'loadPrivateModules', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'loadPrivateModules', arguments: {} });
     }
 
     
@@ -38,10 +39,10 @@ class Api{
 
 
 
-    async  responseApi(data) {
+    async responseApi(url, data) {
        
         console.log('Wysłano->', data);
-        const res = await fetch('../src/api.php', {
+        const res = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
