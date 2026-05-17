@@ -41,7 +41,17 @@ class Config{
                         ]
         };
     }
-    
+    async getWindowConfig(){
+        return {
+            id: 'admin_system_window',
+            title: 'Administracja systemu',
+            width: 800,
+            height: 600,
+            minWidth: 400,
+            minHeight: 300,
+            icon: '⚙️',
+        };
+    }
 
 
 

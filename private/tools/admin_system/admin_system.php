@@ -12,7 +12,7 @@ class AdminSystem
     {
       $this->conn = require __DIR__ . '/../../../src/connect/connect.php';
     //  require_once __DIR__ . '/../../../src/tables/users.php';
-    //  $this->tableUsers = new Users($this->conn);
+
     }
     public function getAdminSystem(...$args): array
     {
@@ -37,7 +37,7 @@ class AdminSystem
 
         return [
             'status' => true,
-            'message' => 'pobrano dane',
+            'message' => 'success',
             'data' => $data,
         ];
     }
