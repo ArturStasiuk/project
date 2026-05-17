@@ -177,7 +177,7 @@ class ProcedurePHP
      return $result;
   
     }
-//=======================================================
+    //=======================================================
 
  
 
@@ -185,7 +185,7 @@ class ProcedurePHP
 
 
     // sprawdzenie czy użytkownik ma w ogóle dostęp do tabel i akcji na tabelach 
-        private function sprawdzSesje() {
+    private function sprawdzSesje() {
         if (!isset($_SESSION['id'])) {
             exit(json_encode([
                 'status' => false,
