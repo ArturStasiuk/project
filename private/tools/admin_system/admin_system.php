@@ -11,8 +11,8 @@ class AdminSystem
     public function __construct()
     {
       $this->conn = require __DIR__ . '/../../../src/connect/connect.php';
-      require_once __DIR__ . '/../../../src/tables/users.php';
-      $this->tableUsers = new Users($this->conn);
+    //  require_once __DIR__ . '/../../../src/tables/users.php';
+    //  $this->tableUsers = new Users($this->conn);
     }
     public function getAdminSystem(...$args): array
     {

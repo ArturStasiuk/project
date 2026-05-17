@@ -178,20 +178,7 @@ class ProcedurePHP
   
     }
 //=======================================================
-    private function getAdminSystem(...$args): array{
-       $userId = $this->sprawdzSesje();
-       $this->sprawdzAktywneKonto($userId);
-       $this->sprawdzDostepDoTabeli($userId,'users', 'add');
-       
-        
-        // inkludowanie klasy Users
-        require_once __DIR__ . '/../tables/users.php';
-        $data = $args[0] ?? null;
-        $users = new Users($this->conn, $data);
-        // wywolanie poprawnej metody i zwrocenie wyniku jako tablica
-        return $users->getAdminSystem();
-      
-    }
+
  
 
 

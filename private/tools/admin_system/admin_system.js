@@ -40,7 +40,8 @@ class AdminSystem{
       const responseData = await this.data.fetchData(data);
 
       console.log(responseData);
-
+      
+     
       
 
     }
