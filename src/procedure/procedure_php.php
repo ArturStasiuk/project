@@ -179,15 +179,95 @@ class ProcedurePHP
     }
 //=======================================================
     private function getUsersData(...$args): array{
+       $userId = $this->sprawdzSesje();
+       $this->sprawdzAktywneKonto($userId);
+       $this->sprawdzDostepDoTabeli($userId, 'users', 'add');
+       
+        
         // inkludowanie klasy Users
         require_once __DIR__ . '/../tables/users.php';
         $data = $args[0] ?? null;
         $users = new Users($this->conn, $data);
         // wywolanie poprawnej metody i zwrocenie wyniku jako tablica
-        return $users->getUsersData();
+        return $users->getUsers();
       
     }
+ 
 
+
+
+
+    // sprawdzenie czy użytkownik ma w ogóle dostęp do tabel i akcji na tabelach 
+        private function sprawdzSesje() {
+        if (!isset($_SESSION['id'])) {
+            exit(json_encode([
+                'status' => false,
+                'message' => 'no session'
+            ]));
+        }
+        return (int)$_SESSION['id'];
+    }
+    // sprawdzenie czy uzytkownik ma aktywne konto
+    private function sprawdzAktywneKonto(int $userId): bool{
+    $stmt = $this->conn->prepare("SELECT 1 FROM users WHERE id = ? AND active = 1 LIMIT 1");
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $stmt->store_result();
+    $exists = $stmt->num_rows > 0;
+    $stmt->close();
+
+    if (!$exists) {
+        exit(json_encode([
+            'status' => false,
+            'message' => 'no activ users'
+        ]));
+    }
+    return true;
+    }
+
+    /** sprawdz czy uzytkownik ma dostep do wykonania akcji na danej tabeli
+     * @param int $userId - id uzytkownika
+     * @param string $tableName - nazwa tabeli
+     * @param string $action - nazwa akcji (np. 'read', 'add', 'update', 'delete', 'access')
+     * @return bool - true jesli uzytkownik ma dostep, false w przeciwnym razie
+     */
+    private function sprawdzDostepDoTabeli(int $userId, string $tableName, string $action): bool{
+     $mapaAkcji = [
+        'access' => 'access_tables',
+        'add'    => 'add_record',
+        'read'   => 'read_record',
+        'update' => 'update_record',
+        'delete' => 'delete_record',
+     ];
+
+     if (!isset($mapaAkcji[$action])) {
+        return false;
+     }
+
+     $kolumna = $mapaAkcji[$action];
+
+     // Pobieramy cały wiersz, aby móc sprawdzić zarówno istnienie rekordu, jak i wartości kolumn
+     $sql = "SELECT * FROM `access_tables` WHERE `id_users` = ? AND `tables` = ? LIMIT 1";
+
+     if ($stmt = $this->conn->prepare($sql)) {
+         $stmt->bind_param('is', $userId, $tableName);
+         $stmt->execute();
+         $result = $stmt->get_result();
+
+         $row = $result->fetch_assoc();
+         $stmt->close();
+
+         // Jeśli rekord istnieje i wartość w kolumnie to 1 (dostęp przyznany)
+         if ($row && (int)$row[$kolumna] === 1) {
+            return true;
+         }
+     }
+
+     exit(json_encode([
+        'status' => false,
+        'message' => 'no acces tables'
+     ]));
+    }
 
 
 

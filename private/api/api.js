@@ -34,6 +34,11 @@ class Api{
     async getUsersData(data) {
         return await this.responseApi({ procedurePhp: 'getUsersData', arguments: { data } });
     }
+    // pobranie danych po podaniu nazwy kolumny i paramentu 
+    async getUsersData(data) {
+        // data: { column: 'name', value: 'John' }
+        return await this.responseApi({ procedurePhp: 'getUsersDataByColumn', arguments: { data } });
+    }
 
 
 
