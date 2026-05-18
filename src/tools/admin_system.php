@@ -16,7 +16,7 @@ class AdminSystem
      
     }
 
-    public function readAdminSystem(...$args): array
+    public function getAdminSystem(...$args): array
     {
         $idUsers = $this->access->sprawdzSesje();
         $this->access->sprawdzAktywneKonto($idUsers);

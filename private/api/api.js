@@ -33,8 +33,8 @@ class Api{
     }
 
     /** pobranie listy administratorów systemu */
-    async readAdminSystem() {
-        return await this.responseApi(this.urlProcedurePhp, { tool: 'AdminSystem', method: 'readAdminSystem', arguments: {} });
+    async AdminSystem(tool, method, args) {
+        return await this.responseApi(this.urlProcedurePhp, { tool: tool, method: method, arguments: args });
     }
 
 
