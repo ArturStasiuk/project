@@ -19,13 +19,15 @@ if (file_exists($currentDir . '/src/bootstrap.php')) {
     require_once $currentDir . '/src/bootstrap.php';
 }
 // tutaj beda umieszczane procedury napisane w php
+// załadowanie klasy ProcedureSQL, aby była dostępna w konstruktorze
+$procedureSql = require_once PATH_PROCEDURES_SQL;
 $conn = require PATH_CONNECT;
 require_once PATH_LOAD_PRIVATE_MODULES;
 
 
 // sprawdzenie czy polaczenie z baza danych jest poprawne
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    throw new RuntimeException("Connection failed: " . $conn->connect_error);
 }
 
 class ProcedurePHP
@@ -33,14 +35,10 @@ class ProcedurePHP
     private $access;
     private mysqli $conn;
     private $procedure;
-    public function __construct(mysqli $conn)
+    public function __construct(mysqli $conn, $procedureSql)
     {
         $this->conn = $conn;
-        $this->access = require PATH_ACCESS;
-
-        // Nie używamy 'require PATH_PROCEDURES_SQL', ponieważ plik został już
-        // załadowany w api.php. Sięgamy do globalnej instancji obiektu.
-        global $procedureSql;
+        $this->access = require_once PATH_ACCESS;
         $this->procedure = $procedureSql;
     }
 
@@ -197,5 +195,5 @@ class ProcedurePHP
 
 
 }
-$procedurePhp = new ProcedurePHP($conn);
+$procedurePhp = new ProcedurePHP($conn, $procedureSql);
 return $procedurePhp;

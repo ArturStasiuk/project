@@ -22,7 +22,7 @@ class AdminSystem{
       await this.view.addStartMenuItem(await this.config.getStartMenuIcon());
     // dodanie ikony na pulpicie
     //  await this.view.addIcon(await this.config.getDesktopIcon());
-
+        //  wywolanie pliku admin_system.php z metoda getAdminSystem
         await this.api.adminSystem({method: 'getAdminSystem', arguments: {}});
     
     

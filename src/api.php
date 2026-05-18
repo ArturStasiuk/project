@@ -19,30 +19,9 @@ set_error_handler(static function (int $severity, string $message, string $file,
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
-/*
- * API endpoint do wywolywania procedur SQL przez POST JSON.
- *
- * Wejscie:
- * {
- *   "procedure": "nazwaProcedury",
- *   "arguments": {
- *     "email": "john@doe.com",
- *     "password": "tajne_haslo",
- *     "rememberMe": 1
- *   }
- * }
- * "arguments" to pary klucz => wartosc (moze ich byc dowolnie wiele).
- * Do procedury SQL przekazywane sa same wartosci, w kolejnosci podanej w JSON.
- *
- * Wyjscie:
- * - sukces: pojedynczy obiekt JSON – przy jednym wierszu procedury:
- *           { status_response?, data }; przy wielu: { results: [ {status_response?, data}, ... ] }
- *           przy braku wierszy: { data: [] } — normalizacja w sql_procedure.php
- * - blad techniczny: { "error": "..." }
- */
 try {
-    require_once PATH_PROCEDURES_SQL;
-    require_once PATH_PROCEDURES_PHP;
+  //  $procedureSql = require_once PATH_PROCEDURES_SQL;
+    $procedurePhp = require_once PATH_PROCEDURES_PHP;
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
@@ -71,46 +50,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$hasProcedurePhp = array_key_exists('procedurePhp', $data);
-$hasProcedureSql = array_key_exists('procedureSql', $data);
+$procedureName = $data['procedure'] ?? $data['procedurePhp'] ?? null;
 
-if (!$hasProcedurePhp && !$hasProcedureSql) {
+if (!$procedureName) {
     http_response_code(400);
     echo json_encode([
         'status' => false,
-        'message' => 'Field "procedurePhp" or "procedureSql" is required.',
+        'message' => 'Field "procedure" is required.',
         'data' => null
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
-
-if ($hasProcedurePhp && $hasProcedureSql) {
-    http_response_code(400);
-    echo json_encode([
-        'status' => false,
-        'message' => 'Use only one field: "procedurePhp" or "procedureSql".',
-        'data' => null
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-$procedureType = $hasProcedurePhp ? 'php' : 'sql';
-$procedureKey = $hasProcedurePhp ? 'procedurePhp' : 'procedureSql';
-
-if (!is_string($data[$procedureKey]) || trim($data[$procedureKey]) === '') {
-    http_response_code(400);
-    echo json_encode([
-        'status' => false,
-        'message' => 'Field "' . $procedureKey . '" must be a non-empty string.',
-        'data' => null
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-$procedureName = trim($data[$procedureKey]);
+$procedureName = trim((string)$procedureName);
 
 // Blokada niebezpiecznych nazw procedur i znakow specjalnych.
-if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $procedureName)) {
+if ($procedureName === '' || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $procedureName)) {
     http_response_code(400);
     echo json_encode([
         'status' => false,
@@ -134,11 +88,7 @@ $arguments = array_values($arguments);
 
 $result = null;
 try {
-    if ($procedureType === 'php') {
-        $result = $procedurePhp->{$procedureName}(...$arguments);
-    } else {
-      //  $result = $procedureSql->{$procedureName}(...$arguments);
-    }
+    $result = $procedurePhp->{$procedureName}(...$arguments);
     echo json_encode($result, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
     http_response_code(400);

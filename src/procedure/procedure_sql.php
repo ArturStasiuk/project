@@ -16,7 +16,7 @@ if (file_exists($currentDir . '/src/bootstrap.php')) {
 $conn = require PATH_CONNECT;
 // sprawdzenie czy polaczenie z baza danych jest poprawne
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    throw new RuntimeException("Connection failed: " . $conn->connect_error);
 }
 
 /**
@@ -25,7 +25,7 @@ if ($conn->connect_error) {
  */
 class ProcedureSQL
 {
-    private mysqli $conn;
+    private  $conn;
 
     public function __construct(mysqli $conn)
     {
