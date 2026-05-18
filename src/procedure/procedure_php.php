@@ -23,6 +23,7 @@ if (file_exists($currentDir . '/src/bootstrap.php')) {
 $procedureSql = require_once PATH_PROCEDURES_SQL;
 $conn = require PATH_CONNECT;
 require_once PATH_LOAD_PRIVATE_MODULES;
+$getData = require_once PATH_GET_DATA;
 
 
 // sprawdzenie czy polaczenie z baza danych jest poprawne
@@ -35,11 +36,13 @@ class ProcedurePHP
     private $access;
     private mysqli $conn;
     private $procedure;
-    public function __construct(mysqli $conn, $procedureSql)
+    private $getData;
+    public function __construct(mysqli $conn, $procedureSql, $getData)
     {
         $this->conn = $conn;
         $this->access = require_once PATH_ACCESS;
         $this->procedure = $procedureSql;
+        $this->getData = $getData;
     }
 
     /**
@@ -184,16 +187,22 @@ class ProcedurePHP
      return $result;
   
     }
+    /** pobranie danych administratorów systemu (przeniesione z admin_system.php) */
+    private function getAdminSystem(...$args): array
+    {
+        $idUsers = $this->access->sprawdzSesje();
+        $this->access->sprawdzAktywneKonto($idUsers);
+        $this->access->sprawdzDostepDoTabeli($idUsers, 'users', 'read');
+        
+        $data = $this->getData->get_records_by_value('users', 'role', 'admin system');
+
+        return [
+            'status' => true,
+            'message' => 'success',
+            'data' => $data,
+        ];
+    }
     //=======================================================
-
- 
-
-
-
-
-
-
-
 }
-$procedurePhp = new ProcedurePHP($conn, $procedureSql);
+$procedurePhp = new ProcedurePHP($conn, $procedureSql, $getData);
 return $procedurePhp;

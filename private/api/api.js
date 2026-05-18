@@ -3,7 +3,6 @@ class Api{
     constructor(){
         this.init();
         this.urlProcedurePhp = '../src/api.php';
-        this.urlAdminSystemPhp = '../src/tools/admin_system.php';
 
     }
 
@@ -33,11 +32,10 @@ class Api{
         return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'loadPrivateModules', arguments: {} });
     }
 
-    async adminSystem(data) {
-        return await this.responseApi(this.urlAdminSystemPhp, data);
+    /** pobranie listy administratorów systemu */
+    async getAdminSystem() {
+        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'getAdminSystem', arguments: {} });
     }
-
-
 
 
 
