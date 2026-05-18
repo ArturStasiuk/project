@@ -19,9 +19,12 @@ set_error_handler(static function (int $severity, string $message, string $file,
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
+// Inicjalizacja wspólnych zależności
 try {
-  //  $procedureSql = require_once PATH_PROCEDURES_SQL;
-    $procedurePhp = require_once PATH_PROCEDURES_PHP;
+    $conn = require PATH_CONNECT;
+    $procedureSql = require_once PATH_PROCEDURES_SQL;
+    $ReadData = require_once PATH_READ_DATA;
+    $access = require_once PATH_ACCESS;
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
@@ -50,51 +53,78 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$procedureName = $data['procedure'] ?? $data['procedurePhp'] ?? null;
-
-if (!$procedureName) {
-    http_response_code(400);
-    echo json_encode([
-        'status' => false,
-        'message' => 'Field "procedure" is required.',
-        'data' => null
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-$procedureName = trim((string)$procedureName);
-
-// Blokada niebezpiecznych nazw procedur i znakow specjalnych.
-if ($procedureName === '' || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $procedureName)) {
-    http_response_code(400);
-    echo json_encode([
-        'status' => false,
-        'message' => 'Invalid procedure name format.',
-        'data' => null
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
+$toolName = $data['tool'] ?? null;
+$procedureSqlName = $data['procedureSql'] ?? null;
+$methodName = $data['method'] ?? $data['procedurePhp'] ?? null;
 $arguments = $data['arguments'] ?? [];
-if (!is_array($arguments)) {
+
+if (!$toolName && !$procedureSqlName) {
     http_response_code(400);
-    echo json_encode([
-        'status' => false,
-        'message' => 'Field "arguments" must be an array.',
-        'data' => null
-    ], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['status' => false, 'message' => 'Tool or procedureSql is required.']);
     exit;
+}
+
+if (!is_array($arguments)) {
+    $arguments = [];
 }
 $arguments = array_values($arguments);
 
-$result = null;
 try {
-    $result = $procedurePhp->{$procedureName}(...$arguments);
+    // Obsługa bezpośrednich procedur SQL
+    if ($procedureSqlName) {
+        $name = trim((string)$procedureSqlName);
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name)) throw new Exception('Invalid SQL procedure name.');
+        echo json_encode($procedureSql->{$name}(...$arguments), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    // Obsługa modułów PHP (Tools)
+    $toolName = trim((string)$toolName);
+    if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $toolName)) throw new Exception('Invalid tool name.');
+    
+    // Konwersja CamelCase na snake_case (np. AdminSystem -> admin_system)
+    $fileName = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $toolName));
+    $toolPath = __DIR__ . "/tools/" . $fileName . ".php";
+    if (!file_exists($toolPath)) {
+        throw new Exception("Tool file not found: $toolName");
+    }
+
+    // Załadowanie klasy narzędzia
+    $toolClass = require_once $toolPath;
+    
+    // Inicjalizacja klasy (zakładamy, że plik zwraca instancję lub definicję przygotowaną do pracy)
+    // Dla spójności przyjmijmy, że każdy plik w tools zwraca obiekt klasy.
+    if (!is_object($toolClass)) {
+        // Jeśli plik nie zwraca obiektu, próbujemy go zainicjować (zakładając nazwę klasy zgodną z plikiem)
+        if (class_exists($toolName)) {
+            $toolInstance = new $toolName($conn, $procedureSql, $ReadData, $access);
+        } else {
+            throw new Exception("Tool class $toolName not found.");
+        }
+    } else {
+        $toolInstance = $toolClass;
+    }
+
+    if (!method_exists($toolInstance, $methodName)) {
+        throw new Exception("Method $methodName not found in tool $toolName.");
+    }
+
+    // Wywołanie metody
+    $result = $toolInstance->{$methodName}(...$arguments);
+
+    // Standaryzacja odpowiedzi, jeśli tool nie zwrócił status_response
+    if (is_array($result) && !isset($result['status_response']) && !isset($result['results'])) {
+        $status = $result['status'] ?? true;
+        $message = $result['message'] ?? 'success';
+        unset($result['status'], $result['message']);
+        $result = [
+            'status_response' => ['status' => $status, 'message' => $message],
+            'data' => $result
+        ];
+    }
+
     echo json_encode($result, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
-    http_response_code(400);
-    echo json_encode([
-        'status' => false,
-        'message' => 'Procedura nieznana lub nie może zostać wykonana.',
-        'data' => null
-    ], JSON_UNESCAPED_UNICODE);
+    http_response_code(500);
+    echo json_encode(['status' => false, 'message' => $e->getMessage()]);
 }

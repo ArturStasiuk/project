@@ -7,7 +7,7 @@ if (file_exists($currentDir . '/src/bootstrap.php')) {
     require_once $currentDir . '/src/bootstrap.php';
 }
 //===============================================================
-class GetData{
+class ReadData{
   private $conn;
     public function __construct()
     {
@@ -38,5 +38,5 @@ class GetData{
 
 }
 
-return new GetData();
+return new ReadData();
 

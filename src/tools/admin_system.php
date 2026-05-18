@@ -1,34 +1,22 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-/**
- * Dynamiczne szukanie bootstrapa w górę drzewa katalogów.
- * Szuka folderu 'src/bootstrap.php' startując od bieżącej lokalizacji.
- */
-$currentDir = __DIR__;
-while ($currentDir !== dirname($currentDir) && !file_exists($currentDir . '/src/bootstrap.php')) {
-    $currentDir = dirname($currentDir);
-}
-if (file_exists($currentDir . '/src/bootstrap.php')) {
-    require_once $currentDir . '/src/bootstrap.php';
-}
-
 class AdminSystem
 {
-   // private $conn;
+    private $conn;
     private $access;
     private $getData;
 
-    public function __construct()
+    private $procedureSql;
+
+    public function __construct($conn, $procedureSql, $getData, $access, )
     {
-     // $this->conn = require PATH_CONNECT;// polaczenie z baza danych
-      $this->access = require PATH_ACCESS;// obiekt do sprawdzania dostepu
-      $this->getData = require PATH_GET_DATA;// obiekt do pobierania danych
-
-
+        $this->conn = $conn;
+        $this->procedureSql = $procedureSql;
+        $this->getData = $getData;
+        $this->access = $access;
+     
     }
-    public function getAdminSystem(...$args): array
+
+    public function readAdminSystem(...$args): array
     {
         $idUsers = $this->access->sprawdzSesje();
         $this->access->sprawdzAktywneKonto($idUsers);
@@ -36,7 +24,10 @@ class AdminSystem
         $table = 'users';
         $column = 'role';
         $value = 'admin system';
-        $data = [];
+
+        // Przykład użycia nowego modułu
+        // $this->setData->updateSomeValue(1, 'New Role');
+
         $data = $this->getData->get_records_by_value($table, $column, $value);
 
         return [
@@ -45,87 +36,5 @@ class AdminSystem
             'data' => $data,
         ];
     }
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-//====
-
-//==================
-// Pobranie danych wejściowych z JSON (dla fetch) oraz $_REQUEST (dla tradycyjnych form)
-$inputData = json_decode(file_get_contents('php://input'), true) ?? [];
-
-function getRequestMethodName(): string
-{
-    global $inputData;
-    return (string) ($inputData['method'] ?? $_REQUEST['method'] ?? '');
-}
-
-function getRequestArguments(): array
-{
-    global $inputData;
-    $arguments = $inputData['arguments'] ?? $_REQUEST['args'] ?? [];
-
-    if (is_string($arguments)) {
-        $decodedArguments = json_decode($arguments, true);
-
-        return is_array($decodedArguments) ? $decodedArguments : [$arguments];
-    }
-
-    return is_array($arguments) ? $arguments : [];
-}
-
-function canCallMethod(object $object, string $method): bool
-{
-    if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $method) || !method_exists($object, $method)) {
-        return false;
-    }
-
-    $reflection = new ReflectionMethod($object, $method);
-
-    return $reflection->isPublic();
-}
-
-function jsonResponse($data): void
-{
-    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-}
-
-header('Content-Type: application/json; charset=utf-8');
-
-$handler = new AdminSystem();
-$method = getRequestMethodName();
-
-if (!canCallMethod($handler, $method)) {
-    jsonResponse([
-        'status' => false,
-        'message' => 'no method',
-    ]);
-
-    exit;
-}
-
-try {
-    jsonResponse(call_user_func_array([$handler, $method], getRequestArguments()));
-} catch (Throwable $exception) {
-    jsonResponse([
-        'status' => false,
-        'message' => $exception->getMessage(),
-    ]);
-}
+return AdminSystem::class;

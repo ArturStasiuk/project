@@ -13,29 +13,30 @@ class Api{
     }
     /** pobiera wszystkie dane sesji uzytkownika */
     async getSessionData() {
-        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'getSessionData', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { tool: 'Auth', method: 'getSessionData', arguments: {} });
     }
     /** pobranie  jezyka dla zalogowanego uzytkownka */
     async getLanguageUser() {
-        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'getLanguageUser', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { tool: 'Auth', method: 'getLanguageUser', arguments: {} });
     }
     /** logowanie uzytkownika */
     async login(data) {
-        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'loginUser', arguments: data });
+        return await this.responseApi(this.urlProcedurePhp, { tool: 'Auth', method: 'loginUser', arguments: data });
     }
     /** wylogowanie uzytkownika */
     async logout() {
-        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'logout', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { tool: 'Auth', method: 'logout', arguments: {} });
     }
     /** ladowanie prywatnych modulow systemu */
     async loadPrivateModules() {
-        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'loadPrivateModules', arguments: {} });
+        return await this.responseApi(this.urlProcedurePhp, { tool: 'Modules', method: 'loadPrivateModules', arguments: {} });
     }
 
     /** pobranie listy administratorów systemu */
-    async getAdminSystem() {
-        return await this.responseApi(this.urlProcedurePhp, { procedurePhp: 'getAdminSystem', arguments: {} });
+    async readAdminSystem() {
+        return await this.responseApi(this.urlProcedurePhp, { tool: 'AdminSystem', method: 'readAdminSystem', arguments: {} });
     }
+
 
 
 
