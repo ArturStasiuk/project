@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+// Inicjalizacja stałych ścieżek
+require_once __DIR__ . '/bootstrap.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -38,10 +41,8 @@ set_error_handler(static function (int $severity, string $message, string $file,
  * - blad techniczny: { "error": "..." }
  */
 try {
-    // dolaczenie pliku oblugi procedur w sql
-    require_once __DIR__ . '/procedure/procedure_sql.php';
-    // dolaczenie procedur w php
-    require_once __DIR__ . '/procedure/procedure_php.php';
+    require_once PATH_PROCEDURES_SQL;
+    require_once PATH_PROCEDURES_PHP;
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
@@ -131,11 +132,12 @@ if (!is_array($arguments)) {
 }
 $arguments = array_values($arguments);
 
+$result = null;
 try {
     if ($procedureType === 'php') {
         $result = $procedurePhp->{$procedureName}(...$arguments);
     } else {
-       //  $result = $procedureSql->{$procedureName}(...$arguments);
+      //  $result = $procedureSql->{$procedureName}(...$arguments);
     }
     echo json_encode($result, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {

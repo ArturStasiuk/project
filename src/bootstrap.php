@@ -16,3 +16,5 @@ define('PATH_PROCEDURES_SQL', __DIR__ . '/procedure/procedure_sql.php');
 define('PATH_ACCESS', __DIR__ . '/modules/access.php');
 // sciezka do pliku get_data.php
 define('PATH_GET_DATA', __DIR__ . '/modules/get_data.php');
+// sciezka do pliku loadPrivateModules.php
+define('PATH_LOAD_PRIVATE_MODULES', __DIR__ . '/modules/loadPrivateModules.php');

@@ -1,7 +1,19 @@
 <?php
 // ostatnia aktualizacja: 10.05.2026
 // wywolywanie procedur skladowych w bazie danych
-$conn = require __DIR__ . '/../connect/connect.php';
+
+/**
+ * Dynamiczne szukanie bootstrapa (dla wywołań bezpośrednich)
+ */
+$currentDir = __DIR__;
+while ($currentDir !== dirname($currentDir) && !file_exists($currentDir . '/src/bootstrap.php')) {
+    $currentDir = dirname($currentDir);
+}
+if (file_exists($currentDir . '/src/bootstrap.php')) {
+    require_once $currentDir . '/src/bootstrap.php';
+}
+
+$conn = require PATH_CONNECT;
 // sprawdzenie czy polaczenie z baza danych jest poprawne
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
