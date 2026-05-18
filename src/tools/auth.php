@@ -3,11 +3,13 @@ class Auth {
     private $conn;
     private $procedureSql;
     private $access;
+    private $constructorArgs;
 
-    public function __construct($conn, $procedureSql, $getData, $access) {
+    public function __construct($conn, $procedureSql, $getData, $access, ...$args) {
         $this->conn = $conn;
         $this->procedureSql = $procedureSql;
         $this->access = $access;
+        $this->constructorArgs = $args;
     }
 
     public function getSessionData() {

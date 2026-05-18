@@ -23,8 +23,8 @@ class AdminSystem{
     // dodanie ikony na pulpicie
     //  await this.view.addIcon(await this.config.getDesktopIcon());
         //  wywolanie pliku admin_system.php z metoda getAdminSystem
-        await this.api.AdminSystem('AdminSystem', 'getAdminSystem', {});
-    
+        const args = {};
+        await this.api.AdminSystem('AdminSystem', 'getAdminSystem', args);
     
      
       

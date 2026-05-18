@@ -4,10 +4,12 @@ require_once PATH_LOAD_PRIVATE_MODULES;
 class Modules {
     private $procedureSql;
     private $access;
+    private $constructorArgs;
 
-    public function __construct($conn, $procedureSql, $getData, $access) {
+    public function __construct($conn, $procedureSql, $getData, $access, ...$args) {
         $this->procedureSql = $procedureSql;
         $this->access = $access;
+        $this->constructorArgs = $args;
     }
 
     public function loadPrivateModules() {

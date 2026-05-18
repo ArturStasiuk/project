@@ -6,13 +6,15 @@ class AdminSystem
     private $getData;
 
     private $procedureSql;
+    private $constructorArgs;
 
-    public function __construct($conn, $procedureSql, $getData, $access, )
+    public function __construct($conn, $procedureSql, $getData, $access, ...$args)
     {
         $this->conn = $conn;
         $this->procedureSql = $procedureSql;
         $this->getData = $getData;
         $this->access = $access;
+        $this->constructorArgs = $args;
      
     }
 
@@ -24,16 +26,13 @@ class AdminSystem
         $table = 'users';
         $column = 'role';
         $value = 'admin system';
-
-        // Przykład użycia nowego modułu
-        // $this->setData->updateSomeValue(1, 'New Role');
-
         $data = $this->getData->get_records_by_value($table, $column, $value);
-
+        $dat1 = $this->getData->get_records_by_value('company', 'name', 'administracja systemu');
         return [
             'status' => true,
             'message' => 'success',
-            'data' => $data,
+            'admin_sytemu' => $data,
+            'company_data' => $dat1,
         ];
     }
 }

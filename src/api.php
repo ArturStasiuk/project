@@ -97,7 +97,7 @@ try {
     if (!is_object($toolClass)) {
         // Jeśli plik nie zwraca obiektu, próbujemy go zainicjować (zakładając nazwę klasy zgodną z plikiem)
         if (class_exists($toolName)) {
-            $toolInstance = new $toolName($conn, $procedureSql, $ReadData, $access);
+            $toolInstance = new $toolName($conn, $procedureSql, $ReadData, $access, ...$arguments);
         } else {
             throw new Exception("Tool class $toolName not found.");
         }
