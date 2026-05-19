@@ -12,6 +12,7 @@ class System {
         this.logut = logut;// tool do wylogowywania
         this.privateModules = new Map();// zaladowane prywatne moduly
       //  this.init();// inicjalizacja systemu
+        
     
     }
 
@@ -22,7 +23,8 @@ class System {
        // sprwdzenie stanu logowania 
       const odp = await this.api.getSessionData();
        if(odp.data.id) {
-        // ladowanie systemu po zalogowaniu
+        // ladowanie systemu po zalogowaniu uzytkownika
+         // console.log(odp);
           await this.loadSystemLoggedIn();
 
        }
@@ -34,24 +36,27 @@ class System {
 
     /** Ustawia window.dataSystem.language i window.dataSystem.launge z API oraz LAUNGE_LOGIN. */
     async loadLanguageUser() {
+     
         const res = await this.api.getLanguageUser();
+       
         const raw = res?.language ?? res?.data?.language ?? 'English';
         const supported = Object.keys(LAUNGE_LOGIN);
         const code = supported.includes(raw) ? raw : 'English';
         window.dataSystem.language = code;
-        window.dataSystem.launge = LAUNGE_LOGIN[code];
+        window.dataSystem.lauguage = LAUNGE_LOGIN[code];
     }
 
     // ladowanie systeu po gdy zalogowany uzytkownik
-    async loadSystemLoggedIn(){
-        console.log("ladowanie systemu po zalogowaniu");
-        // ladowanie jezyka
-        await this.loadLanguageUser();
+    async loadSystemLoggedIn() {
+      //  console.log(window.dataSystem);
+       //    console.log(userData);
+       // await this.api.sendData( 'Auth',  'getSessionData', {});
+       // await this.loadLanguageUser();
         // tools wylogowywania
         await this.logut.init();
         // ladowanie prywatnych modulow systemu
-        const modulesResponse = await this.api.loadPrivateModules();
-        await this.loadPrivateModules(modulesResponse);
+      //  const modulesResponse = await this.api.loadPrivateModules();
+// await this.loadPrivateModules(modulesResponse);
 
     }
 
@@ -92,13 +97,13 @@ class System {
 
         window.dataSystem.privateModules = loadedModuleNames;
     }
-
+     // ladowanie konfiguracji systemu po zalogowaniu  ;
 
     
     // ladowanie systemu po nie zalogowaniu
     async loadSystemLoggedOut(){
         // ladowanie jezyka
-        await this.loadLanguageUser();
+       // await this.loadLanguageUser();
 
 
 

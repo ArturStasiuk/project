@@ -37,8 +37,7 @@ if ($bootstrap['action'] === 'error') {
 
 <script>
 const dataSystem = {
-    language: null,
-    launge: null,
+    user: null , 
     privateModules: [],
 }
 window.dataSystem = dataSystem;

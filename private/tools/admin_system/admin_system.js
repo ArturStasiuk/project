@@ -12,10 +12,12 @@ class AdminSystem{
         this.api = api;
         this.config = config;
         this.view = view;
+
   
         this.init();
     }
     async init(){
+    console.log(window.dataSystem);
     // dodanie ikony na pasku zadan
      // await this.view.addTaskbarItem(await this.config.getTasbarItem());
     // dodanie ikony na pasku menu start
@@ -24,7 +26,10 @@ class AdminSystem{
     //  await this.view.addIcon(await this.config.getDesktopIcon());
         //  wywolanie pliku admin_system.php z metoda getAdminSystem
         const args = {};
-        await this.api.AdminSystem('AdminSystem', 'getAdminSystem', args);
+        await this.api.sendData('AdminSystem', 'getAdminSystem', args);
+
+        await this.view.addWindow(await this.config.getWindowConfig());
+       // console.log(this.lang);
     
      
       
